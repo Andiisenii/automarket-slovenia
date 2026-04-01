@@ -1,18 +1,22 @@
 // API Configuration
-// Exports dynamic API_URL that works for both localhost and tunnels
+// Uses environment variable for production, falls back to localhost for development
 
-// Get API URL based on current hostname
 const getApiBaseUrl = () => {
+  // Production Vercel API URL
+  if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  
+  // Localhost development
   if (typeof window !== 'undefined') {
     const host = window.location.hostname;
-    // For tunnels (Pinggy, ngrok, etc.) use full URL
-    if (host.includes('run.pinggy-free.link') || 
-        host.includes('ngrok') ||
-        host.includes('tunnel')) {
+    // For tunnels
+    if (host.includes('run.pinggy-free.link') || host.includes('ngrok') || host.includes('tunnel')) {
       return `${window.location.protocol}//${host}/api`;
     }
   }
-  // For localhost, use relative path so Vite proxy works
+  
+  // Default to localhost for development
   return '/api';
 };
 
