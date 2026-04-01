@@ -37,11 +37,11 @@ export function PaymentPage() {
     }
   }, [carDataParam, location.state])
   
-  // Fetch packages from API
+  // Fetch packages from API - re-fetch when page becomes visible
   useEffect(() => {
     const fetchPackages = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost/api'}/packages.php`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost/api'}/packages.php?_=${Date.now()}`, {
           headers: { 'X-Pinggy-No-Screen': 'true' }
         })
         const data = await res.json()
@@ -81,6 +81,15 @@ export function PaymentPage() {
       }
     }
     fetchPackages()
+    
+    // Re-fetch when page becomes visible again (e.g., after admin changes)
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        fetchPackages()
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibility)
+    return () => document.removeEventListener('visibilitychange', handleVisibility)
   }, [])
   
   // Check if user is business
