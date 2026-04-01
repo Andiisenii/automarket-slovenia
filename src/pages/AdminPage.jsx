@@ -63,21 +63,15 @@ const DEMO_DATA = {
   }
 }
 
-// API helper with fallback
-const getAdminHeaders = () => {
-  const token = localStorage.getItem('automarket_admin_token') || localStorage.getItem('admin_token') || ''
-  return {
-    'Content-Type': 'application/json',
-    'X-Pinggy-No-Screen': 'true',
-    'X-Admin-Token': token
-  }
-}
+// API helper - uses token as query param because Vite proxy strips headers
+const getAdminToken = () => localStorage.getItem('automarket_admin_token') || localStorage.getItem('admin_token') || ''
 
 const api = {
   get: async (action) => {
     try {
-      const res = await fetch(`${API_URL}/admin.php?action=${action}`, {
-        headers: getAdminHeaders()
+      const token = getAdminToken()
+      const res = await fetch(`${API_URL}/admin.php?action=${action}&admin_token=${encodeURIComponent(token)}`, {
+        headers: { 'X-Pinggy-No-Screen': 'true' }
       })
       const data = await res.json()
       return data
@@ -88,9 +82,10 @@ const api = {
   },
   post: async (action, data) => {
     try {
-      const res = await fetch(`${API_URL}/admin.php?action=${action}`, {
+      const token = getAdminToken()
+      const res = await fetch(`${API_URL}/admin.php?action=${action}&admin_token=${encodeURIComponent(token)}`, {
         method: 'POST',
-        headers: getAdminHeaders(),
+        headers: { 'Content-Type': 'application/json', 'X-Pinggy-No-Screen': 'true' },
         body: JSON.stringify(data)
       })
       return await res.json()
@@ -194,12 +189,11 @@ export default function AdminPage() {
     if (!editingPackage) return
     try {
       const token = localStorage.getItem('automarket_admin_token') || ''
-      const res = await fetch(`${API_URL}/admin.php?action=update_package`, {
+      const res = await fetch(`${API_URL}/admin.php?action=update_package&admin_token=${encodeURIComponent(token)}`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json', 
-          'X-Pinggy-No-Screen': 'true',
-          'X-Admin-Token': token
+          'X-Pinggy-No-Screen': 'true'
         },
         body: JSON.stringify({ ...editForm, id: editingPackage.id, type: editingPackage.type })
       })
