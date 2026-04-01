@@ -1,0 +1,360 @@
+import { useState, useEffect, useRef, useMemo } from 'react'
+import { useSearchParams } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Search, X, ChevronDown, Check, Plus } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
+import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes } from '@/lib/data'
+import { useCars } from '@/lib/CarContext'
+import { useLanguage } from '@/lib/LanguageContext'
+
+export function SearchFilters({ onSearch, onClear }) {
+  const { t, language } = useLanguage()
+  const isSl = language === 'sl'
+  const { cars } = useCars()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const dropdownRef = useRef(null)
+  
+  // Get dynamic brands from API + saved custom brands
+  const [allBrands, setAllBrands] = useState([])
+  const [allCities, setAllCities] = useState([])
+  const [brandModels, setBrandModels] = useState({})
+  
+  // Load saved custom brands and models
+  useEffect(() => {
+    const savedBrands = JSON.parse(localStorage.getItem('automarket_custom_brands') || '{}')
+    const savedCities = JSON.parse(localStorage.getItem('automarket_custom_cities') || '[]')
+    
+    const fetchData = async () => {
+      try {
+        const brands = await getAllBrands()
+        const combinedBrands = [...new Set([...(brands || []), ...Object.keys(savedBrands)])]
+        setAllBrands(combinedBrands)
+        
+        const cities = await getAllCities()
+        const combinedCities = [...new Set([...(cities || []), ...savedCities])]
+        setAllCities(combinedCities)
+      } catch (error) {
+        console.error('Error fetching data:', error)
+        // Fallback to static data
+        setAllBrands(Object.keys(savedBrands).length > 0 ? Object.keys(savedBrands) : ['Audi', 'BMW', 'Mercedes-Benz', 'Volkswagen', 'Toyota'])
+        setAllCities(savedCities.length > 0 ? savedCities : ['Ljubljana', 'Maribor', 'Koper', 'Celje'])
+      }
+    }
+    fetchData()
+  }, [])
+  
+  // Fetch models when brand changes
+  useEffect(() => {
+    const fetchModels = async () => {
+      if (filters.brand && !brandModels[filters.brand]) {
+        const models = await getModelsForBrand(filters.brand)
+        setBrandModels(prev => ({ ...prev, [filters.brand]: models }))
+      }
+    }
+    fetchModels()
+  }, [filters.brand])
+  
+  const initialCity = searchParams.get('city') || ''
+  const initialBrand = searchParams.get('brand') || ''
+  const initialModels = searchParams.getAll('model') || []
+  
+  const [filters, setFilters] = useState({
+    search: searchParams.get('q') || '',
+    brand: initialBrand,
+    models: initialModels,
+    city: initialCity,
+    minPrice: searchParams.get('minPrice') || '',
+    maxPrice: searchParams.get('maxPrice') || '',
+    minYear: searchParams.get('minYear') || '',
+    maxYear: searchParams.get('maxYear') || '',
+    fuelType: searchParams.get('fuelType') || '',
+    transmission: searchParams.get('transmission') || '',
+    bodyType: searchParams.get('bodyType') || '',
+  })
+  
+  // Get available models for selected brand
+  const availableModels = filters.brand ? (brandModels[filters.brand] || []) : []
+  
+  const [openDropdown, setOpenDropdown] = useState(null)
+  
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpenDropdown(null)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+  
+  const handleChange = (key, value) => {
+    setFilters(prev => {
+      const newFilters = { ...prev, [key]: value }
+      
+      // Clear models when brand changes
+      if (key === 'brand' && value !== prev.brand) {
+        newFilters.models = []
+      }
+      return newFilters
+    })
+    
+    // For search field, use 'q' in URL
+    if (key === 'search') {
+      if (value) {
+        searchParams.set('q', value)
+      } else {
+        searchParams.delete('q')
+      }
+    } else if (key === 'brand') {
+      if (value) {
+        searchParams.set('brand', value)
+      } else {
+        searchParams.delete('brand')
+      }
+      // Clear model params when brand changes
+      searchParams.delete('model')
+    } else if (key === 'models') {
+      // For models, we handle separately in toggleModel
+      searchParams.delete('model')
+      if (value.length > 0) {
+        value.forEach(m => searchParams.append('model', m))
+      }
+    } else {
+      if (value) {
+        searchParams.set(key, value)
+      } else {
+        searchParams.delete(key)
+      }
+    }
+    setSearchParams(searchParams)
+  }
+  
+  // Handle multi-select model toggle
+  const toggleModel = (model) => {
+    const currentModels = filters.models || []
+    let newModels
+    if (currentModels.includes(model)) {
+      newModels = currentModels.filter(m => m !== model)
+    } else {
+      newModels = [...currentModels, model]
+    }
+    handleChange('models', newModels)
+  }
+  
+  // Clear all models
+  const clearModels = () => {
+    handleChange('models', [])
+  }
+  
+  const toggleDropdown = (name) => {
+    setOpenDropdown(openDropdown === name ? null : name)
+  }
+  
+  const selectOption = (key, value) => {
+    handleChange(key, value)
+    setOpenDropdown(null)
+  }
+  
+  const handleSearch = () => {
+    onSearch?.(filters)
+  }
+  
+  const handleClear = () => {
+    const cleared = Object.keys(filters).reduce((acc, key) => {
+      acc[key] = key === 'models' ? [] : ''
+      return acc
+    }, {})
+    setFilters(cleared)
+    searchParams.forEach((_, key) => searchParams.delete(key))
+    setSearchParams(searchParams)
+    onClear?.()
+  }
+  
+  const activeFiltersCount = Object.values(filters).filter(v => v).length
+  
+  // Reusable dropdown component with scroll
+  const FilterDropdown = ({ label, name, value, options }) => (
+    <div className="relative" ref={name === openDropdown ? dropdownRef : null}>
+      <button
+        onClick={() => toggleDropdown(name)}
+        className={`w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-left flex items-center justify-between hover:bg-gray-50 transition-colors text-sm ${!value ? 'text-gray-400' : ''}`}
+      >
+        <span className="truncate">{value || label}</span>
+        <ChevronDown className={`w-4 h-4 ml-2 flex-shrink-0 transition-transform ${openDropdown === name ? 'rotate-180' : ''}`} />
+      </button>
+      <AnimatePresence>
+        {openDropdown === name && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="absolute z-20 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-[200px] overflow-y-auto"
+          >
+            <button
+              onClick={() => selectOption(name, '')}
+              className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 transition-colors flex items-center gap-2 ${!value ? 'bg-primary-50 text-primary-700 font-medium' : ''}`}
+            >
+              All
+              {!value && <Check className="w-4 h-4 ml-auto" />}
+            </button>
+            {options.map((opt) => (
+              <button
+                key={opt}
+                onClick={() => selectOption(name, opt)}
+                className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 transition-colors flex items-center gap-2 ${value === opt ? 'bg-primary-50 text-primary-700 font-medium' : ''}`}
+              >
+                {opt}
+                {value === opt && <Check className="w-4 h-4 ml-auto" />}
+              </button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+  
+  // Multi-select Model Filter
+  const ModelFilter = () => {
+    if (!filters.brand || availableModels.length === 0) return null
+    
+    return (
+      <div className="relative" ref={openDropdown === 'model' ? dropdownRef : null}>
+        <button
+          onClick={() => toggleDropdown('model')}
+          className={`w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-left flex items-center justify-between hover:bg-gray-50 transition-colors text-sm ${filters.models?.length > 0 ? 'text-gray-700' : 'text-gray-400'}`}
+        >
+          <span className="truncate">
+            {filters.models?.length > 0 
+              ? `${filters.models.length} model${filters.models.length > 1 ? 's' : ''} selected`
+              : 'Model'}
+          </span>
+          <ChevronDown className={`w-4 h-4 ml-2 flex-shrink-0 transition-transform ${openDropdown === 'model' ? 'rotate-180' : ''}`} />
+        </button>
+        <AnimatePresence>
+          {openDropdown === 'model' && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="absolute z-20 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-[200px] overflow-y-auto"
+            >
+              <div className="px-3 py-2 border-b border-gray-100 flex items-center justify-between">
+                <span className="text-xs text-gray-500">{availableModels.length} models available</span>
+                {filters.models?.length > 0 && (
+                  <button onClick={clearModels} className="text-xs text-primary-600 hover:text-primary-700">
+                    Clear all
+                  </button>
+                )}
+              </div>
+              {availableModels.map((model) => (
+                <button
+                  key={model}
+                  onClick={() => toggleModel(model)}
+                  className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 transition-colors flex items-center gap-2 ${filters.models?.includes(model) ? 'bg-primary-50 text-primary-700 font-medium' : ''}`}
+                >
+                  {model}
+                  {filters.models?.includes(model) && <Check className="w-4 h-4 ml-auto" />}
+                </button>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    )
+  }
+  
+  // Get dynamic cities - use state from API
+  const cityOptions = allCities.length > 0 ? allCities : []
+  
+  return (
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+      {/* Main Search Bar */}
+      <div className="flex flex-col md:flex-row gap-4 mb-4">
+        <div className="flex-1 relative">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search by make, model, or keyword..."
+            value={filters.search}
+            onChange={(e) => handleChange('search', e.target.value)}
+            className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+          />
+        </div>
+        
+        <div className="flex gap-2">
+          {activeFiltersCount > 0 && (
+            <button onClick={handleClear} className="px-4 py-2 text-gray-500 hover:text-gray-700">
+              <X className="w-4 h-4 mr-1 inline" />
+              Clear ({activeFiltersCount})
+            </button>
+          )}
+          <button onClick={handleSearch} className="px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors font-semibold">
+            Search
+          </button>
+        </div>
+      </div>
+      
+      {/* Filter Dropdowns */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3" ref={dropdownRef}>
+        {/* City */}
+        <FilterDropdown label="City" name="city" value={filters.city} options={cityOptions} />
+        
+        {/* Brand */}
+        <FilterDropdown label="Brand" name="brand" value={filters.brand} options={allBrands} />
+        
+        {/* Model - Shows only when brand is selected */}
+        <ModelFilter />
+        
+        {/* Fuel Type */}
+        <FilterDropdown label="Fuel" name="fuelType" value={filters.fuelType} options={fuelTypes} />
+        
+        {/* Transmission */}
+        <FilterDropdown label="Transmission" name="transmission" value={filters.transmission} options={transmissions} />
+        
+        {/* Body Type */}
+        <FilterDropdown label="Body" name="bodyType" value={filters.bodyType} options={bodyTypes} />
+      </div>
+      
+      {/* Price and Year Range with INPUTS */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3 pt-3 border-t border-gray-100">
+        <div className="flex items-center gap-2">
+          <input
+            type="number"
+            placeholder="Min Price (EUR)"
+            value={filters.minPrice}
+            onChange={(e) => handleChange('minPrice', e.target.value)}
+            className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <input
+            type="number"
+            placeholder="Max Price (EUR)"
+            value={filters.maxPrice}
+            onChange={(e) => handleChange('maxPrice', e.target.value)}
+            className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <input
+            type="number"
+            placeholder="From Year"
+            value={filters.minYear}
+            onChange={(e) => handleChange('minYear', e.target.value)}
+            className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <input
+            type="number"
+            placeholder="To Year"
+            value={filters.maxYear}
+            onChange={(e) => handleChange('maxYear', e.target.value)}
+            className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
