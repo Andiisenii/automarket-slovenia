@@ -210,15 +210,23 @@ export default function AdminPage() {
   const savePackage = async () => {
     if (!editingPackage) return
     try {
+      const token = localStorage.getItem('automarket_admin_token') || ''
       const res = await fetch(`${API_URL}/admin.php?action=update_package`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Pinggy-No-Screen': 'true' },
+        headers: { 
+          'Content-Type': 'application/json', 
+          'X-Pinggy-No-Screen': 'true',
+          'X-Admin-Token': token
+        },
         body: JSON.stringify({ ...editForm, id: editingPackage.id, type: editingPackage.type })
       })
       const result = await res.json()
       if (result.success) {
         await loadData()
         setEditingPackage(null)
+        alert(isSl ? 'Paketi u ruajt me sukses!' : 'Package saved successfully!')
+      } else {
+        alert(result.message || (isSl ? 'Gabim gjatë ruajtjes' : 'Error saving'))
       }
     } catch (e) {
       console.error('Save package error:', e)

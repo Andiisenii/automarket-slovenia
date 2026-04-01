@@ -31,83 +31,26 @@ export default function AdminLoginPage() {
         body: JSON.stringify({ 
           action: 'login', 
           email, 
-          password,
-          is_admin: true 
-        }),
-        mode: 'cors'
+          password 
+        })
       })
       
-      console.log('Admin login response:', response.status)
+      const data = await response.json()
       
-      if (response.status === 200 || response.status === 404) {
-        // Try to get JSON - if 404, will throw
-        try {
-          const data = await response.json()
-          console.log('User object:', JSON.stringify(data.user))
-          console.log('Response data:', data)
-          
-          // Check if it's a valid login (user exists, is admin)
-          console.log('Checking login:', data.success, data.user)
-          if (data.success && data.user) {
-            console.log('Setting admin storage...')
-            localStorage.setItem('admin_token', 'admin_token_' + Date.now())
-            localStorage.setItem('admin_user', JSON.stringify({ 
-              email: data.user.email, 
-              role: 'admin',
-              name: data.user.name
-            }))
-            window.location.href = '/admin-panel'
-          } else {
-            // User exists but not admin - use demo admin instead
-            if (email === 'admin@automarket.si' && password === 'admin123') {
-              console.log('Setting admin storage...')
-            localStorage.setItem('admin_token', 'demo_admin_token_' + Date.now())
-              localStorage.setItem('admin_user', JSON.stringify({ 
-                email: 'admin@automarket.si', 
-                role: 'admin',
-                name: 'Admin'
-              }))
-              window.location.href = '/admin-panel'
-            } else {
-              setError(isSl ? 'Niste administrator' : 'Not an administrator')
-            }
-          }
-        } catch (jsonErr) {
-          // Not JSON - use demo mode for admin
-          if (email === 'admin@automarket.si' && password === 'admin123') {
-            console.log('Setting admin storage...')
-            localStorage.setItem('admin_token', 'demo_admin_token_' + Date.now())
-            localStorage.setItem('admin_user', JSON.stringify({ 
-              email: 'admin@automarket.si', 
-              role: 'admin',
-              name: 'Admin'
-            }))
-            window.location.href = '/admin-panel'
-          } else {
-            setError(isSl ? 'Neveljavni podatki za prijavo' : 'Invalid login credentials')
-          }
-        }
+      if (data.success && data.user && data.user.role === 'admin') {
+        const token = 'admin_' + Date.now()
+        localStorage.setItem('automarket_admin_token', token)
+        localStorage.setItem('automarket_admin_user', JSON.stringify(data.user))
+        navigate('/admin')
       } else {
-        throw new Error(`HTTP ${response.status}`)
+        setError(isSl ? 'Neveljaven email ali geslo' : 'Invalid email or password')
       }
     } catch (err) {
       console.error('Login error:', err)
-      // On any error, fallback to demo admin
-      if (email === 'admin@automarket.si' && password === 'admin123') {
-        console.log('Setting admin storage...')
-            localStorage.setItem('admin_token', 'demo_admin_token_' + Date.now())
-        localStorage.setItem('admin_user', JSON.stringify({ 
-          email: 'admin@automarket.si', 
-          role: 'admin',
-          name: 'Admin'
-        }))
-        window.location.href = '/admin-panel'
-      } else {
-        setError(isSl ? 'Napaka pri povezavi' : 'Connection error')
-      }
+      setError(isSl ? 'Napaka pri povezavi' : 'Connection error')
+    } finally {
+      setLoading(false)
     }
-    
-    setLoading(false)
   }
 
   const goBack = () => navigate('/')
@@ -125,7 +68,7 @@ export default function AdminLoginPage() {
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl mb-4 shadow-lg">
               <Shield className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-white">{isSl ? 'Admin Panel' : 'Admin Panel'}</h1>
+            <h1 className="text-2xl font-bold text-white">Admin Panel</h1>
             <p className="text-slate-400 mt-2">{isSl ? 'Prijava za administratorje' : 'Administrator login'}</p>
           </div>
 
