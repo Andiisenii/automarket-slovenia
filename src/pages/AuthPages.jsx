@@ -258,8 +258,9 @@ export function RegisterPage() {
     setCountryCode(code)
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
+    setError('')
     if (!name || !surname || !email || !password) {
       setError('Prosim izpolnite vsa polja')
       return
@@ -267,24 +268,22 @@ export function RegisterPage() {
     const fullName = `${name} ${surname}`
 
     // Register user with selected user type
-    const result = register({
-      name: fullName,
-      username: username || fullName.replace(/\s+/g, '_').toLowerCase(),
-      phone: countryCode + ' ' + phone,
-      email,
-      password,
-      role: 'buyer',
-      userType: userType
-    })
+    try {
+      const result = await register({
+        name: fullName,
+        username: username || fullName.replace(/\s+/g, '_').toLowerCase(),
+        phone: countryCode + ' ' + phone,
+        email,
+        password,
+        role: 'buyer',
+        userType: userType
+      })
 
-    // Check for registration error
-    if (result?.error) {
-      setError(result.error)
-      return
+      // Redirect to dashboard after successful registration
+      navigate('/dashboard')
+    } catch (e) {
+      setError(e.message)
     }
-
-    // Redirect to dashboard after successful registration
-    navigate('/dashboard')
   }
 
   return (
