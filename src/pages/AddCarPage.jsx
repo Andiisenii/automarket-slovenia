@@ -22,6 +22,7 @@ export function AddCarPage() {
   const [allCities, setAllCities] = useState([])
   const [brandModels, setBrandModels] = useState({})
   const [boostPackages, setBoostPackages] = useState({ private: [], business: [] })
+  const [publishingPackages, setPublishingPackages] = useState([])
   
   const [formData, setFormData] = useState({
     title: '', brand: '', model: '', year: new Date().getFullYear(),
@@ -142,7 +143,7 @@ export function AddCarPage() {
     }
   }, [editCar])
 
-  // Fetch boost packages from API
+  // Fetch packages from API
   useEffect(() => {
     const fetchPackages = async () => {
       try {
@@ -151,6 +152,17 @@ export function AddCarPage() {
         })
         const data = await res.json()
         if (data.success && data.packages) {
+          // Set publishing packages with discount info
+          setPublishingPackages(data.packages.filter(p => p.type === 'publishing').map(p => ({
+            id: p.id,
+            name: p.name,
+            name_sl: p.name_sl || p.name,
+            price: parseFloat(p.price),
+            discount_percent: parseInt(p.discount_percent) || 0,
+            discount_active: p.discount_active == 1,
+            min_days: p.min_days || 30
+          })))
+          
           setBoostPackages({
             private: data.packages.filter(p => p.type === 'boost_private').map(p => ({
               id: p.id,
