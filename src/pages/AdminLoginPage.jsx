@@ -41,7 +41,7 @@ export default function AdminLoginPage() {
         const token = 'admin_' + Date.now()
         localStorage.setItem('automarket_admin_token', token)
         localStorage.setItem('automarket_admin_user', JSON.stringify(data.user))
-        navigate('/admin')
+        navigate('/admin-panel')
       } else {
         setError(isSl ? 'Neveljaven email ali geslo' : 'Invalid email or password')
       }

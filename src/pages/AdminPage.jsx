@@ -80,15 +80,10 @@ const api = {
         headers: getAdminHeaders()
       })
       const data = await res.json()
-      // If API returns error or empty, use fallback
-      if (!data.success || !data.users?.length && !data.cars?.length) {
-        console.log(`Using fallback data for ${action}`)
-        return { success: true, ...getFallbackData(action) }
-      }
       return data
     } catch (e) {
-      console.log(`API failed for ${action}, using fallback`)
-      return { success: true, ...getFallbackData(action) }
+      console.error(`API failed for ${action}:`, e)
+      return { success: false, message: 'API error', error: e.message }
     }
   },
   post: async (action, data) => {
@@ -105,18 +100,6 @@ const api = {
   }
 }
 
-function getFallbackData(action) {
-  switch(action) {
-    case 'users': return { users: DEMO_DATA.users }
-    case 'cars': return { cars: DEMO_DATA.cars }
-    case 'purchases': return { purchases: DEMO_DATA.purchases }
-    case 'messages': return { messages: DEMO_DATA.messages }
-    case 'analytics': return DEMO_DATA.analytics
-    case 'packages': return { packages: DEMO_DATA.packages }
-    default: return {}
-  }
-}
-
 export default function AdminPage() {
   const navigate = useNavigate()
   const { language } = useLanguage()
@@ -124,8 +107,8 @@ export default function AdminPage() {
   
   // Auth check
   const [isAuthorized, setIsAuthorized] = useState(() => {
-    const adminUser = localStorage.getItem('admin_user')
-    const adminToken = localStorage.getItem('admin_token')
+    const adminUser = localStorage.getItem('automarket_admin_user')
+    const adminToken = localStorage.getItem('automarket_admin_token')
     if (!adminUser || !adminToken) return false
     try {
       const user = JSON.parse(adminUser)
