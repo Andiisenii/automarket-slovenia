@@ -144,7 +144,7 @@ export default function AdminPage() {
   
   // Package editing
   const [editingPackage, setEditingPackage] = useState(null)
-  const [editForm, setEditForm] = useState({ name: '', price: '', days: '', max_cars: '', features: '' })
+  const [editForm, setEditForm] = useState({ name: '', price: '', days: '', min_days: 1, max_cars: '', features: '', discount: 0, discount_active: false })
   
   // Load data
   const loadData = async () => {
@@ -190,8 +190,11 @@ export default function AdminPage() {
       name_en: pkg.name_en || '',
       price: pkg.price || '',
       days: pkg.days || pkg.duration_days || 30,
+      min_days: pkg.min_days || 1,
       max_cars: pkg.max_cars || '',
-      features: pkg.features || ''
+      features: pkg.features || '',
+      discount: pkg.discount_percent || 0,
+      discount_active: pkg.discount_active || false
     })
   }
   
@@ -593,10 +596,10 @@ export default function AdminPage() {
                       <button onClick={() => startEditPackage(pkg, 'publishing')} className="p-1 hover:bg-gray-100 rounded"><Edit className="w-4 h-4 text-gray-500" /></button>
                     </div>
                   </div>
-                  <p className="text-2xl font-bold text-orange-600 mb-2">{formatPrice(pkg.price)}</p>
-                  <p className="text-sm text-gray-600">{pkg.days || pkg.duration_days} {isSl ? 'dni' : 'days'}</p>
+                  <p className="text-2xl font-bold text-orange-600 mb-1">€{pkg.price}</p>
+                  <p className="text-sm text-gray-600">min {pkg.min_days} {isSl ? 'ditë' : 'days'}</p>
                   <p className="text-sm text-gray-600">{isSl ? 'Max vozila:' : 'Max cars:'} {pkg.max_cars}</p>
-                  <p className="text-xs text-gray-400 mt-2">ID: {pkg.id}</p>
+                  {pkg.discount_percent > 0 && <span className="inline-block mt-2 px-2 py-1 bg-red-100 text-red-700 text-xs rounded">{pkg.discount_percent}% {isSl ? 'zbritje' : 'discount'}</span>}
                 </Card>
               ))}
             </div>
@@ -611,10 +614,11 @@ export default function AdminPage() {
                     <div key={pkg.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                       <div>
                         <p className="font-medium">{pkg.name}</p>
-                        <p className="text-sm text-gray-500">{pkg.days} {isSl ? 'dan' : 'day'}</p>
+                        <p className="text-sm text-gray-500">€{pkg.price}/dan · min {pkg.min_days} {isSl ? 'ditë' : 'days'}</p>
+                        {pkg.discount_percent > 0 && <span className="text-xs text-red-500 font-medium">-{pkg.discount_percent}%</span>}
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-green-600">{formatPrice(pkg.price)}</span>
+                        <span className="font-bold text-green-600">€{pkg.price}</span>
                         <button onClick={() => startEditPackage(pkg, 'boost_private')} className="p-1 hover:bg-gray-200 rounded"><Edit className="w-4 h-4 text-gray-500" /></button>
                       </div>
                     </div>
@@ -629,10 +633,11 @@ export default function AdminPage() {
                     <div key={pkg.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                       <div>
                         <p className="font-medium">{pkg.name}</p>
-                        <p className="text-sm text-gray-500">{pkg.days} {isSl ? 'dni' : 'days'}</p>
+                        <p className="text-sm text-gray-500">€{pkg.price}/dan · min {pkg.min_days} {isSl ? 'ditë' : 'days'}</p>
+                        {pkg.discount_percent > 0 && <span className="text-xs text-red-500 font-medium">-{pkg.discount_percent}%</span>}
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-green-600">{formatPrice(pkg.price)}</span>
+                        <span className="font-bold text-green-600">€{pkg.price}</span>
                         <button onClick={() => startEditPackage(pkg, 'boost_business')} className="p-1 hover:bg-gray-200 rounded"><Edit className="w-4 h-4 text-gray-500" /></button>
                       </div>
                     </div>
@@ -658,13 +663,27 @@ export default function AdminPage() {
                       <label className="block text-sm font-medium mb-1">{isSl ? 'Naziv (EN)' : 'Name (EN)'}</label>
                       <input type="text" value={editForm.name_en} onChange={e => setEditForm({...editForm, name_en: e.target.value})} className="w-full p-2 border rounded" />
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-1">{isSl ? 'Cena (€)' : 'Price (€)'}</label>
-                      <input type="number" step="0.01" value={editForm.price} onChange={e => setEditForm({...editForm, price: e.target.value})} className="w-full p-2 border rounded" />
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-1">{isSl ? 'Cena (€)' : 'Price (€)'}</label>
+                        <input type="number" step="0.01" value={editForm.price} onChange={e => setEditForm({...editForm, price: e.target.value})} className="w-full p-2 border rounded" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-1">{isSl ? 'Min ditë' : 'Min days'}</label>
+                        <input type="number" value={editForm.min_days} onChange={e => setEditForm({...editForm, min_days: e.target.value})} className="w-full p-2 border rounded" />
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-1">{isSl ? 'Trajanje (dni)' : 'Duration (days)'}</label>
-                      <input type="number" value={editForm.days} onChange={e => setEditForm({...editForm, days: e.target.value})} className="w-full p-2 border rounded" />
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-1">{isSl ? 'Zbritje (%)' : 'Discount (%)'}</label>
+                        <input type="number" value={editForm.discount} onChange={e => setEditForm({...editForm, discount: e.target.value})} className="w-full p-2 border rounded" placeholder="0" />
+                      </div>
+                      <div className="flex items-end">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input type="checkbox" checked={editForm.discount_active} onChange={e => setEditForm({...editForm, discount_active: e.target.checked})} className="w-4 h-4" />
+                          <span className="text-sm">{isSl ? 'Zbritje aktive' : 'Discount active'}</span>
+                        </label>
+                      </div>
                     </div>
                     {editingPackage.type === 'publishing' && (
                       <div>
