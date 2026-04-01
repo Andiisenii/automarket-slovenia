@@ -486,6 +486,48 @@ export function AddCarPage() {
           {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
         </div>
 
+        {/* Package Pricing Preview */}
+        {publishingPackages.length > 0 && (
+          <div className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-2xl border border-orange-100 p-6 mb-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">{isSl ? 'Izbira paketa' : 'Package Options'}</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {publishingPackages.map((pkg) => {
+                const discountedPrice = pkg.discount_active && pkg.discount_percent > 0 
+                  ? pkg.price * (1 - pkg.discount_percent / 100) 
+                  : pkg.price
+                const hasDiscount = pkg.discount_active && pkg.discount_percent > 0
+                
+                return (
+                  <div key={pkg.id} className="bg-white rounded-xl p-4 border border-gray-200 relative">
+                    {hasDiscount && (
+                      <div className="absolute -top-2 -right-2 bg-red-500 text-white px-2 py-0.5 rounded-full text-xs font-bold shadow">
+                        -{pkg.discount_percent}%
+                      </div>
+                    )}
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="font-semibold text-gray-900">{pkg.name_sl || pkg.name}</p>
+                        <p className="text-sm text-gray-500">{pkg.min_days} {isSl ? 'dni' : 'days'}</p>
+                      </div>
+                      <div className="text-right">
+                        {hasDiscount ? (
+                          <>
+                            <p className="text-lg font-bold text-[#ff6a00]">€{discountedPrice.toFixed(2)}</p>
+                            <p className="text-xs text-gray-400 line-through">€{pkg.price.toFixed(2)}</p>
+                          </>
+                        ) : (
+                          <p className="text-lg font-bold text-[#ff6a00]">€{pkg.price.toFixed(2)}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+            <p className="text-sm text-gray-500 mt-3">{isSl ? 'Cena velja za izbrano paketo.' : 'Final price depends on selected package.'}</p>
+          </div>
+        )}
+
         <Button type="submit" className="w-full" size="lg">
           {isEditMode ? t('saveChanges') : (canPostCar ? t('publishCar') : t('buyPackage'))}
         </Button>
