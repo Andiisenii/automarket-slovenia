@@ -149,10 +149,13 @@ export function AddCarPage() {
           headers: { 'X-Pinggy-No-Screen': 'true' }
         })
         const data = await res.json()
-        console.log('Packages fetched:', data.packages)
+        console.log('Packages fetched:', JSON.stringify(data).substring(0, 200))
         if (data.success && data.packages) {
+          const pubPkgs = data.packages.filter(p => p.type === 'publishing')
+          console.log('Publishing packages count:', pubPkgs.length, pubPkgs)
+          if (pubPkgs.length === 0) alert('No publishing packages! Check API response')
           // Set publishing packages with discount info
-          setPublishingPackages(data.packages.filter(p => p.type === 'publishing').map(p => ({
+          setPublishingPackages(pubPkgs.map(p => ({
             id: p.id,
             name: p.name,
             name_sl: p.name_sl || p.name,
