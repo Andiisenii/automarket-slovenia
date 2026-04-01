@@ -149,6 +149,7 @@ export function AddCarPage() {
           headers: { 'X-Pinggy-No-Screen': 'true' }
         })
         const data = await res.json()
+        console.log('Packages fetched:', data.packages)
         if (data.success && data.packages) {
           // Set publishing packages with discount info
           setPublishingPackages(data.packages.filter(p => p.type === 'publishing').map(p => ({
