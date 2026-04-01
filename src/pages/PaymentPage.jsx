@@ -18,6 +18,7 @@ export function PaymentPage() {
   // Get car data from location state or URL params
   const carDataParam = searchParams.get('carData')
   const [carData, setCarData] = useState(null)
+  const [boostPackagesData, setBoostPackagesData] = useState({ private: [], business: [] })
   
   useEffect(() => {
     if (carDataParam) {
@@ -34,6 +35,39 @@ export function PaymentPage() {
       navigate('/add-car')
     }
   }, [carDataParam, location.state])
+  
+  // Fetch boost packages from API
+  useEffect(() => {
+    const fetchPackages = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost/api'}/packages.php`, {
+          headers: { 'X-Pinggy-No-Screen': 'true' }
+        })
+        const data = await res.json()
+        if (data.success && data.packages) {
+          setBoostPackagesData({
+            private: data.packages.filter(p => p.type === 'boost_private').map(p => ({
+              id: p.id,
+              name: p.name,
+              price: parseFloat(p.price),
+              min_days: p.min_days || 1,
+              color: 'green'
+            })),
+            business: data.packages.filter(p => p.type === 'boost_business').map(p => ({
+              id: p.id,
+              name: p.name,
+              price: parseFloat(p.price),
+              min_days: p.min_days || 1,
+              color: 'orange'
+            }))
+          })
+        }
+      } catch (e) {
+        console.error('Error fetching packages:', e)
+      }
+    }
+    fetchPackages()
+  }, [])
   
   // Check if user is business
   const isBusiness = user?.userType === 'business'
@@ -55,8 +89,22 @@ export function PaymentPage() {
   const [cardType, setCardType] = useState('unknown')
   const [errors, setErrors] = useState({})
   
-  // Get boost packages from admin config or use defaults
+  // Get boost packages from API or use defaults
   const getBoostPackages = () => {
+    // Use API data if available
+    const packages = isBusiness ? boostPackagesData.business : boostPackagesData.private
+    if (packages.length > 0) {
+      return packages.map(p => ({
+        id: p.id,
+        name: p.name.toUpperCase(),
+        subtitles: [],
+        price: p.price || 1.00,
+        min_days: p.min_days || 1,
+        color: p.color || 'green'
+      }))
+    }
+    
+    // Fallback to localStorage
     const saved = localStorage.getItem('adminPackages')
     if (saved) {
       try {

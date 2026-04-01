@@ -21,6 +21,7 @@ export function AddCarPage() {
   const [allBrands, setAllBrands] = useState([])
   const [allCities, setAllCities] = useState([])
   const [brandModels, setBrandModels] = useState({})
+  const [boostPackages, setBoostPackages] = useState({ private: [], business: [] })
   
   const [formData, setFormData] = useState({
     title: '', brand: '', model: '', year: new Date().getFullYear(),
@@ -78,15 +79,11 @@ export function AddCarPage() {
   const editCarId = isEditMode ? parseInt(isEditMode) : null
   const editCar = editCarId ? getCarById(editCarId) : null
 
-  const boostPackages = isBusiness ? [
-    { id: 'akcija', name: 'Paket vseh cen', price: 0.75, color: 'orange' },
-    { id: 'top', name: 'Top izbira', price: 0.65, color: 'green' },
-    { id: 'skok', name: 'Skok na vrh', price: 0.50, color: 'blue' },
-  ] : [
-    { id: 'akcija', name: 'Paket vseh cen', price: 1.50, color: 'orange' },
-    { id: 'top', name: 'Top izbira', price: 1.50, color: 'green' },
-    { id: 'skok', name: 'Skok na vrh', price: 1.00, color: 'blue' },
-  ]
+  // Use boost packages from API (loaded in useEffect)
+  const getBoostPackages = () => {
+    if (isBusiness) return boostPackages.business
+    return boostPackages.private
+  }
 
   const PRICING = { basic: { monthly: 34.99 }, premium: { monthly: 64.99 }, luxuryFee: 10 }
 
@@ -144,6 +141,39 @@ export function AddCarPage() {
       }
     }
   }, [editCar])
+
+  // Fetch boost packages from API
+  useEffect(() => {
+    const fetchPackages = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost/api'}/packages.php`, {
+          headers: { 'X-Pinggy-No-Screen': 'true' }
+        })
+        const data = await res.json()
+        if (data.success && data.packages) {
+          setBoostPackages({
+            private: data.packages.filter(p => p.type === 'boost_private').map(p => ({
+              id: p.id,
+              name: p.name,
+              name_sl: p.name_sl || p.name,
+              price: parseFloat(p.price),
+              min_days: p.min_days || 1
+            })),
+            business: data.packages.filter(p => p.type === 'boost_business').map(p => ({
+              id: p.id,
+              name: p.name,
+              name_sl: p.name_sl || p.name,
+              price: parseFloat(p.price),
+              min_days: p.min_days || 1
+            }))
+          })
+        }
+      } catch (e) {
+        console.error('Error fetching packages:', e)
+      }
+    }
+    fetchPackages()
+  }, [])
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -237,7 +267,7 @@ export function AddCarPage() {
         promoted: selectedBoost ? true : false,
         hasBoost: !!selectedBoost,
         boostPackage: selectedBoost,
-        boostSpent: selectedBoost ? boostPackages.find(b => b.id === selectedBoost)?.price * boostDays : 0,
+        boostSpent: selectedBoost ? getBoostPackages().find(b => b.id === selectedBoost)?.price * boostDays : 0,
         isLuxuryCar: isLuxuryCar,
         hasFinancing: hasFinancing,
         monthlyBudget: hasFinancing ? monthlyBudget : null,
