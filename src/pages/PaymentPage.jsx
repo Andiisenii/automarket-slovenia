@@ -114,7 +114,9 @@ export function PaymentPage() {
         subtitles: [],
         price: p.price || 1.00,
         min_days: p.min_days || 1,
-        color: p.color || 'green'
+        color: p.color || 'green',
+        discount_percent: p.discount_percent || 0,
+        discount_active: p.discount_active || false
       }))
     }
     
@@ -523,35 +525,59 @@ export function PaymentPage() {
                     </div>
                     
                     <div className="grid grid-cols-1 gap-3">
-                      {boostPackages.map((boost) => (
-                        <button
-                          key={boost.id}
-                          onClick={() => setSelectedBoost(selectedBoost === boost.id ? null : boost.id)}
-                          className={`p-4 rounded-xl border-2 text-left transition-all ${
-                            selectedBoost === boost.id
-                              ? getBoostColorClasses(boost.color)
-                              : 'border-gray-200 hover:border-gray-300'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <div className="font-bold text-gray-900">{boost.name}</div>
-                              <div className="space-y-0.5 mt-1">
-                                {boost.subtitles.map((sub, idx) => (
-                                  <div key={idx} className="text-xs text-gray-500">{sub}</div>
-                                ))}
+                      {boostPackages.map((boost) => {
+                        const discountedPrice = boost.discount_active && boost.discount_percent > 0 
+                          ? boost.price * (1 - boost.discount_percent / 100) 
+                          : boost.price
+                        const hasDiscount = boost.discount_active && boost.discount_percent > 0
+                        
+                        return (
+                          <button
+                            key={boost.id}
+                            onClick={() => setSelectedBoost(selectedBoost === boost.id ? null : boost.id)}
+                            className={`p-4 rounded-xl border-2 text-left transition-all relative ${
+                              selectedBoost === boost.id
+                                ? getBoostColorClasses(boost.color)
+                                : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                          >
+                            {/* Discount Sticker */}
+                            {hasDiscount && (
+                              <div className="absolute -top-2 -right-2 bg-red-500 text-white px-2 py-0.5 rounded-full text-xs font-bold shadow">
+                                -{boost.discount_percent}%
                               </div>
-                              <div className="text-xs text-gray-400 mt-1">{boost.days}</div>
+                            )}
+                            
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <div className="font-bold text-gray-900">{boost.name}</div>
+                                <div className="space-y-0.5 mt-1">
+                                  {boost.subtitles.map((sub, idx) => (
+                                    <div key={idx} className="text-xs text-gray-500">{sub}</div>
+                                  ))}
+                                </div>
+                                <div className="text-xs text-gray-400 mt-1">{boost.days}</div>
+                              </div>
+                              <div className="text-right">
+                                <div className="text-lg font-bold text-[#ff6a00]">
+                                  {hasDiscount ? (
+                                    <>
+                                      <span className="line-through text-gray-400 text-xs mr-1">€{boost.price.toFixed(2)}</span>
+                                      <span>€{discountedPrice.toFixed(2)}</span>
+                                    </>
+                                  ) : (
+                                    <span>€{boost.price.toFixed(2)}</span>
+                                  )}
+                                  <span className="text-xs text-gray-500">/dan</span>
+                                </div>
+                                {selectedBoost === boost.id && (
+                                  <Check className="w-5 h-5 text-green-600 ml-auto mt-1" />
+                                )}
+                              </div>
                             </div>
-                            <div className="text-right">
-                              <div className="text-lg font-bold text-[#ff6a00]">€{boost.price}<span className="text-xs text-gray-500">/dan</span></div>
-                              {selectedBoost === boost.id && (
-                                <Check className="w-5 h-5 text-green-600 ml-auto mt-1" />
-                              )}
-                            </div>
-                          </div>
-                        </button>
-                      ))}
+                          </button>
+                        )
+                      })}
                     </div>
                   </motion.div>
                 )}
