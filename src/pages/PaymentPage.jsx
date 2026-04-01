@@ -19,6 +19,7 @@ export function PaymentPage() {
   const carDataParam = searchParams.get('carData')
   const [carData, setCarData] = useState(null)
   const [boostPackagesData, setBoostPackagesData] = useState({ private: [], business: [] })
+  const [publishingPackages, setPublishingPackages] = useState([])
   
   useEffect(() => {
     if (carDataParam) {
@@ -36,7 +37,7 @@ export function PaymentPage() {
     }
   }, [carDataParam, location.state])
   
-  // Fetch boost packages from API
+  // Fetch packages from API
   useEffect(() => {
     const fetchPackages = async () => {
       try {
@@ -45,6 +46,19 @@ export function PaymentPage() {
         })
         const data = await res.json()
         if (data.success && data.packages) {
+          // Set publishing packages with discount info
+          setPublishingPackages(data.packages.filter(p => p.type === 'publishing').map(p => ({
+            id: p.id,
+            name: p.name,
+            name_sl: p.name_sl || p.name,
+            price: parseFloat(p.price),
+            discount_percent: parseInt(p.discount_percent) || 0,
+            discount_active: p.discount_active == 1,
+            min_days: p.min_days || 30,
+            max_cars: p.max_cars || 100,
+            features: p.description ? p.description.split('|') : []
+          })))
+          
           setBoostPackagesData({
             private: data.packages.filter(p => p.type === 'boost_private').map(p => ({
               id: p.id,
@@ -175,50 +189,18 @@ export function PaymentPage() {
   ]
   }
   
-  // Get admin package config
-  const adminPackages = JSON.parse(localStorage.getItem('adminPackages') || 'null')
-  
   // Get boost packages
   const boostPackages = getBoostPackages()
-  
-  // Pricing - use admin config or defaults
-  const getPrice = (packageId) => {
-    if (adminPackages?.publishing) {
-      const pkg = adminPackages.publishing.find(p => p.id === packageId)
-      if (pkg) return pkg.price
-    }
-    return packageId === 'premium' ? 64.99 : 34.99
-  }
-  
-  const PRICING = {
-    basic: { 
-      monthly: getPrice('osnovni'), 
-      name: 'Osnovni paket', 
-      features: [
-        '10 fotografij',
-        'Osnovne funkcije',
-        '30 dni veljavnosti',
-        'Standardna kakovost'
-      ] 
-    },
-    premium: { 
-      monthly: getPrice('premium'), 
-      name: 'Premium paket', 
-      features: [
-        '30 fotografij',
-        'Statistika ogledov',
-        'HD slike',
-        '360° posnetki',
-        'Komentarji kupcev',
-        'Premium uvrstitev'
-      ] 
-    },
-  }
   
   // Calculate totals
   const isLuxuryCar = carData?.price > LUXURY_CAR_THRESHOLD && !isBusiness
   const luxuryFee = isLuxuryCar ? LUXURY_FEE : 0
-  const packagePrice = selectedPackage === 'premium' ? PRICING.premium.monthly : PRICING.basic.monthly
+  const selectedPkg = publishingPackages.find(p => p.id === selectedPackage)
+  const packagePrice = selectedPkg 
+    ? (selectedPkg.discount_active && selectedPkg.discount_percent > 0 
+        ? selectedPkg.price * (1 - selectedPkg.discount_percent / 100) 
+        : selectedPkg.price)
+    : 0
   const boostPrice = selectedBoost ? boostPackages.find(b => b.id === selectedBoost)?.price * boostDays : 0
   const totalPrice = packagePrice + luxuryFee + boostPrice
   
@@ -308,15 +290,17 @@ export function PaymentPage() {
     setPaymentStep('processing')
     
     setTimeout(() => {
+      // Get selected package info
+      const pkg = publishingPackages.find(p => p.id === selectedPackage) || {}
+      const pkgPrice = pkg.discount_active && pkg.discount_percent > 0 
+        ? pkg.price * (1 - pkg.discount_percent / 100)
+        : pkg.price
+      
       // Save package to database
       packageDB.setPackage({
-        packageId: selectedPackage === 'premium' ? 'premium' : 'osnovni',
-        duration: 30,
+        packageId: pkg.id || 'basic',
+        duration: pkg.min_days || 30,
       })
-      
-      // Get package price from admin config
-      const publishingPkg = adminPackages?.publishing?.find(p => p.id === (selectedPackage === 'premium' ? 'premium' : 'osnovni'))
-      const basePrice = publishingPkg?.price || (selectedPackage === 'premium' ? 64.99 : 34.99)
       
       // Save to admin purchases for tracking
       const purchase = {
@@ -324,12 +308,12 @@ export function PaymentPage() {
         userId: user?.id,
         userEmail: user?.email,
         userName: user?.name,
-        packageId: selectedPackage === 'premium' ? 'premium' : 'osnovni',
-        packageName: selectedPackage === 'premium' ? 'PREMIUM' : 'OSNOVNI',
-        price: basePrice,
-        days: 30,
+        packageId: pkg.id || selectedPackage,
+        packageName: pkg.name || selectedPackage,
+        price: pkgPrice,
+        days: pkg.min_days || 30,
         purchasedAt: new Date().toISOString(),
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        expiresAt: new Date(Date.now() + (pkg.min_days || 30) * 24 * 60 * 60 * 1000).toISOString(),
       }
       const existingPurchases = JSON.parse(localStorage.getItem('adminPurchases') || '[]')
       existingPurchases.push(purchase)
@@ -358,8 +342,8 @@ export function PaymentPage() {
         
         // Save boost purchase if selected
         if (selectedBoost && boostPrice > 0) {
-          const boostPkg = adminPackages?.boost?.[isBusiness ? 'business' : 'private']?.find(b => b.id === selectedBoost)
-          const boostActualPrice = boostPkg?.price || 1.00
+          const boostFound = boostPackages.find(b => b.id === selectedBoost)
+          const boostActualPrice = boostFound?.price || 1.00
           
           const boostPurchase = {
             id: Date.now() + 1,
@@ -457,33 +441,55 @@ export function PaymentPage() {
               
               {/* Package Selection */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                {Object.entries(PRICING).map(([key, pkg]) => (
-                  <button
-                    key={key}
-                    onClick={() => setSelectedPackage(key)}
-                    className={`p-6 rounded-2xl border-2 text-left transition-all ${
-                      selectedPackage === key
-                        ? 'border-[#ff6a00] bg-orange-50 shadow-lg'
-                        : 'border-gray-200 bg-white hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="font-bold text-lg text-gray-900">{pkg.name}</span>
-                      {selectedPackage === key && <Check className="w-5 h-5 text-[#ff6a00]" />}
-                    </div>
-                    <ul className="space-y-2 mb-4">
-                      {pkg.features.map((feature, idx) => (
-                        <li key={idx} className="text-sm text-gray-600 flex items-center gap-2">
-                          <Check className="w-4 h-4 text-green-500" />
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                    <div className="text-2xl font-bold text-[#ff6a00]">
-                      {pkg.monthly}€ <span className="text-sm font-normal text-gray-500">/mesec</span>
-                    </div>
-                  </button>
-                ))}
+                {publishingPackages.map((pkg) => {
+                  const discountedPrice = pkg.discount_active ? pkg.price * (1 - pkg.discount_percent / 100) : pkg.price
+                  const isSelected = selectedPackage === pkg.id
+                  
+                  return (
+                    <button
+                      key={pkg.id}
+                      onClick={() => setSelectedPackage(pkg.id)}
+                      className={`p-6 rounded-2xl border-2 text-left transition-all relative ${
+                        isSelected
+                          ? 'border-[#ff6a00] bg-orange-50 shadow-lg'
+                          : 'border-gray-200 bg-white hover:border-gray-300'
+                      }`}
+                    >
+                      {/* Discount Sticker */}
+                      {pkg.discount_active && pkg.discount_percent > 0 && (
+                        <div className="absolute -top-3 -right-3 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+                          -{pkg.discount_percent}%
+                        </div>
+                      )}
+                      
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="font-bold text-lg text-gray-900">{pkg.name_sl || pkg.name}</span>
+                        {isSelected && <Check className="w-5 h-5 text-[#ff6a00]" />}
+                      </div>
+                      
+                      <ul className="space-y-2 mb-4">
+                        {pkg.features.slice(0, 5).map((feature, idx) => (
+                          <li key={idx} className="text-sm text-gray-600 flex items-center gap-2">
+                            <Check className="w-4 h-4 text-green-500" />
+                            {feature.trim()}
+                          </li>
+                        ))}
+                      </ul>
+                      
+                      <div className="text-2xl font-bold text-[#ff6a00]">
+                        {pkg.discount_active && pkg.discount_percent > 0 ? (
+                          <>
+                            <span className="line-through text-gray-400 text-base mr-2">€{pkg.price.toFixed(2)}</span>
+                            <span>€{discountedPrice.toFixed(2)}</span>
+                          </>
+                        ) : (
+                          <span>€{pkg.price.toFixed(2)}</span>
+                        )}
+                        <span className="text-sm font-normal text-gray-500">/{pkg.min_days} {isSl ? 'dni' : 'days'}</span>
+                      </div>
+                    </button>
+                  )
+                })}
               </div>
               
               {/* Boost Options */}
