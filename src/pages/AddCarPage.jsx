@@ -86,8 +86,6 @@ export function AddCarPage() {
     return boostPackages.private
   }
 
-  const PRICING = { basic: { monthly: 34.99 }, premium: { monthly: 64.99 }, luxuryFee: 10 }
-
   const getMonthlyCarCount = () => {
     if (!userId) return 0
     const myCars = JSON.parse(localStorage.getItem('myListings') || '[]')

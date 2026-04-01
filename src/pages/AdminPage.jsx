@@ -11,58 +11,6 @@ import { formatPrice } from '@/lib/utils'
 import { API_URL } from '@/lib/api'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, AreaChart, Area } from 'recharts'
 
-// Fallback demo data (when API fails)
-const DEMO_DATA = {
-  users: [
-    { id: 1, name: 'Janez Novak', email: 'janez@email.si', user_type: 'private', is_verified: 1, created_at: '2024-01-15' },
-    { id: 2, name: 'Auto d.o.o.', email: 'info@auto.si', user_type: 'business', is_verified: 1, created_at: '2024-02-20' },
-    { id: 3, name: 'Marko Horvat', email: 'marko@email.si', user_type: 'private', is_verified: 0, created_at: '2024-03-10' },
-  ],
-  cars: [
-    { id: 1, title: 'BMW X5 xDrive40i', brand: 'BMW', price: 45000, status: 'active', views: 1250, seller_name: 'Janez Novak', created_at: '2024-01-20' },
-    { id: 2, title: 'Mercedes C220d', brand: 'Mercedes-Benz', price: 38000, status: 'active', views: 890, seller_name: 'Auto d.o.o.', created_at: '2024-02-15' },
-    { id: 3, title: 'Audi A6 45 TFSI', brand: 'Audi', price: 42000, status: 'sold', views: 2100, seller_name: 'Marko Horvat', created_at: '2024-03-01' },
-    { id: 4, title: 'VW Golf R', brand: 'Volkswagen', price: 35000, status: 'active', views: 650, seller_name: 'Janez Novak', created_at: '2024-03-05' },
-    { id: 5, title: 'Ford Mustang GT', brand: 'Ford', price: 48000, status: 'active', views: 1800, seller_name: 'Auto d.o.o.', created_at: '2024-03-10' },
-  ],
-  purchases: [
-    { id: 1, user_name: 'Janez Novak', package_type: 'Premium', price: 64.99, purchased_at: '2024-01-20', expires_at: '2024-02-20', status: 'active' },
-    { id: 2, user_name: 'Auto d.o.o.', package_type: 'Business', price: 149.99, purchased_at: '2024-02-15', expires_at: '2024-05-15', status: 'active' },
-    { id: 3, user_name: 'Marko Horvat', package_type: 'Basic', price: 34.99, purchased_at: '2024-03-01', expires_at: '2024-03-31', status: 'active' },
-  ],
-  messages: [
-    { id: 1, sender_name: 'Test User', sender_email: 'test@email.si', message: 'Pozdravljeni! Zanima me BMW X5.', is_read: false, created_at: '2024-03-28 10:00' },
-    { id: 2, sender_name: 'Janez K', sender_email: 'janez.k@email.si', message: 'Ali imate se kaksne avte?', is_read: true, created_at: '2024-03-27 15:30' },
-  ],
-  analytics: {
-    stats: { totalUsers: 3, totalCars: 15, activeCars: 12, totalRevenue: 4567.50 },
-    dailyData: Array.from({ length: 30 }, (_, i) => ({
-      date: new Date(Date.now() - (29 - i) * 86400000).toISOString().split('T')[0],
-      visitors: Math.floor(Math.random() * 100) + 20,
-      revenue: Math.floor(Math.random() * 200) + 50
-    }))
-  },
-  packages: {
-    publishing: [
-      { id: 1, name: 'Osnovni', name_en: 'Basic', price: 34.99, days: 30, max_cars: 100, active: true },
-      { id: 2, name: 'Premium', name_en: 'Premium', price: 64.99, days: 30, max_cars: 999999, active: true },
-    ],
-    boost: {
-      private: [
-        { id: 'top_p', name: 'Top izbira', price: 1.50, days: 1 },
-        { id: 'skok_p', name: 'Skok na vrh', price: 1.00, days: 1 },
-        { id: 'featured_p', name: 'Izpostavljeno', price: 2.00, days: 3 },
-      ],
-      business: [
-        { id: 'top_b', name: 'Top izbira', price: 3.00, days: 1 },
-        { id: 'skok_b', name: 'Skok na vrh', price: 2.00, days: 1 },
-        { id: 'featured_b', name: 'Izpostavljeno', price: 5.00, days: 7 },
-        { id: 'gold_b', name: 'Zlato', price: 10.00, days: 30 },
-      ]
-    }
-  }
-}
-
 // API helper - uses token as query param because Vite proxy strips headers
 const getAdminToken = () => localStorage.getItem('automarket_admin_token') || localStorage.getItem('admin_token') || ''
 

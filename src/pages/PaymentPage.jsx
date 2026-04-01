@@ -103,92 +103,19 @@ export function PaymentPage() {
   const [cardType, setCardType] = useState('unknown')
   const [errors, setErrors] = useState({})
   
-  // Get boost packages from API or use defaults
+  // Get boost packages from API
   const getBoostPackages = () => {
-    // Use API data if available
     const packages = isBusiness ? boostPackagesData.business : boostPackagesData.private
-    if (packages.length > 0) {
-      return packages.map(p => ({
-        id: p.id,
-        name: p.name.toUpperCase(),
-        subtitles: [],
-        price: p.price || 1.00,
-        min_days: p.min_days || 1,
-        color: p.color || 'green',
-        discount_percent: p.discount_percent || 0,
-        discount_active: p.discount_active || false
-      }))
-    }
-    
-    // Fallback to localStorage
-    const saved = localStorage.getItem('adminPackages')
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved)
-        const type = isBusiness ? 'business' : 'private'
-        if (parsed.boost?.[type]) {
-          return parsed.boost[type].map(p => ({
-            id: p.id,
-            name: p.name,
-            subtitles: [],
-            price: p.price || 1.00,
-            days: p.days || 1,
-            color: p.color || 'green'
-          }))
-        }
-      } catch {}
-    }
-    return isBusiness ? [
-    { 
-      id: 'akcija', 
-      name: 'PAKET VSEH CEN', 
-      subtitles: ['akcijska cena', 'znižana cena', 'CENA S FINANCIRANJEM', 'UGODNA CENA'],
-      price: 0.75, 
-      days: 'rok trajanja po vaši izbiri',
-      color: 'orange'
-    },
-    { 
-      id: 'top', 
-      name: 'TOP IZBIRA', 
+    return packages.map(p => ({
+      id: p.id,
+      name: p.name.toUpperCase(),
       subtitles: [],
-      price: 0.65, 
-      days: 'minimalno naročilo 30 dni',
-      color: 'green'
-    },
-    { 
-      id: 'skok', 
-      name: 'SKOK NA VRH', 
-      subtitles: [],
-      price: 0.50, 
-      days: 'minimalno naročilo 30 dni',
-      color: 'blue'
-    },
-  ] : [
-    { 
-      id: 'akcija', 
-      name: 'PAKET VSEH CEN', 
-      subtitles: ['akcijska cena', 'znižana cena', 'ugodna cena'],
-      price: 1.50, 
-      days: 'rok trajanja po vaši izbiri',
-      color: 'orange'
-    },
-    { 
-      id: 'top', 
-      name: 'TOP IZBIRA', 
-      subtitles: [],
-      price: 1.50, 
-      days: 'minimalno naročilo 15 dni',
-      color: 'green'
-    },
-    { 
-      id: 'skok', 
-      name: 'SKOK NA VRH', 
-      subtitles: [],
-      price: 1.00, 
-      days: 'minimalno naročilo 15 dni',
-      color: 'blue'
-    },
-  ]
+      price: p.price || 1.00,
+      min_days: p.min_days || 1,
+      color: p.color || 'green',
+      discount_percent: p.discount_percent || 0,
+      discount_active: p.discount_active || false
+    }))
   }
   
   // Get boost packages
