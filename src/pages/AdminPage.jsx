@@ -142,6 +142,10 @@ export default function AdminPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [refreshing, setRefreshing] = useState(false)
   
+  // Package editing
+  const [editingPackage, setEditingPackage] = useState(null)
+  const [editForm, setEditForm] = useState({ name: '', price: '', days: '', max_cars: '', features: '' })
+  
   // Load data
   const loadData = async () => {
     setLoading(true)
@@ -176,6 +180,52 @@ export default function AdminPage() {
     localStorage.removeItem('admin_user')
     localStorage.removeItem('admin_token')
     window.location.href = '/admin'
+  }
+  
+  // Package editing
+  const startEditPackage = (pkg, type) => {
+    setEditingPackage({ ...pkg, type })
+    setEditForm({
+      name: pkg.name || '',
+      name_en: pkg.name_en || '',
+      price: pkg.price || '',
+      days: pkg.days || pkg.duration_days || 30,
+      max_cars: pkg.max_cars || '',
+      features: pkg.features || ''
+    })
+  }
+  
+  const savePackage = async () => {
+    if (!editingPackage) return
+    try {
+      const res = await fetch(`${API_URL}/admin.php?action=update_package`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Pinggy-No-Screen': 'true' },
+        body: JSON.stringify({ ...editForm, id: editingPackage.id, type: editingPackage.type })
+      })
+      const result = await res.json()
+      if (result.success) {
+        await loadData()
+        setEditingPackage(null)
+      }
+    } catch (e) {
+      console.error('Save package error:', e)
+    }
+  }
+  
+  const deletePackage = async (id) => {
+    if (!confirm(isSl ? 'Ali ste prepričani?' : 'Are you sure?')) return
+    try {
+      const res = await fetch(`${API_URL}/admin.php?action=delete_package`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Pinggy-No-Screen': 'true' },
+        body: JSON.stringify({ id })
+      })
+      const result = await res.json()
+      if (result.success) await loadData()
+    } catch (e) {
+      console.error('Delete package error:', e)
+    }
   }
   
   // Filter helpers
@@ -530,23 +580,28 @@ export default function AdminPage() {
         {/* Packages Tab */}
         {!loading && activeTab === 'packages' && (
           <div className="space-y-6">
-            <h2 className="text-xl font-semibold">{isSl ? 'Paketi za objavo' : 'Publishing Packages'}</h2>
+            {/* Publishing Packages */}
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold">{isSl ? 'Paketi za objavo' : 'Publishing Packages'}</h2>
+            </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {packages.publishing?.map(pkg => (
-                <Card key={pkg.id} className="p-5">
+                <Card key={pkg.id} className="p-5 relative">
                   <div className="flex justify-between items-start mb-3">
                     <h3 className="font-semibold">{pkg.name}</h3>
-                    <span className={`px-2 py-1 rounded text-xs ${pkg.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
-                      {pkg.active ? (isSl ? 'Aktiven' : 'Active') : (isSl ? 'Neaktiven' : 'Inactive')}
-                    </span>
+                    <div className="flex gap-1">
+                      <button onClick={() => startEditPackage(pkg, 'publishing')} className="p-1 hover:bg-gray-100 rounded"><Edit className="w-4 h-4 text-gray-500" /></button>
+                    </div>
                   </div>
                   <p className="text-2xl font-bold text-orange-600 mb-2">{formatPrice(pkg.price)}</p>
-                  <p className="text-sm text-gray-600">{pkg.days} {isSl ? 'dni' : 'days'}</p>
+                  <p className="text-sm text-gray-600">{pkg.days || pkg.duration_days} {isSl ? 'dni' : 'days'}</p>
                   <p className="text-sm text-gray-600">{isSl ? 'Max vozila:' : 'Max cars:'} {pkg.max_cars}</p>
+                  <p className="text-xs text-gray-400 mt-2">ID: {pkg.id}</p>
                 </Card>
               ))}
             </div>
             
+            {/* Boost Packages - Private */}
             <h2 className="text-xl font-semibold mt-8">{isSl ? 'Paketi za promocijo' : 'Boost Packages'}</h2>
             <div className="grid md:grid-cols-2 gap-6">
               <Card className="p-5">
@@ -558,7 +613,10 @@ export default function AdminPage() {
                         <p className="font-medium">{pkg.name}</p>
                         <p className="text-sm text-gray-500">{pkg.days} {isSl ? 'dan' : 'day'}</p>
                       </div>
-                      <span className="font-bold text-green-600">{formatPrice(pkg.price)}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-green-600">{formatPrice(pkg.price)}</span>
+                        <button onClick={() => startEditPackage(pkg, 'boost_private')} className="p-1 hover:bg-gray-200 rounded"><Edit className="w-4 h-4 text-gray-500" /></button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -573,12 +631,55 @@ export default function AdminPage() {
                         <p className="font-medium">{pkg.name}</p>
                         <p className="text-sm text-gray-500">{pkg.days} {isSl ? 'dni' : 'days'}</p>
                       </div>
-                      <span className="font-bold text-green-600">{formatPrice(pkg.price)}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-green-600">{formatPrice(pkg.price)}</span>
+                        <button onClick={() => startEditPackage(pkg, 'boost_business')} className="p-1 hover:bg-gray-200 rounded"><Edit className="w-4 h-4 text-gray-500" /></button>
+                      </div>
                     </div>
                   ))}
                 </div>
               </Card>
             </div>
+            
+            {/* Edit Modal */}
+            {editingPackage && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <Card className="w-full max-w-md p-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-semibold">{isSl ? 'Uredi paket' : 'Edit Package'}</h3>
+                    <button onClick={() => setEditingPackage(null)}><X className="w-5 h-5" /></button>
+                  </div>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-1">{isSl ? 'Naziv (SL)' : 'Name (SL)'}</label>
+                      <input type="text" value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})} className="w-full p-2 border rounded" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">{isSl ? 'Naziv (EN)' : 'Name (EN)'}</label>
+                      <input type="text" value={editForm.name_en} onChange={e => setEditForm({...editForm, name_en: e.target.value})} className="w-full p-2 border rounded" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">{isSl ? 'Cena (€)' : 'Price (€)'}</label>
+                      <input type="number" step="0.01" value={editForm.price} onChange={e => setEditForm({...editForm, price: e.target.value})} className="w-full p-2 border rounded" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">{isSl ? 'Trajanje (dni)' : 'Duration (days)'}</label>
+                      <input type="number" value={editForm.days} onChange={e => setEditForm({...editForm, days: e.target.value})} className="w-full p-2 border rounded" />
+                    </div>
+                    {editingPackage.type === 'publishing' && (
+                      <div>
+                        <label className="block text-sm font-medium mb-1">{isSl ? 'Max vozil' : 'Max cars'}</label>
+                        <input type="number" value={editForm.max_cars} onChange={e => setEditForm({...editForm, max_cars: e.target.value})} className="w-full p-2 border rounded" />
+                      </div>
+                    )}
+                    <div className="flex gap-2 pt-2">
+                      <Button onClick={savePackage} className="flex-1">{isSl ? 'Shrani' : 'Save'}</Button>
+                      <Button variant="outline" onClick={() => setEditingPackage(null)}>{isSl ? 'Prekliči' : 'Cancel'}</Button>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+            )}
           </div>
         )}
       </div>
