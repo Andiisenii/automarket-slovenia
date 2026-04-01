@@ -80,7 +80,7 @@ export function AddCarPage() {
   const editCar = editCarId ? getCarById(editCarId) : null
 
   // Use boost packages from API (loaded in useEffect)
-  const getBoostPackages = () => {
+  const getBoostPkgs = () => {
     if (isBusiness) return boostPackages.business
     return boostPackages.private
   }
@@ -267,7 +267,7 @@ export function AddCarPage() {
         promoted: selectedBoost ? true : false,
         hasBoost: !!selectedBoost,
         boostPackage: selectedBoost,
-        boostSpent: selectedBoost ? getBoostPackages().find(b => b.id === selectedBoost)?.price * boostDays : 0,
+        boostSpent: selectedBoost ? getBoostPkgs().find(b => b.id === selectedBoost)?.price * boostDays : 0,
         isLuxuryCar: isLuxuryCar,
         hasFinancing: hasFinancing,
         monthlyBudget: hasFinancing ? monthlyBudget : null,

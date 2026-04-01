@@ -64,11 +64,20 @@ const DEMO_DATA = {
 }
 
 // API helper with fallback
+const getAdminHeaders = () => {
+  const token = localStorage.getItem('automarket_admin_token') || localStorage.getItem('admin_token') || ''
+  return {
+    'Content-Type': 'application/json',
+    'X-Pinggy-No-Screen': 'true',
+    'X-Admin-Token': token
+  }
+}
+
 const api = {
   get: async (action) => {
     try {
       const res = await fetch(`${API_URL}/admin.php?action=${action}`, {
-        headers: { 'X-Pinggy-No-Screen': 'true' }
+        headers: getAdminHeaders()
       })
       const data = await res.json()
       // If API returns error or empty, use fallback
@@ -86,7 +95,7 @@ const api = {
     try {
       const res = await fetch(`${API_URL}/admin.php?action=${action}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Pinggy-No-Screen': 'true' },
+        headers: getAdminHeaders(),
         body: JSON.stringify(data)
       })
       return await res.json()
