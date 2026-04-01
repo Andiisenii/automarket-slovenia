@@ -17,7 +17,15 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost',
         changeOrigin: true,
-        secure: false
+        secure: false,
+        configure: (proxy, options) => {
+          proxy.on('proxyReq', (proxyReq, req, res) => {
+            // Copy all headers from the original request
+            Object.keys(req.headers).forEach(key => {
+              proxyReq.setHeader(key, req.headers[key])
+            })
+          })
+        }
       }
     }
   }
