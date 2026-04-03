@@ -281,8 +281,7 @@ export function AddCarPage() {
     return Object.keys(newErrors).length === 0
   }
 
-  const userPackage = packageDB.getCurrentPackage()
-  const isPremium = packageDB.isPremium()
+  // Note: userPackage, isPremium, isBusiness are already declared at the top
   const currentUserCarCount = carDB.getMyCarCount()
   
   // FREE_CAR_LIMIT = 2 cars without package, after that need to buy a package
