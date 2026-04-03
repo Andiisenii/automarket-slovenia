@@ -16,7 +16,8 @@ const isSl = true // Default to Slovenian
 
 export default function AdminPage() {
   const navigate = useNavigate()
-  const { user: currentUser } = useAuth()
+  const { user: authUser } = useAuth()
+  const [adminUser, setAdminUser] = useState(null)
   const [activeTab, setActiveTab] = useState('dashboard')
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
@@ -45,16 +46,37 @@ export default function AdminPage() {
   const [messageForm, setMessageForm] = useState({ recipientId: '', subject: '', content: '' })
   const [broadcastForm, setBroadcastForm] = useState({ subject: '', content: '' })
   
-  // Auth check
+  // Load admin user from localStorage
   useEffect(() => {
-    if (!currentUser || currentUser.role !== 'admin') {
-      navigate('/')
+    try {
+      const storedAdmin = localStorage.getItem('automarket_admin_user')
+      if (storedAdmin) {
+        const parsed = JSON.parse(storedAdmin)
+        if (parsed.role === 'admin') {
+          setAdminUser(parsed)
+        } else {
+          navigate('/admin')
+        }
+      } else {
+        navigate('/admin')
+      }
+    } catch (e) {
+      navigate('/admin')
     }
-  }, [currentUser, navigate])
+  }, [navigate])
   
-  if (!currentUser || currentUser.role !== 'admin') {
-    return null
+  if (!adminUser) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p>Nalaganje...</p>
+        </div>
+      </div>
+    )
   }
+  
+  const currentUser = adminUser
 
   // Load data from Supabase
   const loadData = async () => {
