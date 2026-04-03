@@ -259,7 +259,7 @@ export function CarsPage() {
           {(vehicleType === 'used' || vehicleType === 'rabljena' || vehicleType === 'new' || vehicleType === 'nova' || vehicleType === 'electric' || vehicleType === 'električna' || isFinancingPage || (fuelParam && (fuelParam?.toLowerCase().includes('electric') || fuelParam?.toLowerCase().includes('električ')))) && (
             <button
               onClick={() => navigate('/')}
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
+              className="flex items-center gap-2 text-[#FFFFFF] hover:text-[#FFFFFF]/80 mb-6 transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
               {language === 'sl' ? 'Nazaj' : 'Back'}
@@ -270,13 +270,13 @@ export function CarsPage() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl lg:text-4xl font-bold text-[#FFFFFF] mb-2">
               {getPageTitle()}
             </h1>
             {getSearchSubtitle() ? (
-              <p className="text-gray-600">{getSearchSubtitle()}</p>
+              <p className="text-[#FFFFFF]/80">{getSearchSubtitle()}</p>
             ) : (
-              <p className="text-gray-600">
+              <p className="text-[#FFFFFF]/80">
                 {filteredCars.length} {filteredCars.length === 1 ? 'vozilo' : 'vozil'} najdeno
               </p>
             )}
@@ -338,13 +338,13 @@ export function CarsPage() {
             animate={{ opacity: 1 }}
             className="text-center py-20"
           >
-            <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Car className="w-10 h-10 text-white" />
+            <div className="w-20 h-20 bg-[#FFFFFF]/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Car className="w-10 h-10 text-[#FFFFFF]" />
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">
+            <h3 className="text-xl font-semibold text-[#FFFFFF] mb-2">
               Ni vozil
             </h3>
-            <p className="text-white/70 mb-6">
+            <p className="text-[#FFFFFF]/70 mb-6">
               Poskusite spremeniti iskalne kriterije
             </p>
             <Link to="/cars">
