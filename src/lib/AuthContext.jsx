@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import { API_URL } from './api'
+import { supabase } from './supabase'
+import bcrypt from 'bcryptjs'
 
 const AuthContext = createContext(null)
 
@@ -17,7 +18,6 @@ export function AuthProvider({ children }) {
       if (token && savedUser) {
         try {
           const userData = JSON.parse(savedUser)
-          // Just use the local data - trust it for now
           setUser(userData)
         } catch (e) {
           localStorage.removeItem('automarket_token')
@@ -35,59 +35,50 @@ export function AuthProvider({ children }) {
     setLoading(true)
     
     try {
-      // DEMO CREDENTIALS - for testing without backend
-      if (email === 'harbin309@gmail.com' && password === '++Admin12345') {
-        const demoUser = {
-          id: 1,
-          name: 'Admin',
-          email: 'admin@automarket.si',
-          role: 'admin',
-          user_type: 'business'
-        }
-        localStorage.setItem('automarket_token', 'demo_token_' + Date.now())
-        localStorage.setItem('automarket_user', JSON.stringify(demoUser))
-        setUser(demoUser)
-        setLoading(false)
-        return demoUser
-      }
+      // Query Supabase directly
+      const { data: user, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', email)
+        .single()
       
-      // Try API login
-      const response = await fetch(`${API_URL}/auth.php`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Pinggy-No-Screen': 'true'
-        },
-        body: JSON.stringify({ action: 'login', email, password })
-      })
-      
-      const result = await response.json()
-      
-      console.log('Login response:', response.status, result)
-      
-      // Check if API returned success
-      if (!result.success) {
+      if (error || !user) {
         throw new Error('Neveljaven email ali geslo')
       }
       
-      if (!result.token) {
-        throw new Error('Napaka pri prijavi')
+      // Verify password with bcrypt
+      const isValidPassword = await bcrypt.compare(password, user.password)
+      
+      if (!isValidPassword) {
+        throw new Error('Neveljaven email ali geslo')
       }
       
-      // Save token and user
-      localStorage.setItem('automarket_token', result.token)
-      localStorage.setItem('automarket_user', JSON.stringify(result.user))
+      // Create session
+      const token = 'auth_' + Date.now()
       
-      setUser(result.user)
-      return result.user
+      // Save session
+      localStorage.setItem('automarket_token', token)
+      localStorage.setItem('automarket_user', JSON.stringify({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        user_type: user.user_type
+      }))
+      
+      setUser({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        user_type: user.user_type
+      })
+      
+      return user
       
     } catch (e) {
       console.error('Login error:', e)
-      // Translate error messages to Slovenian
       let errorMsg = e.message || 'Napaka pri prijavi'
-      if (errorMsg.includes('Invalid credentials') || errorMsg.includes('Invalid email') || errorMsg.includes('not found')) {
-        errorMsg = 'Neveljaven email ali geslo'
-      }
       setError(errorMsg)
       throw new Error(errorMsg)
     } finally {
@@ -100,31 +91,56 @@ export function AuthProvider({ children }) {
     setLoading(true)
     
     try {
-      const response = await fetch(`${API_URL}/auth.php`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Pinggy-No-Screen': 'true'
-        },
-        body: JSON.stringify({ action: 'register', ...userData })
-      })
+      // Hash password
+      const hashedPassword = await bcrypt.hash(userData.password, 10)
       
-      const result = await response.json()
+      // Insert into Supabase
+      const { data, error } = await supabase
+        .from('users')
+        .insert({
+          name: userData.name,
+          email: userData.email,
+          password: hashedPassword,
+          phone: userData.phone || null,
+          role: 'user',
+          user_type: userData.userType || 'private'
+        })
+        .select()
+        .single()
       
-      if (!result.success) {
-        throw new Error(result.message || 'Registration failed')
+      if (error) {
+        if (error.message.includes('duplicate')) {
+          throw new Error('Ta email je že registriran')
+        }
+        throw new Error(error.message)
       }
       
       // Auto login after register
-      localStorage.setItem('automarket_token', result.token)
-      localStorage.setItem('automarket_user', JSON.stringify(result.user))
+      const token = 'auth_' + Date.now()
+      localStorage.setItem('automarket_token', token)
+      localStorage.setItem('automarket_user', JSON.stringify({
+        id: data.id,
+        name: data.name,
+        email: data.email,
+        role: data.role,
+        user_type: data.user_type
+      }))
       
-      setUser(result.user)
-      return result.user
+      setUser({
+        id: data.id,
+        name: data.name,
+        email: data.email,
+        role: data.role,
+        user_type: data.user_type
+      })
+      
+      return data
       
     } catch (e) {
-      setError(e.message)
-      throw e
+      console.error('Register error:', e)
+      let errorMsg = e.message || 'Napaka pri registraciji'
+      setError(errorMsg)
+      throw new Error(errorMsg)
     } finally {
       setLoading(false)
     }
