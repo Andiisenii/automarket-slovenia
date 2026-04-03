@@ -79,6 +79,94 @@ app.post('/api/auth.php', async (req, res) => {
   }
 })
 
+// ============ FORGOT PASSWORD ============
+app.post('/api/forgot-password.php', async (req, res) => {
+  const { email } = req.body
+  
+  if (!email) {
+    return res.json({ success: false, message: 'Email is required' })
+  }
+  
+  // Check if user exists
+  const { data: user, error } = await supabase
+    .from('users')
+    .select('id, email')
+    .eq('email', email)
+    .single()
+  
+  if (error || !user) {
+    // Don't reveal if email exists or not for security
+    return res.json({ success: true, message: 'If an account exists, a reset code has been sent' })
+  }
+  
+  // Generate 6-digit reset code
+  const resetCode = Math.floor(100000 + Math.random() * 900000).toString()
+  
+  // Store reset code with expiry (15 minutes)
+  const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString()
+  
+  await supabase
+    .from('users')
+    .update({ 
+      reset_code: resetCode,
+      reset_expires_at: expiresAt
+    })
+    .eq('id', user.id)
+  
+  // In production, send email here. For now, log to console.
+  console.log(`Password reset code for ${email}: ${resetCode}`)
+  
+  return res.json({ 
+    success: true, 
+    message: 'If an account exists, a reset code has been sent',
+    // For demo purposes, include the code in response (remove in production!)
+    demo_code: resetCode 
+  })
+})
+
+app.post('/api/reset-password.php', async (req, res) => {
+  const { email, token, newPassword } = req.body
+  
+  if (!email || !token || !newPassword) {
+    return res.json({ success: false, message: 'All fields are required' })
+  }
+  
+  if (newPassword.length < 6) {
+    return res.json({ success: false, message: 'Password must be at least 6 characters' })
+  }
+  
+  // Find user with matching reset code and non-expired code
+  const { data: user, error } = await supabase
+    .from('users')
+    .select('id')
+    .eq('email', email)
+    .eq('reset_code', token)
+    .single()
+  
+  if (error || !user) {
+    return res.json({ success: false, message: 'Invalid or expired reset code' })
+  }
+  
+  // Hash new password
+  const hashedPassword = await bcrypt.hash(newPassword, 10)
+  
+  // Update password and clear reset code
+  const { error: updateError } = await supabase
+    .from('users')
+    .update({ 
+      password: hashedPassword,
+      reset_code: null,
+      reset_expires_at: null
+    })
+    .eq('id', user.id)
+  
+  if (updateError) {
+    return res.json({ success: false, message: 'Failed to reset password' })
+  }
+  
+  return res.json({ success: true, message: 'Password reset successfully' })
+})
+
 // ============ CARS ============
 app.get('/api/cars.php', async (req, res) => {
   const { data, error } = await supabase
