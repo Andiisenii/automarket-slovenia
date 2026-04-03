@@ -46,7 +46,9 @@ export function AddCarPage() {
 
   const userId = user?.id
 
-  // Package check  const userPackage = packageDB.getCurrentPackage()  const isPremium = packageDB.isPremium()  const photoQuality = isPremium ? 'HD + 360' + [char]0x00B0 + ' ' + ': 'Standard'  const maxPhotos = isPremium ? 30 : 10
+  // Package check
+  const userPackage = packageDB.getCurrentPackage()
+  const isPremium = packageDB.isPremium()
   const isBusiness = user?.userType === 'business'
 
   useEffect(() => {
@@ -282,7 +284,37 @@ export function AddCarPage() {
   const userPackage = packageDB.getCurrentPackage()
   const isPremium = packageDB.isPremium()
   const currentUserCarCount = carDB.getMyCarCount()
-  const canPost = () => { if (isPremium) return true; if (userPackage?.packageId === 'osnovni' && currentUserCarCount < 100) return true; return false }
+  
+  // FREE_CAR_LIMIT = 2 cars without package, after that need to buy a package
+  const FREE_CAR_LIMIT = 2
+  
+  // Logic: Premium always can post. No package = max 2 free cars. Basic/other package = unlimited.
+  const canPost = () => {
+    // Premium users can always post
+    if (isPremium) return { allowed: true, reason: null }
+    
+    // If user has a valid package (not expired), they can post
+    if (userPackage && userPackage.expiresAt) {
+      const expiresAt = new Date(userPackage.expiresAt)
+      if (expiresAt > new Date()) {
+        return { allowed: true, reason: null }
+      }
+    }
+    
+    // No valid package - check if under free limit
+    if (currentUserCarCount < FREE_CAR_LIMIT) {
+      return { allowed: true, reason: null }
+    }
+    
+    // Over free limit, needs package
+    return { 
+      allowed: false, 
+      reason: isSl 
+        ? `Brez paketa lahko objavite največ ${FREE_CAR_LIMIT} vozila. Za več kupite paket.`
+        : `Without a package you can only list ${FREE_CAR_LIMIT} cars. Buy a package to list more.`
+    }
+  }
+  
   const canPostCar = canPost()
 
   const handleSubmit = (e) => {
@@ -309,7 +341,7 @@ export function AddCarPage() {
       return
     }
 
-    if (canPostCar) {
+    if (canPostCar.allowed) {
       const carPrice = parseFloat(formData.price) || 0
       const isLuxuryCar = !isBusiness && carPrice > LUXURY_CAR_THRESHOLD
       const carData = {
@@ -659,6 +691,52 @@ export function AddCarPage() {
           {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
         </div>
 
+        {/* Free car limit notice */}
+        {!canPostCar.allowed && (
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-4 mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                <CreditCard className="w-5 h-5 text-red-600" />
+              </div>
+              <div>
+                <p className="font-semibold text-red-800">
+                  {isSl ? 'Potrebujete paket!' : 'You need a package!'}
+                </p>
+                <p className="text-sm text-red-600">
+                  {canPostCar.reason}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Show remaining free listings */}
+        {canPostCar.allowed && !isPremium && currentUserCarCount < FREE_CAR_LIMIT && (
+          <div className="bg-green-50 border border-green-200 rounded-2xl p-4 mb-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                  <Check className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <p className="font-semibold text-green-800">
+                    {isSl ? 'Brezplacna objava!' : 'Free listing!'}
+                  </p>
+                  <p className="text-sm text-green-600">
+                    {isSl 
+                      ? `Imate ${FREE_CAR_LIMIT - currentUserCarCount} brezplacnih objav preostalo`
+                      : `You have ${FREE_CAR_LIMIT - currentUserCarCount} free listings remaining`
+                    }
+                  </p>
+                </div>
+              </div>
+              <span className="text-2xl font-bold text-green-700">
+                {currentUserCarCount}/{FREE_CAR_LIMIT}
+              </span>
+            </div>
+          </div>
+        )}
+
         {/* Package Pricing Preview */}
         {publishingPackages.length > 0 && (
           <div className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-2xl border border-orange-100 p-6 mb-6">
@@ -702,7 +780,7 @@ export function AddCarPage() {
         )}
 
         <Button type="submit" className="w-full" size="lg">
-          {isEditMode ? t('saveChanges') : (canPostCar ? t('publishCar') : t('buyPackage'))}
+          {isEditMode ? t('saveChanges') : (canPostCar.allowed ? t('publishCar') : t('buyPackage'))}
         </Button>
       </form>
     </div>
