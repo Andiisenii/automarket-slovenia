@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowUpDown, Search, ArrowLeft } from 'lucide-react'
+import { ArrowUpDown, ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { CarCard } from '@/components/features/CarCard'
 import { useLanguage } from '@/lib/LanguageContext'
@@ -20,7 +20,6 @@ export function FinancingPage() {
   const isSl = language === 'sl'
   const { cars } = useCars()
   const [sortBy, setSortBy] = useState('newest')
-  const [searchText, setSearchText] = useState('')
   const navigate = useNavigate()
 
   // Filter cars with financing
@@ -42,17 +41,6 @@ export function FinancingPage() {
       (car.hasFinancing === true || car.hasFinancing === 1 || car.has_financing === true || car.has_financing === 1)
     )
     
-    // Filter by search text
-    if (searchText.trim()) {
-      const search = searchText.toLowerCase()
-      result = result.filter(car =>
-        car.title?.toLowerCase().includes(search) ||
-        car.brand?.toLowerCase().includes(search) ||
-        car.model?.toLowerCase().includes(search) ||
-        car.description?.toLowerCase().includes(search)
-      )
-    }
-
     // Sort
     switch (sortBy) {
       case 'price-low':
@@ -72,7 +60,7 @@ export function FinancingPage() {
     }
 
     return result
-  }, [cars, sortBy, searchText])
+  }, [cars, sortBy])
 
   return (
     <div className="min-h-screen">
@@ -96,21 +84,7 @@ export function FinancingPage() {
               {isSl ? 'Financiranje' : 'Financing'}
             </h1>
             
-            {/* Search Box */}
-            <div className="max-w-xl">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder={isSl ? 'Išči vozila za financiranje...' : 'Search vehicles with financing...'}
-                  value={searchText}
-                  onChange={(e) => setSearchText(e.target.value)}
-                  className="w-full px-4 py-3 pl-12 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[#ff6a00] focus:border-transparent backdrop-blur"
-                />
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/70" />
-              </div>
-            </div>
-            
-            <p className="text-gray-300 mt-4">
+            <p className="text-gray-300">
               {financedCars.length} {financedCars.length === 1 ? 'vozilo' : 'vozil'} najdeno
             </p>
           </motion.div>
@@ -161,25 +135,11 @@ export function FinancingPage() {
               <Search className="w-10 h-10 text-gray-400" />
             </div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              {searchText 
-                ? (isSl ? 'Ni vozil, ki ustrezajo iskanju' : 'No vehicles matching your search')
-                : (isSl ? 'Ni vozil na financiranje' : 'No cars with financing')
-              }
+              {isSl ? 'Ni vozil na financiranje' : 'No cars with financing'}
             </h3>
             <p className="text-gray-600 mb-6">
-              {searchText 
-                ? (isSl ? 'Poskusite z drugimi iskalnimi pogoji' : 'Try different search terms')
-                : (isSl ? 'Nobeno vozilo še nima omogočenega financiranja' : 'No cars have financing enabled yet')
-              }
+              {isSl ? 'Nobeno vozilo še nima omogočenega financiranja' : 'No cars have financing enabled yet'}
             </p>
-            {searchText ? (
-              <button
-                onClick={() => setSearchText('')}
-                className="px-6 py-2.5 bg-[#ff6a00] text-white rounded-lg font-medium hover:bg-[#ff7f2a] transition-colors"
-              >
-                {isSl ? 'Počisti iskanje' : 'Clear search'}
-              </button>
-            ) : (
               <Link to="/cars">
                 <Button variant="secondary">
                   {isSl ? 'Pojdi na vsa vozila' : 'Go to all cars'}
