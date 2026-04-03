@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { Shield, Lock, Mail, ArrowLeft, AlertCircle, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { useLanguage } from '@/lib/LanguageContext'
-import { API_URL } from '@/lib/api'
+import { supabase } from '@/lib/supabase'
+import bcrypt from 'bcryptjs'
 
 export default function AdminLoginPage() {
   const navigate = useNavigate()
@@ -21,30 +22,48 @@ export default function AdminLoginPage() {
     setLoading(true)
     
     try {
-      const response = await fetch(`${API_URL}/auth.php`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'X-Pinggy-No-Screen': 'true'
-        },
-        body: JSON.stringify({ 
-          action: 'login', 
-          email, 
-          password 
-        })
-      })
+      // Query Supabase directly
+      const { data: user, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', email)
+        .single()
       
-      const data = await response.json()
-      
-      if (data.success && data.user && data.user.role === 'admin') {
-        const token = 'admin_' + Date.now()
-        localStorage.setItem('automarket_admin_token', token)
-        localStorage.setItem('automarket_admin_user', JSON.stringify(data.user))
-        navigate('/admin-panel')
-      } else {
+      if (userError || !user) {
         setError(isSl ? 'Neveljaven email ali geslo' : 'Invalid email or password')
+        setLoading(false)
+        return
       }
+      
+      // Verify password with bcrypt
+      const isValidPassword = await bcrypt.compare(password, user.password)
+      
+      if (!isValidPassword) {
+        setError(isSl ? 'Neveljaven email ali geslo' : 'Invalid email or password')
+        setLoading(false)
+        return
+      }
+      
+      // Check if admin
+      if (user.role !== 'admin') {
+        setError(isSl ? 'Nimate administrator' : 'You are not an administrator')
+        setLoading(false)
+        return
+      }
+      
+      // Save admin session
+      const token = 'admin_' + Date.now()
+      localStorage.setItem('automarket_admin_token', token)
+      localStorage.setItem('automarket_admin_user', JSON.stringify({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        user_type: user.user_type
+      }))
+      
+      navigate('/admin-panel')
+      
     } catch (err) {
       console.error('Login error:', err)
       setError(isSl ? 'Napaka pri povezavi' : 'Connection error')
