@@ -101,8 +101,9 @@ export function LoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ff6a00] focus:border-transparent shadow-none"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ff6a00] focus:border-transparent"
                 placeholder="vas@email.com"
+                style={{ boxShadow: 'none' }}
               />
             </div>
 

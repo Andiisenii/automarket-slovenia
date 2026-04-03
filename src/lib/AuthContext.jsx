@@ -36,7 +36,7 @@ export function AuthProvider({ children }) {
     
     try {
       // DEMO CREDENTIALS - for testing without backend
-      if (email === 'admin@automarket.si' && password === '++Admin12345') {
+      if (email === 'harbin309@gmail.com' && password === '++Admin12345') {
         const demoUser = {
           id: 1,
           name: 'Admin',
