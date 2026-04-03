@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowUpDown, ArrowLeft } from 'lucide-react'
+import { ArrowUpDown, ArrowLeft, Car } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { CarCard } from '@/components/features/CarCard'
 import { useLanguage } from '@/lib/LanguageContext'
@@ -131,21 +131,20 @@ export function FinancingPage() {
             animate={{ opacity: 1 }}
             className="text-center py-20"
           >
-            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Search className="w-10 h-10 text-gray-400" />
+            <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Car className="w-10 h-10 text-white" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              {isSl ? 'Ni vozil na financiranje' : 'No cars with financing'}
+            <h3 className="text-xl font-semibold text-white mb-2">
+              Ni vozil
             </h3>
-            <p className="text-gray-600 mb-6">
-              {isSl ? 'Nobeno vozilo še nima omogočenega financiranja' : 'No cars have financing enabled yet'}
+            <p className="text-white/70 mb-6">
+              Poskusite spremeniti iskalne kriterije
             </p>
-              <Link to="/cars">
-                <Button variant="secondary">
-                  {isSl ? 'Pojdi na vsa vozila' : 'Go to all cars'}
-                </Button>
-              </Link>
-            )}
+            <Link to="/cars">
+              <Button variant="secondary">
+                {isSl ? 'Pojdi na vsa vozila' : 'Go to all cars'}
+              </Button>
+            </Link>
           </motion.div>
         )}
       </div>
