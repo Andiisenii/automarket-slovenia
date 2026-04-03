@@ -1,106 +1,95 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
 import { 
-  Users, Car, DollarSign, BarChart3, Edit, Package, Bell, 
-  Send, Mail, ToggleLeft, ToggleRight, Shield, Trash2, Eye, TrendingUp, LogOut, X, Save, RefreshCw, Plus, Search
+  Users, Car, DollarSign, TrendingUp, Edit, Trash2, Eye, X, Save, 
+  RefreshCw, Search, Send, Mail, MessageSquare, Bell, Shield, Check,
+  ChevronDown, ChevronUp, Star, Zap, Package, ShoppingCart
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { useLanguage } from '@/lib/LanguageContext'
-import { formatPrice } from '@/lib/utils'
-import { API_URL } from '@/lib/api'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, AreaChart, Area } from 'recharts'
+import { useAuth } from '@/lib/AuthContext'
+import { supabase } from '@/lib/supabase'
 
-// API helper - uses token as query param because Vite proxy strips headers
-const getAdminToken = () => localStorage.getItem('automarket_admin_token') || localStorage.getItem('admin_token') || ''
-
-const api = {
-  get: async (action) => {
-    try {
-      const token = getAdminToken()
-      const res = await fetch(`${API_URL}/admin.php?action=${action}&admin_token=${encodeURIComponent(token)}`, {
-        headers: { 'X-Pinggy-No-Screen': 'true' }
-      })
-      const data = await res.json()
-      return data
-    } catch (e) {
-      console.error(`API failed for ${action}:`, e)
-      return { success: false, message: 'API error', error: e.message }
-    }
-  },
-  post: async (action, data) => {
-    try {
-      const token = getAdminToken()
-      const res = await fetch(`${API_URL}/admin.php?action=${action}&admin_token=${encodeURIComponent(token)}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Pinggy-No-Screen': 'true' },
-        body: JSON.stringify(data)
-      })
-      return await res.json()
-    } catch (e) {
-      return { success: false, message: 'API error' }
-    }
-  }
-}
+const isSl = true // Default to Slovenian
 
 export default function AdminPage() {
   const navigate = useNavigate()
-  const { language } = useLanguage()
-  const isSl = language === 'sl'
-  
-  // Auth check
-  const [isAuthorized, setIsAuthorized] = useState(() => {
-    const adminUser = localStorage.getItem('automarket_admin_user')
-    const adminToken = localStorage.getItem('automarket_admin_token')
-    if (!adminUser || !adminToken) return false
-    try {
-      const user = JSON.parse(adminUser)
-      return user.role === 'admin'
-    } catch { return false }
-  })
-  
-  useEffect(() => {
-    if (!isAuthorized) window.location.href = '/admin'
-  }, [isAuthorized])
-  
-  if (!isAuthorized) return null
-  
-  // State
+  const { user: currentUser } = useAuth()
   const [activeTab, setActiveTab] = useState('dashboard')
   const [loading, setLoading] = useState(true)
-  const [users, setUsers] = useState([])
-  const [cars, setCars] = useState([])
-  const [purchases, setPurchases] = useState([])
-  const [messages, setMessages] = useState([])
-  const [analytics, setAnalytics] = useState(null)
-  const [packages, setPackages] = useState({ publishing: [], boost: { private: [], business: [] } })
-  const [searchTerm, setSearchTerm] = useState('')
   const [refreshing, setRefreshing] = useState(false)
   
-  // Package editing
-  const [editingPackage, setEditingPackage] = useState(null)
-  const [editForm, setEditForm] = useState({ name: '', price: '', days: '', min_days: 1, max_cars: '', features: '', discount: 0, discount_active: false })
+  // Data states
+  const [users, setUsers] = useState([])
+  const [cars, setCars] = useState([])
+  const [packages, setPackages] = useState([])
+  const [messages, setMessages] = useState([])
+  const [userPackages, setUserPackages] = useState({})
   
-  // Load data
+  // Search & filters
+  const [searchTerm, setSearchTerm] = useState('')
+  
+  // Modals
+  const [showUserModal, setShowUserModal] = useState(false)
+  const [showCarModal, setShowCarModal] = useState(false)
+  const [showPackageModal, setShowPackageModal] = useState(false)
+  const [showMessageModal, setShowMessageModal] = useState(false)
+  const [showBroadcastModal, setShowBroadcastModal] = useState(false)
+  const [selectedUser, setSelectedUser] = useState(null)
+  const [selectedCar, setSelectedCar] = useState(null)
+  const [selectedPackage, setSelectedPackage] = useState(null)
+  
+  // Forms
+  const [messageForm, setMessageForm] = useState({ recipientId: '', subject: '', content: '' })
+  const [broadcastForm, setBroadcastForm] = useState({ subject: '', content: '' })
+  
+  // Auth check
+  useEffect(() => {
+    if (!currentUser || currentUser.role !== 'admin') {
+      navigate('/')
+    }
+  }, [currentUser, navigate])
+  
+  if (!currentUser || currentUser.role !== 'admin') {
+    return null
+  }
+
+  // Load data from Supabase
   const loadData = async () => {
     setLoading(true)
     try {
-      const [usersRes, carsRes, purchasesRes, analyticsRes, packagesRes, messagesRes] = await Promise.all([
-        api.get('users'),
-        api.get('cars'),
-        api.get('purchases'),
-        api.get('analytics'),
-        api.get('packages'),
-        api.get('messages')
+      const [
+        usersRes, 
+        carsRes, 
+        packagesRes, 
+        messagesRes,
+        userPackagesRes
+      ] = await Promise.all([
+        supabase.from('users').select('*').order('created_at', { ascending: false }),
+        supabase.from('cars').select('*').order('created_at', { ascending: false }),
+        supabase.from('packages').select('*').order('type'),
+        supabase.from('messages').select('*').order('created_at', { ascending: false }),
+        supabase.from('user_packages').select('*')
       ])
       
-      if (usersRes.success) setUsers(usersRes.users || [])
-      if (carsRes.success) setCars(carsRes.cars || [])
-      if (purchasesRes.success) setPurchases(purchasesRes.purchases || [])
-      if (analyticsRes.success) setAnalytics(analyticsRes)
-      if (packagesRes.success) setPackages(packagesRes.packages || { publishing: [], boost: { private: [], business: [] } })
-      if (messagesRes.success) setMessages(messagesRes.messages || [])
-    } catch (err) { 
+      if (usersRes.data) setUsers(usersRes.data)
+      if (carsRes.data) setCars(carsRes.data)
+      if (packagesRes.data) setPackages(packagesRes.data)
+      if (messagesRes.data) setMessages(messagesRes.data)
+      
+      // Group user packages by user_id
+      const upMap = {}
+      if (userPackagesRes.data) {
+        userPackagesRes.data.forEach(up => {
+          if (!upMap[up.user_id]) upMap[up.user_id] = []
+          upMap[up.user_id].push(up)
+        })
+        setUserPackages(upMap)
+      }
+      
+    } catch (err) {
       console.error('Error loading data:', err)
     }
     setLoading(false)
@@ -109,100 +98,153 @@ export default function AdminPage() {
   
   useEffect(() => { loadData() }, [])
   
-  // Handlers
   const handleRefresh = () => { setRefreshing(true); loadData() }
-  const handleLogout = () => {
-    localStorage.removeItem('admin_user')
-    localStorage.removeItem('admin_token')
-    window.location.href = '/admin'
-  }
-  
-  // Package editing
-  const startEditPackage = (pkg, type) => {
-    setEditingPackage({ ...pkg, type })
-    setEditForm({
-      name: pkg.name || '',
-      name_en: pkg.name_en || '',
-      price: pkg.price || '',
-      days: pkg.days || pkg.duration_days || 30,
-      min_days: pkg.min_days || 1,
-      max_cars: pkg.max_cars || '',
-      features: pkg.features || '',
-      discount: pkg.discount_percent || 0,
-      discount_active: pkg.discount_active || false
-    })
-  }
-  
-  const savePackage = async () => {
-    if (!editingPackage) return
-    try {
-      const token = localStorage.getItem('automarket_admin_token') || ''
-      const res = await fetch(`${API_URL}/admin.php?action=update_package&admin_token=${encodeURIComponent(token)}`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json', 
-          'X-Pinggy-No-Screen': 'true'
-        },
-        body: JSON.stringify({ ...editForm, id: editingPackage.id, type: editingPackage.type })
-      })
-      const result = await res.json()
-      if (result.success) {
-        await loadData()
-        setEditingPackage(null)
-        alert(isSl ? 'Paketi u ruajt me sukses!' : 'Package saved successfully!')
-      } else {
-        alert(result.message || (isSl ? 'Gabim gjatë ruajtjes' : 'Error saving'))
-      }
-    } catch (e) {
-      console.error('Save package error:', e)
-    }
-  }
-  
-  const deletePackage = async (id) => {
-    if (!confirm(isSl ? 'Ali ste prepričani?' : 'Are you sure?')) return
-    try {
-      const res = await fetch(`${API_URL}/admin.php?action=delete_package`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Pinggy-No-Screen': 'true' },
-        body: JSON.stringify({ id })
-      })
-      const result = await res.json()
-      if (result.success) await loadData()
-    } catch (e) {
-      console.error('Delete package error:', e)
-    }
-  }
   
   // Filter helpers
   const filteredUsers = users.filter(u => 
+    !searchTerm || 
     u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     u.email?.toLowerCase().includes(searchTerm.toLowerCase())
   )
   
   const filteredCars = cars.filter(c => 
+    !searchTerm || 
     c.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    c.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    c.seller_name?.toLowerCase().includes(searchTerm.toLowerCase())
+    c.brand?.toLowerCase().includes(searchTerm.toLowerCase())
   )
   
-  const tabs = [
-    { id: 'dashboard', label: isSl ? 'Nadzorna plošča' : 'Dashboard', icon: TrendingUp },
-    { id: 'users', label: isSl ? 'Uporabniki' : 'Users', icon: Users, count: users.length },
-    { id: 'cars', label: isSl ? 'Vozila' : 'Cars', icon: Car, count: cars.length },
-    { id: 'purchases', label: isSl ? 'Nakopi' : 'Purchases', icon: DollarSign, count: purchases.length },
-    { id: 'messages', label: isSl ? 'Sporočila' : 'Messages', icon: Mail, count: messages.filter(m => !m.is_read).length },
-    { id: 'packages', label: isSl ? 'Paketi' : 'Packages', icon: Package },
-  ]
-  
-  const stats = analytics?.stats || { 
-    totalUsers: users.length, 
-    totalCars: cars.length, 
-    activeCars: cars.filter(c => c.status === 'active').length, 
-    totalRevenue: purchases.reduce((a, b) => a + (b.price || 0), 0) 
+  // Stats
+  const stats = {
+    totalUsers: users.length,
+    totalCars: cars.length,
+    activeCars: cars.filter(c => c.status === 'active').length,
+    totalPackages: packages.length,
+    unreadMessages: messages.filter(m => !m.is_read && m.recipient_id === currentUser.id).length
   }
   
+  // Tabs
+  const tabs = [
+    { id: 'dashboard', label: 'Nadzorna plošča', icon: TrendingUp },
+    { id: 'users', label: 'Uporabniki', icon: Users, count: users.length },
+    { id: 'cars', label: 'Vozila', icon: Car, count: cars.length },
+    { id: 'packages', label: 'Paketi', icon: Package },
+    { id: 'messages', label: 'Sporočila', icon: Mail, count: stats.unreadMessages },
+  ]
+  
+  // Get user's active packages
+  const getUserActivePackages = (userId) => {
+    const ups = userPackages[userId] || []
+    return ups.filter(up => new Date(up.expires_at) > new Date())
+  }
+  
+  // Send message to user
+  const sendMessage = async () => {
+    if (!messageForm.content.trim()) return
+    
+    try {
+      const { error } = await supabase.from('messages').insert({
+        sender_id: currentUser.id,
+        recipient_id: messageForm.recipientId,
+        subject: messageForm.subject || '',
+        content: messageForm.content,
+        is_system: false
+      })
+      
+      if (error) throw error
+      
+      setMessageForm({ recipientId: '', subject: '', content: '' })
+      setShowMessageModal(false)
+      loadData()
+      alert('Sporočilo poslano!')
+    } catch (err) {
+      console.error('Error sending message:', err)
+      alert('Napaka pri pošiljanju')
+    }
+  }
+  
+  // Send broadcast to all users
+  const sendBroadcast = async () => {
+    if (!broadcastForm.content.trim()) return
+    
+    try {
+      // Insert broadcast
+      const { data: broadcast, error: broadcastErr } = await supabase.from('broadcasts').insert({
+        subject: broadcastForm.subject,
+        content: broadcastForm.content,
+        sent_by: currentUser.id
+      }).select().single()
+      
+      if (broadcastErr) throw broadcastErr
+      
+      // Send to all users
+      const messageInserts = users.map(u => ({
+        sender_id: currentUser.id,
+        recipient_id: u.id,
+        subject: broadcastForm.subject || 'Obvestilo',
+        content: broadcastForm.content,
+        is_system: true
+      }))
+      
+      await supabase.from('messages').insert(messageInserts)
+      
+      setBroadcastForm({ subject: '', content: '' })
+      setShowBroadcastModal(false)
+      loadData()
+      alert(`Sporočilo poslano ${users.length} uporabnikom!`)
+    } catch (err) {
+      console.error('Error sending broadcast:', err)
+      alert('Napaka pri pošiljanju')
+    }
+  }
+  
+  // Delete user
+  const deleteUser = async (userId) => {
+    if (!confirm('Ali ste prepričani, da želite izbrisati uporabnika?')) return
+    try {
+      await supabase.from('users').delete().eq('id', userId)
+      loadData()
+    } catch (err) {
+      console.error('Error deleting user:', err)
+    }
+  }
+  
+  // Delete car
+  const deleteCar = async (carId) => {
+    if (!confirm('Ali ste prepričani, da želite izbrisati vozilo?')) return
+    try {
+      await supabase.from('cars').delete().eq('id', carId)
+      loadData()
+    } catch (err) {
+      console.error('Error deleting car:', err)
+    }
+  }
+  
+  // Update package
+  const updatePackage = async () => {
+    if (!selectedPackage) return
+    try {
+      const { error } = await supabase.from('packages').update({
+        price: selectedPackage.price,
+        discount_percent: selectedPackage.discount_percent,
+        discount_active: selectedPackage.discount_active,
+        name: selectedPackage.name,
+        name_sl: selectedPackage.name_sl,
+        min_days: selectedPackage.min_days
+      }).eq('id', selectedPackage.id)
+      
+      if (error) throw error
+      
+      setShowPackageModal(false)
+      loadData()
+      alert('Paket posodobljen!')
+    } catch (err) {
+      console.error('Error updating package:', err)
+      alert('Napaka pri posodabljanju')
+    }
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-100">
       {/* Header */}
       <header className="bg-white shadow-sm border-b sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -212,17 +254,16 @@ export default function AdminPage() {
             </div>
             <div>
               <h1 className="text-xl font-bold text-gray-900">Admin Panel</h1>
-              <p className="text-xs text-gray-500">{isSl ? 'Nadzornik sistema' : 'System Administrator'}</p>
+              <p className="text-xs text-gray-500">Nadzornik sistema</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <Button variant="outline" size="sm" onClick={handleRefresh} disabled={refreshing}>
               <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-              {isSl ? 'Osveži' : 'Refresh'}
+              Osveži
             </Button>
-            <Button variant="outline" size="sm" onClick={handleLogout} className="text-red-600 border-red-300 hover:bg-red-50">
-              <LogOut className="w-4 h-4 mr-2" />
-              {isSl ? 'Izhod' : 'Logout'}
+            <Button variant="outline" size="sm" onClick={() => navigate('/')}>
+              Nazaj na stran
             </Button>
           </div>
         </div>
@@ -255,94 +296,59 @@ export default function AdminPage() {
         {/* Loading */}
         {loading && (
           <div className="flex items-center justify-center py-20">
-            <div className="text-center">
-              <RefreshCw className="w-8 h-8 animate-spin text-orange-500 mx-auto mb-2" />
-              <p className="text-gray-500">{isSl ? 'Nalaganje...' : 'Loading...'}</p>
-            </div>
+            <RefreshCw className="w-8 h-8 animate-spin text-orange-500" />
           </div>
         )}
         
         {/* Dashboard */}
         {!loading && activeTab === 'dashboard' && (
           <div className="space-y-6">
-            {/* Stats Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Card className="p-5 hover:shadow-md transition-shadow">
+              <Card className="p-5">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
                     <Users className="w-6 h-6 text-blue-600" />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">{isSl ? 'Uporabniki' : 'Users'}</p>
+                    <p className="text-xs text-gray-500">Uporabniki</p>
                     <p className="text-2xl font-bold">{stats.totalUsers}</p>
                   </div>
                 </div>
               </Card>
-              <Card className="p-5 hover:shadow-md transition-shadow">
+              <Card className="p-5">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
                     <Car className="w-6 h-6 text-green-600" />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">{isSl ? 'Vozila' : 'Cars'}</p>
+                    <p className="text-xs text-gray-500">Vozila</p>
                     <p className="text-2xl font-bold">{stats.totalCars}</p>
                   </div>
                 </div>
               </Card>
-              <Card className="p-5 hover:shadow-md transition-shadow">
+              <Card className="p-5">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                    <TrendingUp className="w-6 h-6 text-purple-600" />
+                    <Package className="w-6 h-6 text-purple-600" />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">{isSl ? 'Aktivna' : 'Active'}</p>
+                    <p className="text-xs text-gray-500">Aktivna</p>
                     <p className="text-2xl font-bold">{stats.activeCars}</p>
                   </div>
                 </div>
               </Card>
-              <Card className="p-5 hover:shadow-md transition-shadow">
+              <Card className="p-5">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
-                    <DollarSign className="w-6 h-6 text-orange-600" />
+                    <Mail className="w-6 h-6 text-orange-600" />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">{isSl ? 'Prihodki' : 'Revenue'}</p>
-                    <p className="text-2xl font-bold">{formatPrice(stats.totalRevenue)}</p>
+                    <p className="text-xs text-gray-500">Sporočila</p>
+                    <p className="text-2xl font-bold">{stats.unreadMessages}</p>
                   </div>
                 </div>
               </Card>
             </div>
-            
-            {/* Charts */}
-            {analytics && (
-              <div className="grid md:grid-cols-2 gap-6">
-                <Card className="p-5">
-                  <h3 className="text-lg font-semibold mb-4">{isSl ? 'Obiskovalci' : 'Visitors'}</h3>
-                  <ResponsiveContainer width="100%" height={280}>
-                    <AreaChart data={analytics.dailyData || []}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                      <XAxis dataKey="date" tick={{ fontSize: 10 }} stroke="#9ca3af" />
-                      <YAxis stroke="#9ca3af" />
-                      <Tooltip />
-                      <Area type="monotone" dataKey="visitors" stroke="#f97316" fill="#fdba74" strokeWidth={2} />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </Card>
-                
-                <Card className="p-5">
-                  <h3 className="text-lg font-semibold mb-4">{isSl ? 'Prihodki' : 'Revenue'}</h3>
-                  <ResponsiveContainer width="100%" height={280}>
-                    <BarChart data={analytics.dailyData || []}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                      <XAxis dataKey="date" tick={{ fontSize: 10 }} stroke="#9ca3af" />
-                      <YAxis stroke="#9ca3af" />
-                      <Tooltip />
-                      <Bar dataKey="revenue" fill="#22c55e" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </Card>
-              </div>
-            )}
           </div>
         )}
         
@@ -350,50 +356,93 @@ export default function AdminPage() {
         {!loading && activeTab === 'users' && (
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <h2 className="text-xl font-semibold">{isSl ? 'Uporabniki' : 'Users'} ({filteredUsers.length})</h2>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder={isSl ? 'Išči...' : 'Search...'}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 border rounded-lg"
-                />
+              <h2 className="text-xl font-semibold">Uporabniki ({filteredUsers.length})</h2>
+              <div className="flex gap-2">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Išči..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 pr-4 py-2 border rounded-lg"
+                  />
+                </div>
+                <Button onClick={() => { setBroadcastForm({ subject: '', content: '' }); setShowBroadcastModal(true) }}>
+                  <Send className="w-4 h-4 mr-2" />
+                  Pošlji vsem
+                </Button>
               </div>
             </div>
+            
             <Card className="overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="px-4 py-3 text-left text-sm font-medium">ID</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">{isSl ? 'Ime' : 'Name'}</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium">Ime</th>
                       <th className="px-4 py-3 text-left text-sm font-medium">Email</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">{isSl ? 'Tip' : 'Type'}</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">{isSl ? 'Status' : 'Status'}</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">{isSl ? 'Datum' : 'Date'}</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium">Tip</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium">Paketi</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium">Vozila</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium">Akcije</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y">
-                    {filteredUsers.map(user => (
-                      <tr key={user.id} className="hover:bg-gray-50">
-                        <td className="px-4 py-3 text-sm">{user.id}</td>
-                        <td className="px-4 py-3 font-medium text-sm">{user.name}</td>
-                        <td className="px-4 py-3 text-sm">{user.email}</td>
-                        <td className="px-4 py-3">
-                          <span className={`px-2 py-1 rounded text-xs font-medium ${user.user_type === 'business' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
-                            {user.user_type === 'business' ? (isSl ? 'Podjetje' : 'Business') : (isSl ? 'Zasebno' : 'Private')}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3">
-                          <span className={`px-2 py-1 rounded text-xs font-medium ${user.is_verified ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                            {user.is_verified ? (isSl ? 'Potrjen' : 'Verified') : (isSl ? 'Nepotrjen' : 'Pending')}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-sm text-gray-500">{user.created_at?.split(' ')[0]}</td>
-                      </tr>
-                    ))}
+                    {filteredUsers.map(user => {
+                      const userCars = cars.filter(c => c.user_id === user.id)
+                      const userPacks = getUserActivePackages(user.id)
+                      return (
+                        <tr key={user.id} className="hover:bg-gray-50">
+                          <td className="px-4 py-3 text-sm">{user.id}</td>
+                          <td className="px-4 py-3 font-medium text-sm">{user.name}</td>
+                          <td className="px-4 py-3 text-sm">{user.email}</td>
+                          <td className="px-4 py-3">
+                            <span className={`px-2 py-1 rounded text-xs font-medium ${user.user_type === 'business' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
+                              {user.user_type === 'business' ? 'Podjetje' : 'Zasebno'}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3">
+                            {userPacks.length > 0 ? (
+                              <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-medium">
+                                {userPacks.length} aktivni
+                              </span>
+                            ) : (
+                              <span className="text-gray-400 text-xs">Ni paketa</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className="font-medium">{userCars.length}</span>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="flex gap-1">
+                              <button 
+                                onClick={() => { setSelectedUser(user); setShowUserModal(true) }}
+                                className="p-1.5 hover:bg-gray-100 rounded"
+                                title="Pregled"
+                              >
+                                <Eye className="w-4 h-4 text-gray-500" />
+                              </button>
+                              <button 
+                                onClick={() => { setMessageForm({ recipientId: user.id, subject: '', content: '' }); setShowMessageModal(true) }}
+                                className="p-1.5 hover:bg-gray-100 rounded"
+                                title="Sporočilo"
+                              >
+                                <MessageSquare className="w-4 h-4 text-gray-500" />
+                              </button>
+                              <button 
+                                onClick={() => deleteUser(user.id)}
+                                className="p-1.5 hover:bg-red-50 rounded"
+                                title="Izbriši"
+                              >
+                                <Trash2 className="w-4 h-4 text-red-500" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -405,245 +454,393 @@ export default function AdminPage() {
         {!loading && activeTab === 'cars' && (
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <h2 className="text-xl font-semibold">{isSl ? 'Vozila' : 'Cars'} ({filteredCars.length})</h2>
+              <h2 className="text-xl font-semibold">Vozila ({filteredCars.length})</h2>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="text"
-                  placeholder={isSl ? 'Išči...' : 'Search...'}
+                  placeholder="Išči..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 pr-4 py-2 border rounded-lg"
                 />
               </div>
             </div>
+            
             <Card className="overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="px-4 py-3 text-left text-sm font-medium">ID</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">{isSl ? 'Naslov' : 'Title'}</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium">Naslov</th>
                       <th className="px-4 py-3 text-left text-sm font-medium">Brand</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">{isSl ? 'Cena' : 'Price'}</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">{isSl ? 'Status' : 'Status'}</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">{isSl ? 'Prodajalec' : 'Seller'}</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">Views</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium">Cena</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium">Status</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium">Prodajalec</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium">Akcije</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y">
-                    {filteredCars.map(car => (
-                      <tr key={car.id} className="hover:bg-gray-50">
-                        <td className="px-4 py-3 text-sm">{car.id}</td>
-                        <td className="px-4 py-3 font-medium text-sm max-w-xs truncate">{car.title}</td>
-                        <td className="px-4 py-3 text-sm">{car.brand}</td>
-                        <td className="px-4 py-3 text-sm font-medium">{formatPrice(car.price)}</td>
-                        <td className="px-4 py-3">
-                          <span className={`px-2 py-1 rounded text-xs font-medium ${car.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
-                            {car.status === 'active' ? (isSl ? 'Aktivno' : 'Active') : car.status}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-sm">{car.seller_name}</td>
-                        <td className="px-4 py-3 text-sm">{car.views || 0}</td>
-                      </tr>
-                    ))}
+                    {filteredCars.map(car => {
+                      const seller = users.find(u => u.id === car.user_id)
+                      return (
+                        <tr key={car.id} className="hover:bg-gray-50">
+                          <td className="px-4 py-3 text-sm">{car.id}</td>
+                          <td className="px-4 py-3 font-medium text-sm max-w-xs truncate">{car.title}</td>
+                          <td className="px-4 py-3 text-sm">{car.brand}</td>
+                          <td className="px-4 py-3 text-sm font-medium">€{car.price?.toLocaleString()}</td>
+                          <td className="px-4 py-3">
+                            <span className={`px-2 py-1 rounded text-xs font-medium ${car.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+                              {car.status === 'active' ? 'Aktivno' : car.status}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-sm">{seller?.name || 'Neznan'}</td>
+                          <td className="px-4 py-3">
+                            <div className="flex gap-1">
+                              <button 
+                                onClick={() => navigate(`/car/${car.id}`)}
+                                className="p-1.5 hover:bg-gray-100 rounded"
+                                title="Pregled"
+                              >
+                                <Eye className="w-4 h-4 text-gray-500" />
+                              </button>
+                              <button 
+                                onClick={() => deleteCar(car.id)}
+                                className="p-1.5 hover:bg-red-50 rounded"
+                                title="Izbriši"
+                              >
+                                <Trash2 className="w-4 h-4 text-red-500" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    })}
                   </tbody>
                 </table>
               </div>
             </Card>
-          </div>
-        )}
-        
-        {/* Purchases Tab */}
-        {!loading && activeTab === 'purchases' && (
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold">{isSl ? 'Nakopi' : 'Purchases'} ({purchases.length})</h2>
-            <Card className="overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-sm font-medium">ID</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">{isSl ? 'Uporabnik' : 'User'}</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">{isSl ? 'Paket' : 'Package'}</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">{isSl ? 'Cena' : 'Price'}</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">{isSl ? 'Datum' : 'Date'}</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">{isSl ? 'Velja do' : 'Expires'}</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">{isSl ? 'Status' : 'Status'}</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y">
-                    {purchases.map(p => (
-                      <tr key={p.id} className="hover:bg-gray-50">
-                        <td className="px-4 py-3 text-sm">{p.id}</td>
-                        <td className="px-4 py-3 font-medium text-sm">{p.user_name}</td>
-                        <td className="px-4 py-3 text-sm">{p.package_type}</td>
-                        <td className="px-4 py-3 text-sm font-medium">{formatPrice(p.price)}</td>
-                        <td className="px-4 py-3 text-sm">{p.purchased_at?.split(' ')[0]}</td>
-                        <td className="px-4 py-3 text-sm text-gray-500">{p.expires_at?.split(' ')[0]}</td>
-                        <td className="px-4 py-3">
-                          <span className={`px-2 py-1 rounded text-xs font-medium ${p.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
-                            {p.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </Card>
-          </div>
-        )}
-        
-        {/* Messages Tab */}
-        {!loading && activeTab === 'messages' && (
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold">{isSl ? 'Sporočila' : 'Messages'} ({messages.length})</h2>
-            <div className="space-y-3">
-              {messages.map(msg => (
-                <Card key={msg.id} className={`p-4 ${!msg.is_read ? 'border-l-4 border-orange-500' : ''}`}>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="font-medium">{msg.sender_name}</p>
-                      <p className="text-sm text-gray-600">{msg.sender_email}</p>
-                      <p className="mt-2">{msg.message}</p>
-                      <p className="text-xs text-gray-400 mt-2">{msg.created_at}</p>
-                    </div>
-                    {!msg.is_read && (
-                      <span className="px-2 py-1 bg-orange-100 text-orange-700 rounded text-xs">{isSl ? 'Novo' : 'New'}</span>
-                    )}
-                  </div>
-                </Card>
-              ))}
-              {messages.length === 0 && (
-                <p className="text-center text-gray-500 py-8">{isSl ? 'Ni sporočil' : 'No messages'}</p>
-              )}
-            </div>
           </div>
         )}
         
         {/* Packages Tab */}
         {!loading && activeTab === 'packages' && (
           <div className="space-y-6">
-            {/* Publishing Packages */}
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold">{isSl ? 'Paketi za objavo' : 'Publishing Packages'}</h2>
+              <h2 className="text-xl font-semibold">Paketi za objavo</h2>
             </div>
+            
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {packages.publishing?.map(pkg => (
-                <Card key={pkg.id} className="p-5 relative">
-                  <div className="flex justify-between items-start mb-3">
-                    <h3 className="font-semibold">{pkg.name}</h3>
-                    <div className="flex gap-1">
-                      <button onClick={() => startEditPackage(pkg, 'publishing')} className="p-1 hover:bg-gray-100 rounded"><Edit className="w-4 h-4 text-gray-500" /></button>
+              {packages.filter(p => p.type === 'publishing').map(pkg => (
+                <Card key={pkg.id} className="p-5 relative overflow-hidden">
+                  {/* Discount Sticker */}
+                  {pkg.discount_active && pkg.discount_percent > 0 && (
+                    <div className="absolute top-0 right-0 bg-red-500 text-white px-3 py-1 text-xs font-bold rounded-bl-lg">
+                      -{pkg.discount_percent}%
                     </div>
+                  )}
+                  
+                  <h3 className="font-semibold text-lg mb-2">{pkg.name}</h3>
+                  <div className="flex items-baseline gap-2 mb-3">
+                    {pkg.discount_active && pkg.discount_percent > 0 ? (
+                      <>
+                        <span className="text-2xl font-bold text-red-500">€{(pkg.price * (1 - pkg.discount_percent / 100)).toFixed(2)}</span>
+                        <span className="text-lg text-gray-400 line-through">€{pkg.price}</span>
+                      </>
+                    ) : (
+                      <span className="text-2xl font-bold text-orange-600">€{pkg.price}</span>
+                    )}
+                    <span className="text-gray-500 text-sm">/mesec</span>
                   </div>
-                  <p className="text-2xl font-bold text-orange-600 mb-1">€{pkg.price}</p>
-                  <p className="text-sm text-gray-600">min {pkg.min_days} {isSl ? 'ditë' : 'days'}</p>
-                  <p className="text-sm text-gray-600">{isSl ? 'Max vozila:' : 'Max cars:'} {pkg.max_cars}</p>
-                  {pkg.discount_percent > 0 && <span className="inline-block mt-2 px-2 py-1 bg-red-100 text-red-700 text-xs rounded">{pkg.discount_percent}% {isSl ? 'zbritje' : 'discount'}</span>}
+                  <p className="text-sm text-gray-600 mb-4">Min {pkg.min_days} dni</p>
+                  
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full"
+                    onClick={() => { setSelectedPackage(pkg); setShowPackageModal(true) }}
+                  >
+                    <Edit className="w-4 h-4 mr-2" />
+                    Uredi
+                  </Button>
                 </Card>
               ))}
             </div>
             
-            {/* Boost Packages - Private */}
-            <h2 className="text-xl font-semibold mt-8">{isSl ? 'Paketi za promocijo' : 'Boost Packages'}</h2>
-            <div className="grid md:grid-cols-2 gap-6">
-              <Card className="p-5">
-                <h3 className="font-semibold mb-4">{isSl ? 'Zasebni uporabniki' : 'Private Users'}</h3>
-                <div className="space-y-3">
-                  {packages.boost?.private?.map(pkg => (
-                    <div key={pkg.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                      <div>
-                        <p className="font-medium">{pkg.name}</p>
-                        <p className="text-sm text-gray-500">€{pkg.price}/dan · min {pkg.min_days} {isSl ? 'ditë' : 'days'}</p>
-                        {pkg.discount_percent > 0 && <span className="text-xs text-red-500 font-medium">-{pkg.discount_percent}%</span>}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-green-600">€{pkg.price}</span>
-                        <button onClick={() => startEditPackage(pkg, 'boost_private')} className="p-1 hover:bg-gray-200 rounded"><Edit className="w-4 h-4 text-gray-500" /></button>
-                      </div>
+            <h2 className="text-xl font-semibold mt-8">Paketi za promocijo - Zasebni</h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {packages.filter(p => p.type === 'boost_private').map(pkg => (
+                <Card key={pkg.id} className="p-5 relative overflow-hidden">
+                  {pkg.discount_active && pkg.discount_percent > 0 && (
+                    <div className="absolute top-0 right-0 bg-red-500 text-white px-3 py-1 text-xs font-bold rounded-bl-lg">
+                      -{pkg.discount_percent}%
                     </div>
-                  ))}
-                </div>
-              </Card>
-              
-              <Card className="p-5">
-                <h3 className="font-semibold mb-4">{isSl ? 'Poslovni uporabniki' : 'Business Users'}</h3>
-                <div className="space-y-3">
-                  {packages.boost?.business?.map(pkg => (
-                    <div key={pkg.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                      <div>
-                        <p className="font-medium">{pkg.name}</p>
-                        <p className="text-sm text-gray-500">€{pkg.price}/dan · min {pkg.min_days} {isSl ? 'ditë' : 'days'}</p>
-                        {pkg.discount_percent > 0 && <span className="text-xs text-red-500 font-medium">-{pkg.discount_percent}%</span>}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-green-600">€{pkg.price}</span>
-                        <button onClick={() => startEditPackage(pkg, 'boost_business')} className="p-1 hover:bg-gray-200 rounded"><Edit className="w-4 h-4 text-gray-500" /></button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </Card>
+                  )}
+                  <h3 className="font-semibold text-lg mb-2">{pkg.name}</h3>
+                  <div className="flex items-baseline gap-2 mb-3">
+                    {pkg.discount_active && pkg.discount_percent > 0 ? (
+                      <>
+                        <span className="text-2xl font-bold text-red-500">€{(pkg.price * (1 - pkg.discount_percent / 100)).toFixed(2)}</span>
+                        <span className="text-lg text-gray-400 line-through">€{pkg.price}</span>
+                      </>
+                    ) : (
+                      <span className="text-2xl font-bold text-orange-600">€{pkg.price}</span>
+                    )}
+                    <span className="text-gray-500 text-sm">/dan</span>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-4">Min {pkg.min_days} dni</p>
+                  <Button variant="outline" size="sm" className="w-full" onClick={() => { setSelectedPackage(pkg); setShowPackageModal(true) }}>
+                    <Edit className="w-4 h-4 mr-2" />Uredi
+                  </Button>
+                </Card>
+              ))}
             </div>
             
-            {/* Edit Modal */}
-            {editingPackage && (
-              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                <Card className="w-full max-w-md p-6">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-semibold">{isSl ? 'Uredi paket' : 'Edit Package'}</h3>
-                    <button onClick={() => setEditingPackage(null)}><X className="w-5 h-5" /></button>
-                  </div>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-1">{isSl ? 'Naziv (SL)' : 'Name (SL)'}</label>
-                      <input type="text" value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})} className="w-full p-2 border rounded" />
+            <h2 className="text-xl font-semibold mt-8">Paketi za promocijo - Poslovni</h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {packages.filter(p => p.type === 'boost_business').map(pkg => (
+                <Card key={pkg.id} className="p-5 relative overflow-hidden">
+                  {pkg.discount_active && pkg.discount_percent > 0 && (
+                    <div className="absolute top-0 right-0 bg-red-500 text-white px-3 py-1 text-xs font-bold rounded-bl-lg">
+                      -{pkg.discount_percent}%
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-1">{isSl ? 'Naziv (EN)' : 'Name (EN)'}</label>
-                      <input type="text" value={editForm.name_en} onChange={e => setEditForm({...editForm, name_en: e.target.value})} className="w-full p-2 border rounded" />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium mb-1">{isSl ? 'Cena (€)' : 'Price (€)'}</label>
-                        <input type="number" step="0.01" value={editForm.price} onChange={e => setEditForm({...editForm, price: e.target.value})} className="w-full p-2 border rounded" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-1">{isSl ? 'Min ditë' : 'Min days'}</label>
-                        <input type="number" value={editForm.min_days} onChange={e => setEditForm({...editForm, min_days: e.target.value})} className="w-full p-2 border rounded" />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium mb-1">{isSl ? 'Zbritje (%)' : 'Discount (%)'}</label>
-                        <input type="number" value={editForm.discount} onChange={e => setEditForm({...editForm, discount: e.target.value})} className="w-full p-2 border rounded" placeholder="0" />
-                      </div>
-                      <div className="flex items-end">
-                        <label className="flex items-center gap-2 cursor-pointer">
-                          <input type="checkbox" checked={editForm.discount_active} onChange={e => setEditForm({...editForm, discount_active: e.target.checked})} className="w-4 h-4" />
-                          <span className="text-sm">{isSl ? 'Zbritje aktive' : 'Discount active'}</span>
-                        </label>
-                      </div>
-                    </div>
-                    {editingPackage.type === 'publishing' && (
-                      <div>
-                        <label className="block text-sm font-medium mb-1">{isSl ? 'Max vozil' : 'Max cars'}</label>
-                        <input type="number" value={editForm.max_cars} onChange={e => setEditForm({...editForm, max_cars: e.target.value})} className="w-full p-2 border rounded" />
-                      </div>
+                  )}
+                  <h3 className="font-semibold text-lg mb-2">{pkg.name}</h3>
+                  <div className="flex items-baseline gap-2 mb-3">
+                    {pkg.discount_active && pkg.discount_percent > 0 ? (
+                      <>
+                        <span className="text-2xl font-bold text-red-500">€{(pkg.price * (1 - pkg.discount_percent / 100)).toFixed(2)}</span>
+                        <span className="text-lg text-gray-400 line-through">€{pkg.price}</span>
+                      </>
+                    ) : (
+                      <span className="text-2xl font-bold text-orange-600">€{pkg.price}</span>
                     )}
-                    <div className="flex gap-2 pt-2">
-                      <Button onClick={savePackage} className="flex-1">{isSl ? 'Shrani' : 'Save'}</Button>
-                      <Button variant="outline" onClick={() => setEditingPackage(null)}>{isSl ? 'Prekliči' : 'Cancel'}</Button>
-                    </div>
+                    <span className="text-gray-500 text-sm">/dan</span>
                   </div>
+                  <p className="text-sm text-gray-600 mb-4">Min {pkg.min_days} dni</p>
+                  <Button variant="outline" size="sm" className="w-full" onClick={() => { setSelectedPackage(pkg); setShowPackageModal(true) }}>
+                    <Edit className="w-4 h-4 mr-2" />Uredi
+                  </Button>
                 </Card>
-              </div>
-            )}
+              ))}
+            </div>
+          </div>
+        )}
+        
+        {/* Messages Tab */}
+        {!loading && activeTab === 'messages' && (
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold">Sporočila ({messages.length})</h2>
+            </div>
+            
+            <div className="space-y-3">
+              {messages.map(msg => {
+                const sender = users.find(u => u.id === msg.sender_id)
+                return (
+                  <Card key={msg.id} className={`p-4 ${!msg.is_read ? 'border-l-4 border-orange-500 bg-orange-50/50' : ''}`}>
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          {msg.is_system && <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">SISTEM</span>}
+                          <span className="font-medium">{sender?.name || 'Neznan'}</span>
+                          <span className="text-gray-400">·</span>
+                          <span className="text-sm text-gray-500">{sender?.email}</span>
+                        </div>
+                        {msg.subject && <p className="font-medium text-sm mb-1">{msg.subject}</p>}
+                        <p className="text-gray-700">{msg.content}</p>
+                        <p className="text-xs text-gray-400 mt-2">{new Date(msg.created_at).toLocaleString()}</p>
+                      </div>
+                      {!msg.is_read && (
+                        <span className="px-2 py-1 bg-orange-500 text-white rounded text-xs font-medium">Novo</span>
+                      )}
+                    </div>
+                  </Card>
+                )
+              })}
+              {messages.length === 0 && (
+                <p className="text-center text-gray-500 py-8">Ni sporočil</p>
+              )}
+            </div>
           </div>
         )}
       </div>
+      
+      {/* User Detail Modal */}
+      <AnimatePresence>
+        {showUserModal && selectedUser && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }} 
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-white rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
+            >
+              <div className="p-6 border-b flex justify-between items-center sticky top-0 bg-white">
+                <h3 className="text-lg font-semibold">Uporabnik #{selectedUser.id}</h3>
+                <button onClick={() => setShowUserModal(false)}><X className="w-5 h-5" /></button>
+              </div>
+              
+              <div className="p-6 space-y-4">
+                <div>
+                  <p className="text-sm text-gray-500">Ime</p>
+                  <p className="font-medium">{selectedUser.name}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Email</p>
+                  <p className="font-medium">{selectedUser.email}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Telefon</p>
+                  <p className="font-medium">{selectedUser.phone || 'Ni podatka'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Tip</p>
+                  <span className={`px-2 py-1 rounded text-xs font-medium ${selectedUser.user_type === 'business' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
+                    {selectedUser.user_type === 'business' ? 'Podjetje' : 'Zasebno'}
+                  </span>
+                </div>
+                
+                <div className="border-t pt-4">
+                  <p className="text-sm text-gray-500 mb-2">Aktivni paketi</p>
+                  {getUserActivePackages(selectedUser.id).length > 0 ? (
+                    <div className="space-y-2">
+                      {getUserActivePackages(selectedUser.id).map(pack => (
+                        <div key={pack.id} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                          <span>{pack.package_name}</span>
+                          <span className="text-xs text-gray-500">do {new Date(pack.expires_at).toLocaleDateString()}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-400 text-sm">Ni aktivnih paketov</p>
+                  )}
+                </div>
+                
+                <div className="border-t pt-4">
+                  <p className="text-sm text-gray-500 mb-2">Vozila ({cars.filter(c => c.user_id === selectedUser.id).length})</p>
+                  <div className="space-y-2 max-h-40 overflow-y-auto">
+                    {cars.filter(c => c.user_id === selectedUser.id).map(car => (
+                      <div key={car.id} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                        <span className="text-sm truncate flex-1">{car.title}</span>
+                        <span className={`px-2 py-0.5 rounded text-xs ${car.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-200'}`}>
+                          {car.status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+      
+      {/* Send Message Modal */}
+      <AnimatePresence>
+        {showMessageModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-xl max-w-md w-full">
+              <div className="p-6 border-b flex justify-between items-center">
+                <h3 className="text-lg font-semibold">Pošlji sporočilo</h3>
+                <button onClick={() => setShowMessageModal(false)}><X className="w-5 h-5" /></button>
+              </div>
+              <div className="p-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Zadeva</label>
+                  <input type="text" value={messageForm.subject} onChange={e => setMessageForm({...messageForm, subject: e.target.value})} className="w-full p-2 border rounded" placeholder="Neobvezno" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Sporočilo</label>
+                  <textarea value={messageForm.content} onChange={e => setMessageForm({...messageForm, content: e.target.value})} className="w-full p-2 border rounded h-32" placeholder="Vnesite sporočilo..." />
+                </div>
+                <Button onClick={sendMessage} className="w-full">
+                  <Send className="w-4 h-4 mr-2" />
+                  Pošlji
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+      
+      {/* Broadcast Modal */}
+      <AnimatePresence>
+        {showBroadcastModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-xl max-w-md w-full">
+              <div className="p-6 border-b flex justify-between items-center">
+                <h3 className="text-lg font-semibold">Pošlji vsem uporabnikom</h3>
+                <button onClick={() => setShowBroadcastModal(false)}><X className="w-5 h-5" /></button>
+              </div>
+              <div className="p-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Zadeva</label>
+                  <input type="text" value={broadcastForm.subject} onChange={e => setBroadcastForm({...broadcastForm, subject: e.target.value})} className="w-full p-2 border rounded" placeholder="Neobvezno" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Sporočilo</label>
+                  <textarea value={broadcastForm.content} onChange={e => setBroadcastForm({...broadcastForm, content: e.target.value})} className="w-full p-2 border rounded h-32" placeholder="Vnesite sporočilo za vse uporabnike..." />
+                </div>
+                <p className="text-sm text-gray-500">Sporočilo bo poslano {users.length} uporabnikom.</p>
+                <Button onClick={sendBroadcast} className="w-full">
+                  <Send className="w-4 h-4 mr-2" />
+                  Pošlji vsem
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+      
+      {/* Package Edit Modal */}
+      <AnimatePresence>
+        {showPackageModal && selectedPackage && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-xl max-w-md w-full">
+              <div className="p-6 border-b flex justify-between items-center">
+                <h3 className="text-lg font-semibold">Uredi paket</h3>
+                <button onClick={() => setShowPackageModal(false)}><X className="w-5 h-5" /></button>
+              </div>
+              <div className="p-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Naziv (SL)</label>
+                  <input type="text" value={selectedPackage.name || ''} onChange={e => setSelectedPackage({...selectedPackage, name: e.target.value})} className="w-full p-2 border rounded" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Cena (€)</label>
+                    <input type="number" step="0.01" value={selectedPackage.price || 0} onChange={e => setSelectedPackage({...selectedPackage, price: parseFloat(e.target.value)})} className="w-full p-2 border rounded" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Min dni</label>
+                    <input type="number" value={selectedPackage.min_days || 1} onChange={e => setSelectedPackage({...selectedPackage, min_days: parseInt(e.target.value)})} className="w-full p-2 border rounded" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Zbritja (%)</label>
+                    <input type="number" value={selectedPackage.discount_percent || 0} onChange={e => setSelectedPackage({...selectedPackage, discount_percent: parseInt(e.target.value)})} className="w-full p-2 border rounded" placeholder="0" />
+                  </div>
+                  <div className="flex items-end">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="checkbox" checked={selectedPackage.discount_active || false} onChange={e => setSelectedPackage({...selectedPackage, discount_active: e.target.checked})} className="w-4 h-4" />
+                      <span className="text-sm">Zbritja aktivna</span>
+                    </label>
+                  </div>
+                </div>
+                <div className="flex gap-2 pt-2">
+                  <Button onClick={updatePackage} className="flex-1">
+                    <Save className="w-4 h-4 mr-2" />
+                    Shrani
+                  </Button>
+                  <Button variant="outline" onClick={() => setShowPackageModal(false)}>Prekliči</Button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
