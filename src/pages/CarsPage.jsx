@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
-import { useSearchParams, Link, useLocation } from 'react-router-dom'
+import { useSearchParams, Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowUpDown, Heart } from 'lucide-react'
+import { ArrowUpDown, Heart, ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { CarCard } from '@/components/features/CarCard'
 import { useCars } from '@/lib/CarContext'
@@ -22,6 +22,7 @@ export function CarsPage() {
   const { cars } = useCars()
   const { favorites } = useFavorites()
   const location = useLocation()
+  const navigate = useNavigate()
   const { t, language } = useLanguage()
   
   // Get filters from URL (from HomePage search)
@@ -251,9 +252,20 @@ export function CarsPage() {
   return (
     <div className="min-h-screen">
       {/* ===== HERO BANNER ===== */}
-      <div className="py-20">
+      <div className="py-16">
         {/* Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Back Button - show for Rabljena, Nova, Električna, Financiranje */}
+          {(vehicleType === 'used' || vehicleType === 'rabljena' || vehicleType === 'new' || vehicleType === 'nova' || vehicleType === 'electric' || vehicleType === 'električna' || isFinancingPage || fuelParam?.toLowerCase().includes('electric') || fuelParam?.toLowerCase().includes('električ')) && (
+            <button
+              onClick={() => navigate('/')}
+              className="flex items-center gap-2 text-white/80 hover:text-white mb-6 transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              {language === 'sl' ? 'Nazaj' : 'Back'}
+            </button>
+          )}
+          
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}

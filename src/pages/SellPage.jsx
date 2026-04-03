@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Check } from 'lucide-react'
+import { Check, ArrowLeft } from 'lucide-react'
 import { useAuth } from '@/lib/AuthContext'
 import { useLanguage } from '@/lib/LanguageContext'
 
@@ -293,6 +293,14 @@ export function SellPage() {
       </div>
       
       <div className="relative h-[200px] md:h-[280px] overflow-hidden">
+        {/* Back Button */}
+        <button
+          onClick={() => navigate('/')}
+          className="absolute top-4 left-4 z-20 flex items-center gap-2 text-white/80 hover:text-white transition-colors bg-black/30 backdrop-blur-sm px-3 py-2 rounded-lg"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          {language === 'sl' ? 'Nazaj' : 'Back'}
+        </button>
         <img src="https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=1920&h=600&fit=crop" alt="Car sales" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         <div className="absolute inset-0 flex items-center justify-center p-4">

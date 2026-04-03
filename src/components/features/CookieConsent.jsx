@@ -46,13 +46,13 @@ export function CookieConsent() {
   return (
     <>
       <div className="fixed inset-0 bg-black/50 z-50" />
-      <div className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl z-50 p-4 md:p-6">
+      <div className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl z-50 p-4 md:p-6 border-t border-gray-200">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-start justify-between gap-4 mb-4">
             <div>
-              <h3 className="text-lg font-bold mb-2">🍪 Cookie Settings</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-1">Spletne piškotke</h3>
               <p className="text-sm text-gray-600">
-                We use cookies to improve your experience. You can choose which cookies you want to accept.
+                Uporabljamo piškotke za izboljšanje vaše izkušnje. Lahko izberete, katere piškotke želite sprejeti.
               </p>
             </div>
           </div>
@@ -61,21 +61,21 @@ export function CookieConsent() {
             <div className="flex flex-wrap gap-3">
               <button
                 onClick={acceptAll}
-                className="px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition"
+                className="px-6 py-2.5 bg-[#ff6a00] text-white rounded-lg font-medium hover:bg-[#ff7f2a] transition-colors shadow-sm"
               >
-                ✅ Accept All
+                Sprejmi vse
               </button>
               <button
                 onClick={declineAll}
-                className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition"
+                className="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors"
               >
-                ❌ Decline Optional
+                Zavrni neobvezne
               </button>
               <button
                 onClick={() => setShowPreferences(true)}
-                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition"
+                className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
               >
-                ⚙️ Custom Settings
+                Nastavitve
               </button>
             </div>
           ) : (
@@ -95,53 +95,65 @@ function CookiePreferences({ onSave, onCancel }) {
   })
   
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between py-2 border-b">
+    <div className="space-y-4 bg-gray-50 rounded-xl p-4">
+      <div className="flex items-center justify-between py-3 border-b border-gray-200">
         <div>
-          <p className="font-medium">Necessary Cookies</p>
-          <p className="text-sm text-gray-500">Required for the site to work</p>
+          <p className="font-medium text-gray-900">Nujni piškotki</p>
+          <p className="text-sm text-gray-500">Potrebni za delovanje spletnega mesta</p>
         </div>
-        <input type="checkbox" checked disabled className="w-5 h-5" />
+        <div className="relative">
+          <input type="checkbox" checked disabled className="sr-only peer" />
+          <div className="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-green-500 cursor-not-allowed"></div>
+          <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition peer-checked:translate-x-5"></div>
+        </div>
       </div>
       
-      <div className="flex items-center justify-between py-2 border-b">
+      <div className="flex items-center justify-between py-3 border-b border-gray-200">
         <div>
-          <p className="font-medium">Analytics</p>
-          <p className="text-sm text-gray-500">Help us improve the site</p>
+          <p className="font-medium text-gray-900">Analitika</p>
+          <p className="text-sm text-gray-500">Pomagajo nam izboljšati spletno stran</p>
         </div>
-        <input 
-          type="checkbox" 
-          checked={prefs.analytics}
-          onChange={(e) => setPrefs({...prefs, analytics: e.target.checked})}
-          className="w-5 h-5 accent-green-600" 
-        />
+        <label className="relative inline-flex items-center cursor-pointer">
+          <input 
+            type="checkbox" 
+            checked={prefs.analytics}
+            onChange={(e) => setPrefs({...prefs, analytics: e.target.checked})}
+            className="sr-only peer" 
+          />
+          <div className="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-[#ff6a00] transition-colors"></div>
+          <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition peer-checked:translate-x-5 shadow"></div>
+        </label>
       </div>
       
-      <div className="flex items-center justify-between py-2">
+      <div className="flex items-center justify-between py-3">
         <div>
-          <p className="font-medium">Marketing</p>
-          <p className="text-sm text-gray-500">Used for personalized ads</p>
+          <p className="font-medium text-gray-900">Trženje</p>
+          <p className="text-sm text-gray-500">Uporabljajo se za prilagojene oglase</p>
         </div>
-        <input 
-          type="checkbox" 
-          checked={prefs.marketing}
-          onChange={(e) => setPrefs({...prefs, marketing: e.target.checked})}
-          className="w-5 h-5 accent-green-600" 
-        />
+        <label className="relative inline-flex items-center cursor-pointer">
+          <input 
+            type="checkbox" 
+            checked={prefs.marketing}
+            onChange={(e) => setPrefs({...prefs, marketing: e.target.checked})}
+            className="sr-only peer" 
+          />
+          <div className="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-[#ff6a00] transition-colors"></div>
+          <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition peer-checked:translate-x-5 shadow"></div>
+        </label>
       </div>
       
       <div className="flex gap-3 pt-2">
         <button
           onClick={() => onSave(prefs)}
-          className="px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700"
+          className="px-6 py-2.5 bg-[#ff6a00] text-white rounded-lg font-medium hover:bg-[#ff7f2a] transition-colors shadow-sm"
         >
-          Save Preferences
+          Shrani nastavitve
         </button>
         <button
           onClick={onCancel}
-          className="px-6 py-2 text-gray-600 hover:text-gray-800"
+          className="px-6 py-2.5 text-gray-600 hover:text-gray-800 font-medium"
         >
-          Cancel
+          Prekliči
         </button>
       </div>
     </div>

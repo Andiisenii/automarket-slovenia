@@ -91,9 +91,9 @@ export function Header() {
                   placeholder={language === 'sl' ? 'Išči...' : 'Search...'}
                   value={headerSearch}
                   onChange={(e) => setHeaderSearch(e.target.value)}
-                  className="w-32 px-3 py-1.5 pl-8 bg-white/10 border border-white/20 rounded-lg text-sm text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[#ff6a00]"
+                  className="w-28 px-2 py-1 pl-7 bg-white/10 border border-white/20 rounded-lg text-sm text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[#ff6a00] transition-all"
                 />
-                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/70" />
+                <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/70" />
               </form>
             )}
             
