@@ -252,14 +252,14 @@ export function CarsPage() {
   return (
     <div className="min-h-screen">
       {/* ===== HERO BANNER ===== */}
-      <div className="py-16">
+      <div className="py-16 bg-white">
         {/* Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Back Button - show for Rabljena, Nova, Električna, Financiranje */}
           {(vehicleType === 'used' || vehicleType === 'rabljena' || vehicleType === 'new' || vehicleType === 'nova' || vehicleType === 'electric' || vehicleType === 'električna' || isFinancingPage || (fuelParam && (fuelParam?.toLowerCase().includes('electric') || fuelParam?.toLowerCase().includes('električ')))) && (
             <button
               onClick={() => navigate('/')}
-              className="flex items-center gap-2 text-white hover:text-white/80 mb-6 transition-colors"
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
               {language === 'sl' ? 'Nazaj' : 'Back'}
@@ -270,13 +270,13 @@ export function CarsPage() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">
+            <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
               {getPageTitle()}
             </h1>
             {getSearchSubtitle() ? (
-              <p className="text-white/80">{getSearchSubtitle()}</p>
+              <p className="text-gray-600">{getSearchSubtitle()}</p>
             ) : (
-              <p className="text-white/80">
+              <p className="text-gray-600">
                 {filteredCars.length} {filteredCars.length === 1 ? 'vozilo' : 'vozil'} najdeno
               </p>
             )}
@@ -285,7 +285,7 @@ export function CarsPage() {
       </div>
       
       {/* ===== CONTENT ===== */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-white">
         
         {/* Promoted Cars Section */}
         {filteredCars.some(car => car.promoted) && (
@@ -338,13 +338,13 @@ export function CarsPage() {
             animate={{ opacity: 1 }}
             className="text-center py-20"
           >
-            <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Car className="w-10 h-10 text-white" />
+            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Car className="w-10 h-10 text-gray-400" />
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
               Ni vozil
             </h3>
-            <p className="text-white/70 mb-6">
+            <p className="text-gray-600 mb-6">
               Poskusite spremeniti iskalne kriterije
             </p>
             <Link to="/cars">
