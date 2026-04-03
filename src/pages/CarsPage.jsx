@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useSearchParams, Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowUpDown, Heart, ArrowLeft } from 'lucide-react'
+import { ArrowUpDown, Heart, ArrowLeft, Car } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { CarCard } from '@/components/features/CarCard'
 import { useCars } from '@/lib/CarContext'
@@ -256,10 +256,10 @@ export function CarsPage() {
         {/* Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Back Button - show for Rabljena, Nova, Električna, Financiranje */}
-          {(vehicleType === 'used' || vehicleType === 'rabljena' || vehicleType === 'new' || vehicleType === 'nova' || vehicleType === 'electric' || vehicleType === 'električna' || isFinancingPage || fuelParam?.toLowerCase().includes('electric') || fuelParam?.toLowerCase().includes('električ')) && (
+          {(vehicleType === 'used' || vehicleType === 'rabljena' || vehicleType === 'new' || vehicleType === 'nova' || vehicleType === 'electric' || vehicleType === 'električna' || isFinancingPage || (fuelParam && (fuelParam?.toLowerCase().includes('electric') || fuelParam?.toLowerCase().includes('električ')))) && (
             <button
               onClick={() => navigate('/')}
-              className="flex items-center gap-2 text-white/80 hover:text-white mb-6 transition-colors"
+              className="flex items-center gap-2 text-white hover:text-white/80 mb-6 transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
               {language === 'sl' ? 'Nazaj' : 'Back'}
@@ -274,9 +274,9 @@ export function CarsPage() {
               {getPageTitle()}
             </h1>
             {getSearchSubtitle() ? (
-              <p className="text-gray-200">{getSearchSubtitle()}</p>
+              <p className="text-white/80">{getSearchSubtitle()}</p>
             ) : (
-              <p className="text-gray-200">
+              <p className="text-white/80">
                 {filteredCars.length} {filteredCars.length === 1 ? 'vozilo' : 'vozil'} najdeno
               </p>
             )}
@@ -285,7 +285,7 @@ export function CarsPage() {
       </div>
       
       {/* ===== CONTENT ===== */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-[#f5f6f8]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
         {/* Promoted Cars Section */}
         {filteredCars.some(car => car.promoted) && (
@@ -338,11 +338,13 @@ export function CarsPage() {
             animate={{ opacity: 1 }}
             className="text-center py-20"
           >
-            <div className="text-6xl mb-4">🔍</div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Car className="w-10 h-10 text-white" />
+            </div>
+            <h3 className="text-xl font-semibold text-white mb-2">
               Ni vozil
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-white/70 mb-6">
               Poskusite spremeniti iskalne kriterije
             </p>
             <Link to="/cars">
