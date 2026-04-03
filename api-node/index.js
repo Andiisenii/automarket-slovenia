@@ -236,6 +236,32 @@ app.post('/api/admin.php', async (req, res) => {
   return res.json({ success: false, message: 'Unknown action' })
 })
 
+// ============ CAR FEATURES ============
+app.get('/api/features.php', async (req, res) => {
+  const { data, error } = await supabase
+    .from('car_features')
+    .select('*')
+    .eq('is_active', true)
+    .order('category')
+  
+  if (error) {
+    return res.json({ success: false, message: error.message })
+  }
+  
+  // Group by category
+  const grouped = {}
+  if (data) {
+    data.forEach(feature => {
+      if (!grouped[feature.category]) {
+        grouped[feature.category] = []
+      }
+      grouped[feature.category].push(feature)
+    })
+  }
+  
+  return res.json({ success: true, features: data || [], grouped })
+})
+
 // ============ BRANDS ============
 app.get('/api/brands.php', async (req, res) => {
   const brands = [

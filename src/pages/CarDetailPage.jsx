@@ -5,8 +5,10 @@ import { API_URL } from '@/lib/api'
 import { 
   ArrowLeft, Heart, Share2, Eye, Calendar, Gauge, Fuel, 
   Settings, Shield, Phone, MessageCircle, 
-  Star, Check, Clock, AlertCircle, X, Send, Phone as PhoneIcon, MessageSquare, CreditCard
+  Star, Check, Clock, AlertCircle, X, Send, Phone as PhoneIcon, MessageSquare, CreditCard,
+  Wifi, Car, Wind, Leaf, Users
 } from 'lucide-react'
+import { getFeatureNameById, getFeatureById } from '@/lib/data'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
@@ -59,6 +61,7 @@ export function CarDetailPage() {
             monthlyBudget: carData.monthly_budget ?? carData.monthlyBudget ?? 0,
             downPaymentType: carData.down_payment_type || carData.downPaymentType || 'amount',
             downPaymentValue: carData.down_payment_value || carData.downPaymentValue || 0,
+            featureIds: carData.feature_ids || carData.featureIds || [],
             createdAt: carData.created_at || carData.createdAt,
             seller: {
               name: carData.seller_name || carData.seller?.name || 'Seller',
@@ -147,6 +150,10 @@ export function CarDetailPage() {
     { icon: Shield, label: t('color'), value: car.color || 'N/A' },
     { icon: Shield, label: t('bodyType'), value: car.bodyType || 'N/A' },
   ]
+  
+  // Get selected features with names
+  const selectedFeatureIds = car.featureIds || []
+  const selectedFeatures = selectedFeatureIds.map(id => getFeatureById(id)).filter(Boolean)
   
   const handleSendMessage = () => {
     if (!isAuthenticated) {
@@ -415,6 +422,30 @@ export function CarDetailPage() {
                 ))}
               </div>
             </Card>
+            
+            {/* Features / Equipment */}
+            {selectedFeatures.length > 0 && (
+              <Card className="p-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Oprema vozila</h2>
+                <div className="flex flex-wrap gap-2">
+                  {selectedFeatures.map((feature) => (
+                    <div 
+                      key={feature.id}
+                      className="inline-flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-lg text-sm"
+                      title={feature.name_en}
+                    >
+                      <Check className="w-4 h-4 text-green-600" />
+                      <span className="text-green-800">
+                        {isSl ? feature.name_sl : feature.name_en}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-sm text-gray-500 mt-3">
+                  Skupaj: {selectedFeatures.length} opreme
+                </p>
+              </Card>
+            )}
           </div>
           
           {/* Sidebar */}

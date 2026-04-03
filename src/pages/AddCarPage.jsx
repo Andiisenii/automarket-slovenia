@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, Upload, X, Check, CreditCard, ChevronDown } from 'lucide-react'
+import { ArrowLeft, Upload, X, Check, CreditCard, ChevronDown, Shield, Settings, Wifi, Car, Fuel, Star, ChevronUp } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { useAuth } from '@/lib/AuthContext'
 import { useLanguage } from '@/lib/LanguageContext'
 import { useCars } from '@/lib/CarContext'
 import { packageDB, carDB } from '@/lib/database'
-import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, colors, LUXURY_CAR_THRESHOLD } from '@/lib/data'
+import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, colors, LUXURY_CAR_THRESHOLD, carFeatures, featureCategoryNames } from '@/lib/data'
 
 export function AddCarPage() {
   const navigate = useNavigate()
@@ -28,7 +28,10 @@ export function AddCarPage() {
     title: '', brand: '', model: '', year: new Date().getFullYear(),
     price: '', mileage: '', fuelType: '', transmission: '', bodyType: '',
     engine: '', horsepower: '', color: '', city: '', description: '',
+    featureIds: [],
   })
+
+  const [openFeaturesCategory, setOpenFeaturesCategory] = useState('safety')
 
   const [hasFinancing, setHasFinancing] = useState(false)
   const [monthlyBudget, setMonthlyBudget] = useState('')
@@ -121,6 +124,31 @@ export function AddCarPage() {
     return [...new Set([...apiModels, ...custom])]
   }
 
+  // Feature selection helpers
+  const isFeatureSelected = (featureId) => formData.featureIds.includes(featureId)
+  
+  const toggleFeature = (featureId) => {
+    setFormData(prev => ({
+      ...prev,
+      featureIds: prev.featureIds.includes(featureId)
+        ? prev.featureIds.filter(id => id !== featureId)
+        : [...prev.featureIds, featureId]
+    }))
+  }
+
+  const selectAllInCategory = (category) => {
+    const categoryFeatureIds = carFeatures[category].map(f => f.id)
+    const allSelected = categoryFeatureIds.every(id => formData.featureIds.includes(id))
+    setFormData(prev => ({
+      ...prev,
+      featureIds: allSelected
+        ? prev.featureIds.filter(id => !categoryFeatureIds.includes(id))
+        : [...new Set([...prev.featureIds, ...categoryFeatureIds])]
+    }))
+  }
+
+  const getSelectedCount = () => formData.featureIds.length
+
   useEffect(() => {
     if (editCar) {
       setFormData({
@@ -137,6 +165,9 @@ export function AddCarPage() {
         setMonthlyBudget(editCar.monthlyBudget || '')
         setDownPaymentType(editCar.downPaymentType || 'amount')
         setDownPaymentValue(editCar.downPaymentValue || '')
+      }
+      if (editCar.featureIds) {
+        setFormData(prev => ({ ...prev, featureIds: editCar.featureIds || [] }))
       }
     }
   }, [editCar])
@@ -318,6 +349,7 @@ export function AddCarPage() {
       monthlyBudget: hasFinancing ? monthlyBudget : null,
       downPaymentType: hasFinancing && downPaymentValue ? downPaymentType : null,
       downPaymentValue: hasFinancing && downPaymentValue ? downPaymentValue : null,
+      featureIds: formData.featureIds,
     }
     navigate('/payment', { state: { carData: carDataForPayment } })
   }
@@ -446,6 +478,136 @@ export function AddCarPage() {
             <Dropdown label={t('color') + ' *'} name="color" value={formData.color} options={colors} color={true} />
             <Input label={t('engine')} placeholder={isSl ? 'npr. 2.0 TDI' : 'e.g. 2.0L TFSI'} value={formData.engine} onChange={(e) => handleChange('engine', e.target.value)} />
             <Input label={t('power') + ' (HP)'} type="number" placeholder="200" value={formData.horsepower} onChange={(e) => handleChange('horsepower', parseInt(e.target.value))} />
+          </div>
+        </div>
+
+        {/* Features Section */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">Oprema vozila</h2>
+            <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+              {getSelectedCount()} izbrano
+            </span>
+          </div>
+          
+          {/* Category tabs */}
+          <div className="flex flex-wrap gap-2 mb-4">
+            {Object.entries(featureCategoryNames).map(([key, names]) => {
+              const categoryFeatures = carFeatures[key] || []
+              const selectedInCategory = categoryFeatures.filter(f => isFeatureSelected(f.id)).length
+              const totalInCategory = categoryFeatures.length
+              const isActive = openFeaturesCategory === key
+              
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setOpenFeaturesCategory(key)}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
+                    isActive 
+                      ? 'bg-primary-100 text-primary-700' 
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  {key === 'safety' && <Shield className="w-4 h-4" />}
+                  {key === 'comfort' && <Settings className="w-4 h-4" />}
+                  {key === 'technology' && <Wifi className="w-4 h-4" />}
+                  {key === 'exterior' && <Car className="w-4 h-4" />}
+                  {key === 'interior' && <Star className="w-4 h-4" />}
+                  {key === 'seats' && <Star className="w-4 h-4" />}
+                  {key === 'doors' && <Star className="w-4 h-4" />}
+                  {key === 'efficiency' && <Fuel className="w-4 h-4" />}
+                  {key === 'other' && <Star className="w-4 h-4" />}
+                  {names.sl}
+                  {selectedInCategory > 0 && (
+                    <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+                      isActive ? 'bg-primary-200 text-primary-800' : 'bg-gray-200 text-gray-700'
+                    }`}>
+                      {selectedInCategory}
+                    </span>
+                  )}
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Features grid for selected category */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={openFeaturesCategory}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm text-gray-500">
+                  {carFeatures[openFeaturesCategory]?.length || 0} možnosti v {featureCategoryNames[openFeaturesCategory]?.sl}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => selectAllInCategory(openFeaturesCategory)}
+                  className="text-xs text-primary-600 hover:text-primary-700 font-medium"
+                >
+                  {carFeatures[openFeaturesCategory]?.every(f => isFeatureSelected(f.id)) 
+                    ? 'Ponastavi vse' 
+                    : 'Izberi vse'}
+                </button>
+              </div>
+              
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 max-h-[300px] overflow-y-auto p-1">
+                {(carFeatures[openFeaturesCategory] || []).map((feature) => {
+                  const selected = isFeatureSelected(feature.id)
+                  return (
+                    <button
+                      key={feature.id}
+                      type="button"
+                      onClick={() => toggleFeature(feature.id)}
+                      className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border text-left transition-all text-sm ${
+                        selected 
+                          ? 'border-primary-500 bg-primary-50 text-primary-700' 
+                          : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                        selected 
+                          ? 'border-primary-500 bg-primary-500' 
+                          : 'border-gray-300'
+                      }`}>
+                        {selected && <Check className="w-3 h-3 text-white" />}
+                      </div>
+                      <span className="flex-1 truncate">{isSl ? feature.name_sl : feature.name_en}</span>
+                    </button>
+                  )
+                })}
+              </div>
+            </motion.div>
+          </AnimatePresence>
+          
+          {/* Popular features quick select */}
+          <div className="mt-4 pt-4 border-t border-gray-100">
+            <p className="text-xs text-gray-500 mb-2">Hitra izbira - pogoste opreme:</p>
+            <div className="flex flex-wrap gap-2">
+              {[1, 5, 6, 16, 18, 20, 24, 35, 41, 44, 50, 57].map(id => {
+                const feature = Object.values(carFeatures).flat().find(f => f.id === id)
+                if (!feature) return null
+                const selected = isFeatureSelected(id)
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => toggleFeature(id)}
+                    className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
+                      selected 
+                        ? 'bg-primary-100 text-primary-700' 
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    {isSl ? feature.name_sl : feature.name_en}
+                  </button>
+                )
+              })}
+            </div>
           </div>
         </div>
 
