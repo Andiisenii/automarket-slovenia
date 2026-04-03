@@ -35,6 +35,23 @@ export function AuthProvider({ children }) {
     setLoading(true)
     
     try {
+      // DEMO CREDENTIALS - for testing without backend
+      if (email === 'admin@automarket.si' && password === 'test123') {
+        const demoUser = {
+          id: 1,
+          name: 'Admin',
+          email: 'admin@automarket.si',
+          role: 'admin',
+          user_type: 'business'
+        }
+        localStorage.setItem('automarket_token', 'demo_token_' + Date.now())
+        localStorage.setItem('automarket_user', JSON.stringify(demoUser))
+        setUser(demoUser)
+        setLoading(false)
+        return demoUser
+      }
+      
+      // Try API login
       const response = await fetch(`${API_URL}/auth.php`, {
         method: 'POST',
         headers: {
@@ -50,11 +67,11 @@ export function AuthProvider({ children }) {
       
       // Check if API returned success
       if (!result.success) {
-        throw new Error(result.message || 'Login failed: ' + JSON.stringify(result))
+        throw new Error('Neveljaven email ali geslo')
       }
       
       if (!result.token) {
-        throw new Error('No token received from server')
+        throw new Error('Napaka pri prijavi')
       }
       
       // Save token and user
@@ -66,8 +83,13 @@ export function AuthProvider({ children }) {
       
     } catch (e) {
       console.error('Login error:', e)
-      setError(e.message)
-      throw e
+      // Translate error messages to Slovenian
+      let errorMsg = e.message || 'Napaka pri prijavi'
+      if (errorMsg.includes('Invalid credentials') || errorMsg.includes('Invalid email') || errorMsg.includes('not found')) {
+        errorMsg = 'Neveljaven email ali geslo'
+      }
+      setError(errorMsg)
+      throw new Error(errorMsg)
     } finally {
       setLoading(false)
     }
