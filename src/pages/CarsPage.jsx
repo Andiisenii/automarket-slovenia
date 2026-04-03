@@ -252,7 +252,7 @@ export function CarsPage() {
   return (
     <div className="min-h-screen">
       {/* ===== HERO BANNER ===== */}
-      <div className="py-16 bg-white">
+      <div className="py-16">
         {/* Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Back Button - show for Rabljena, Nova, Električna, Financiranje */}
@@ -285,7 +285,7 @@ export function CarsPage() {
       </div>
       
       {/* ===== CONTENT ===== */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
         {/* Promoted Cars Section */}
         {filteredCars.some(car => car.promoted) && (
@@ -338,8 +338,8 @@ export function CarsPage() {
             animate={{ opacity: 1 }}
             className="text-center py-20"
           >
-            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Car className="w-10 h-10 text-gray-400" />
+            <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Car className="w-10 h-10 text-gray-900" />
             </div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
               Ni vozil
