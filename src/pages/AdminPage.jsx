@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
@@ -46,43 +46,11 @@ export default function AdminPage() {
   // Forms
   const [messageForm, setMessageForm] = useState({ recipientId: '', subject: '', content: '' })
   const [broadcastForm, setBroadcastForm] = useState({ subject: '', content: '' })
-  
-  // Load admin user from localStorage
-  useEffect(() => {
-    setMounted(true)
-    try {
-      const storedAdmin = localStorage.getItem('automarket_admin_user')
-      if (storedAdmin) {
-        const parsed = JSON.parse(storedAdmin)
-        if (parsed.role === 'admin') {
-          setAdminUser(parsed)
-        } else {
-          navigate('/admin')
-        }
-      } else {
-        navigate('/admin')
-      }
-    } catch (e) {
-      navigate('/admin')
-    }
-  }, [navigate])
-  
-  // Show loading until mounted (avoids hydration mismatch)
-  if (!mounted || !adminUser) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p>Nalaganje...</p>
-        </div>
-      </div>
-    )
-  }
-  
-  const currentUser = adminUser
 
-  // Load data from Supabase
-  const loadData = async () => {
+  // Load data from Supabase - defined as ref to avoid hook ordering issues
+  const loadDataRef = useRef(null)
+  
+  loadDataRef.current = async () => {
     setLoading(true)
     try {
       const [
@@ -121,7 +89,46 @@ export default function AdminPage() {
     setRefreshing(false)
   }
   
-  useEffect(() => { loadData() }, [])
+  // Load admin user from localStorage
+  useEffect(() => {
+    setMounted(true)
+    try {
+      const storedAdmin = localStorage.getItem('automarket_admin_user')
+      if (storedAdmin) {
+        const parsed = JSON.parse(storedAdmin)
+        if (parsed.role === 'admin') {
+          setAdminUser(parsed)
+        } else {
+          navigate('/admin')
+        }
+      } else {
+        navigate('/admin')
+      }
+    } catch (e) {
+      navigate('/admin')
+    }
+  }, [navigate])
+  
+  // Show loading until mounted (avoids hydration mismatch)
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p>Nalaganje...</p>
+        </div>
+      </div>
+    )
+  }
+  
+  if (!adminUser) {
+    return null
+  }
+  
+  const currentUser = adminUser
+  
+  // Load data when adminUser is set
+  const loadData = loadDataRef.current
   
   const handleRefresh = () => { setRefreshing(true); loadData() }
   
