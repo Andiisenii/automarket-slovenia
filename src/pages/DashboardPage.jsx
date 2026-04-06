@@ -15,6 +15,7 @@ import { useMessages } from '@/lib/MessagesContext'
 import { useLanguage } from '@/lib/LanguageContext'
 import { carDB } from '@/lib/database'
 import { formatPrice, formatNumber, getTimeAgo } from '@/lib/utils'
+import { supabase } from '@/lib/supabase'
 
 // Package configurations
 const SUBSCRIPTION_PLANS = [
@@ -224,6 +225,22 @@ export function DashboardPage() {
   
   const [userPackage, setUserPackage] = useState(getUserPackage)
   const [purchasedBoosts, setPurchasedBoosts] = useState(getPurchasedBoosts())
+  const [supabasePackages, setSupabasePackages] = useState([])
+  
+  // Load packages from Supabase for discount info
+  useEffect(() => {
+    const loadPackages = async () => {
+      try {
+        const { data } = await supabase.from('packages').select('*').eq('is_active', true)
+        if (data) {
+          setSupabasePackages(data)
+        }
+      } catch (err) {
+        console.error('Error loading packages:', err)
+      }
+    }
+    loadPackages()
+  }, [])
   
   // Refresh data when user changes or on mount
   useEffect(() => {
@@ -246,6 +263,22 @@ export function DashboardPage() {
   const isPremium = userPackage?.packageId === 'premium' && new Date(userPackage?.expiresAt) > new Date()
   const hasSubscription = userPackage?.packageId && new Date(userPackage?.expiresAt) > new Date()
   const isBusiness = user?.userType === 'business'
+  
+  // Get package with discount info from Supabase
+  const getPackageWithDiscount = () => {
+    if (!userPackage || !supabasePackages.length) return userPackage
+    const pkg = supabasePackages.find(p => p.name === userPackage.packageName)
+    if (pkg && pkg.discount_active && pkg.discount_percent > 0) {
+      return {
+        ...userPackage,
+        originalPrice: pkg.price,
+        discountedPrice: pkg.price * (1 - pkg.discount_percent / 100),
+        discountPercent: pkg.discount_percent
+      }
+    }
+    return userPackage
+  }
+  const packageWithDiscount = getPackageWithDiscount()
   
   // Business promotions - support multiple promotions
   const getBusinessPromotions = () => {
@@ -556,7 +589,10 @@ export function DashboardPage() {
                 {/* Package Status */}
                 {hasSubscription ? (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-sm font-medium">
-                    <Package className="w-4 h-4" /> {userPackage.packageName || 'Aktivno'}
+                    <Package className="w-4 h-4" /> {packageWithDiscount?.packageName || 'Aktivno'}
+                    {packageWithDiscount?.discountPercent && (
+                      <span className="bg-red-500 text-white px-1.5 py-0.5 rounded text-xs">-{packageWithDiscount.discountPercent}%</span>
+                    )}
                   </span>
                 ) : (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/20 text-red-400 text-sm font-medium">
