@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { Eye, EyeOff, Check, Star, Zap } from 'lucide-react'
 import { useAuth } from '@/lib/AuthContext'
 import { API_URL } from '@/lib/api'
+import { supabase } from '@/lib/supabase'
 
 const pricingPlans = [
   {
@@ -492,32 +493,32 @@ export function RegisterPage() {
 }
 
 export function ForgotPasswordPage() {
-  const [step, setStep] = useState('email') // 'email' | 'code' | 'success'
+  const [step, setStep] = useState('email') // 'email' | 'success'
   const [email, setEmail] = useState('')
-  const [token, setToken] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [emailSent, setEmailSent] = useState(false)
 
-  const handleSendCode = async (e) => {
+  // Check if we have a reset token in URL (from email link)
+  const hasResetToken = typeof window !== 'undefined' && window.location.hash.includes('access_token')
+
+  const handleSendResetEmail = async (e) => {
     e.preventDefault()
     if (!email) return
     setError('')
     setLoading(true)
 
     try {
-      const res = await fetch(`${API_URL}/forgot-password.php`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Pinggy-No-Screen': 'true' },
-        body: JSON.stringify({ email })
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`
       })
-      const data = await res.json()
       
-      if (data.success) {
-        setStep('code')
+      if (error) {
+        setError(error.message || 'Napaka pri pošiljanju')
       } else {
-        setError(data.message || 'Napaka pri pošiljanju')
+        setEmailSent(true)
       }
     } catch (err) {
       setError('Napaka povezave. Poskusite znova.')
@@ -530,10 +531,6 @@ export function ForgotPasswordPage() {
     e.preventDefault()
     setError('')
 
-    if (!token || token.length !== 6) {
-      setError('Vnesite 6-mestno kodo')
-      return
-    }
     if (newPassword.length < 6) {
       setError('Geslo mora imeti vsaj 6 znakov')
       return
@@ -546,17 +543,14 @@ export function ForgotPasswordPage() {
     setLoading(true)
 
     try {
-      const res = await fetch(`${API_URL}/reset-password.php`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Pinggy-No-Screen': 'true' },
-        body: JSON.stringify({ email, token, newPassword })
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
       })
-      const data = await res.json()
 
-      if (data.success) {
-        setStep('success')
+      if (error) {
+        setError(error.message || 'Napaka pri ponastavitvi')
       } else {
-        setError(data.message || 'Napaka pri ponastavitvi')
+        setStep('success')
       }
     } catch (err) {
       setError('Napaka povezave. Poskusite znova.')
@@ -565,8 +559,34 @@ export function ForgotPasswordPage() {
     }
   }
 
-  // Step: Email sent, enter code
-  if (step === 'code') {
+  // Step: Success
+  if (step === 'success') {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-8">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="w-full max-w-md text-center"
+        >
+          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Check className="w-10 h-10 text-green-600" />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Geslo ponastavljeno!</h1>
+          <p className="text-gray-600 mb-8">
+            Vase geslo je bilo uspesno spremenjeno.
+          </p>
+          <Link to="/login">
+            <button className="w-full py-3 bg-[#ff6a00] text-white font-semibold rounded-xl hover:bg-[#ff7f2a] transition-colors">
+              Nadaljuj na prijavo
+            </button>
+          </Link>
+        </motion.div>
+      </div>
+    )
+  }
+
+  // Step: Email sent confirmation
+  if (emailSent) {
     return (
       <div className="min-h-screen flex items-center justify-center p-8">
         <motion.div
@@ -578,80 +598,28 @@ export function ForgotPasswordPage() {
             <img src="/logo.png" alt="Vozilo.si" className="h-[50px] w-auto" />
           </Link>
 
-          <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
-            <p className="text-green-700 text-sm">
-              ✓ Koda poslana na <strong>{email}</strong>
+          <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-6">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                <Check className="w-5 h-5 text-green-600" />
+              </div>
+              <p className="text-green-700 font-semibold">E-poshta poslana!</p>
+            </div>
+            <p className="text-green-600 text-sm">
+              Poslali smo povezavo za ponastavitev gesla na <strong>{email}</strong>
+            </p>
+            <p className="text-green-600 text-sm mt-2">
+              Preverite svojo e-poshto in kliknite povezavo za ponastavitev gesla.
             </p>
           </div>
 
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Vnesite kodo</h1>
-          <p className="text-gray-600 mb-8">
-            Vnesite 6-mestno kodo, ki smo vam jo poslali na email.
-          </p>
-
-          <form onSubmit={handleResetPassword} className="space-y-4">
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-xl p-3">
-                <p className="text-red-600 text-sm">{error}</p>
-              </div>
-            )}
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                6-mestna koda
-              </label>
-              <input
-                type="text"
-                value={token}
-                onChange={(e) => setToken(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ff6a00] focus:border-transparent text-center text-2xl tracking-widest font-mono"
-                placeholder="000000"
-                maxLength={6}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Novo geslo
-              </label>
-              <input
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ff6a00] focus:border-transparent"
-                placeholder="Min. 6 znakov"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Potrdi geslo
-              </label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ff6a00] focus:border-transparent"
-                placeholder="Ponovno vnesite geslo"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 bg-[#ff6a00] text-white font-semibold rounded-xl hover:bg-[#ff7f2a] transition-colors disabled:opacity-50"
-            >
-              {loading ? 'Prosimo počakajte...' : 'Ponastavi geslo'}
-            </button>
-          </form>
-
           <p className="text-center mt-6 text-gray-600">
-            Niste prejeli kode?{' '}
+            Niste prejeli e-poste?{' '}
             <button 
-              onClick={() => setStep('email')} 
+              onClick={() => setEmailSent(false)} 
               className="text-[#ff6a00] font-semibold hover:underline"
             >
-              Pošlji znova
+              Poslji znova
             </button>
           </p>
 
@@ -660,33 +628,6 @@ export function ForgotPasswordPage() {
               ← Nazaj na prijavo
             </Link>
           </p>
-        </motion.div>
-      </div>
-    )
-  }
-
-  // Step: Success
-  if (step === 'success') {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-8">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center"
-        >
-          <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
-            <Check className="w-8 h-8 text-green-500" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Geslo ponastavljeno!</h2>
-          <p className="text-gray-600 mb-6">
-            Vaše geslo je bilo uspešno spremenjeno.
-          </p>
-          <Link 
-            to="/login" 
-            className="inline-block px-8 py-3 bg-[#ff6a00] text-white font-semibold rounded-xl hover:bg-[#ff7f2a] transition-colors"
-          >
-            Prijava z novim geslom
-          </Link>
         </motion.div>
       </div>
     )
@@ -706,10 +647,10 @@ export function ForgotPasswordPage() {
 
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Pozabljeno geslo?</h1>
         <p className="text-gray-600 mb-8">
-          Vnesite svoj email naslov in poslali vam bomo kodo za ponastavitev.
+          Vnesite svoj e-naslov in poslali vam bomo povezavo za ponastavitev.
         </p>
 
-        <form onSubmit={handleSendCode} className="space-y-4">
+        <form onSubmit={handleSendResetEmail} className="space-y-4">
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-xl p-3">
               <p className="text-red-600 text-sm">{error}</p>
@@ -718,7 +659,7 @@ export function ForgotPasswordPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email naslov
+              E-naslov
             </label>
             <input
               type="email"
@@ -735,14 +676,14 @@ export function ForgotPasswordPage() {
             disabled={loading}
             className="w-full py-3 bg-[#ff6a00] text-white font-semibold rounded-xl hover:bg-[#ff7f2a] transition-colors disabled:opacity-50"
           >
-            {loading ? 'Pošiljanje...' : 'Pošlji kodo'}
+            {loading ? 'Pošiljanje...' : 'Poslji povezavo'}
           </button>
         </form>
 
         <p className="text-center mt-6 text-gray-600">
           Se spomnite gesla?{' '}
           <Link to="/login" className="text-[#ff6a00] font-semibold hover:underline">
-            Prijava
+            Prijavite se
           </Link>
         </p>
       </motion.div>
