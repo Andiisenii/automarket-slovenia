@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Check, ArrowLeft, Star, Zap, Package, TrendingDown } from 'lucide-react'
+import { Check, X, ArrowLeft, Star, Zap, Package, TrendingDown } from 'lucide-react'
 import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabase'
 
@@ -19,32 +19,25 @@ const translations = {
     paymentSuccess: 'Placilo uspesno!',
     monthly: 'mesecna cena',
     perDay: '/dan',
-    duration: 'minimalno trajanje',
-    minOrder: 'minimalno',
-    publishPackages: 'Paketi za objavo',
-    boostPackages: 'Paketa za promocijo',
-    privateBoost: 'Za zasebne uporabnike',
-    businessBoost: 'Za poslovne uporabnike',
     discount: 'Zbitka',
-    discounted: 'Znizana cena',
-    original: 'Originalna cena',
-    day: 'dan',
-    days: 'dni',
-    akcija: 'akcijska cena',
   }
 }
 
-// Original publishing packages
+// Original publishing packages WITH features (included/excluded)
 const PUBLISHING_PACKAGES = [
   { 
     id: 'osnovni', 
     name: 'OSNOVNI', 
     price: 34.99, 
     features: [
-      'Objava do 100 oglasov',
-      '10 fotografij na oglas',
-      'Neomejeno urejanje oglasov',
-      'Osnovne funkcije',
+      { text: 'Objava do 100 oglasov', included: true },
+      { text: '10 fotografij na oglas', included: true },
+      { text: 'Neomejeno urejanje oglasov', included: true },
+      { text: 'Osnovne funkcije', included: true },
+      { text: 'Statistika ogledov', included: false },
+      { text: 'HD slike', included: false },
+      { text: '360 posnetki', included: false },
+      { text: 'Premium uvrstitev', included: false },
     ]
   },
   { 
@@ -52,13 +45,14 @@ const PUBLISHING_PACKAGES = [
     name: 'PREMIUM', 
     price: 64.99, 
     features: [
-      'Neomejena objava oglasov',
-      '30 fotografij na oglas',
-      'Neomejeno urejanje oglasov',
-      'Statistika ogledov',
-      'HD slike',
-      '360 posnetki',
-      'Premium uvrstitev',
+      { text: 'Neomejena objava oglasov', included: true },
+      { text: '30 fotografij na oglas', included: true },
+      { text: 'Neomejeno urejanje oglasov', included: true },
+      { text: 'Statistika ogledov', included: true },
+      { text: 'HD slike', included: true },
+      { text: '360 posnetki', included: true },
+      { text: 'Premium uvrstitev', included: true },
+      { text: 'Komentarji kupcev', included: true },
     ]
   },
 ]
@@ -99,6 +93,7 @@ export function SellPage() {
           .order('type')
         
         if (data && data.length > 0) {
+          // Group Supabase packages
           const grouped = {
             publishing: data.filter(p => p.type === 'publishing'),
             boost_private: data.filter(p => p.type === 'boost_private'),
@@ -125,9 +120,6 @@ export function SellPage() {
     }
     loadPackages()
   }, [])
-  
-  const getUserType = () => user?.user_type || 'private'
-  const userType = getUserType()
   
   const getFinalPrice = (pkg) => {
     if (pkg.discount_active && pkg.discount_percent > 0) {
@@ -247,7 +239,7 @@ export function SellPage() {
                   {selectedPlan.discount_active && selectedPlan.discount_percent > 0 ? (
                     <>
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-gray-600">{t.original}</span>
+                        <span className="text-gray-600">Originalna cena</span>
                         <span className="text-gray-400 line-through">€{selectedPlan.price}</span>
                       </div>
                       <div className="flex justify-between items-center mb-2">
@@ -290,12 +282,12 @@ export function SellPage() {
       {/* Publishing Packages */}
       <section className="py-12 md:py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center">{t.publishPackages}</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center">Paketi za objavo</h2>
           
           {loading ? (
             <div className="flex justify-center py-8"><div className="animate-spin w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full"></div></div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
               {packages.publishing?.map((pkg, index) => {
                 const hasDiscount = pkg.discount_active && pkg.discount_percent > 0
                 
@@ -335,14 +327,20 @@ export function SellPage() {
                         <p className="text-gray-500 text-sm mt-1">{t.monthly}</p>
                       </div>
                       
-                      {/* Features */}
-                      <ul className="space-y-3 mb-6">
+                      {/* Features with Check/X */}
+                      <ul className="space-y-2 mb-6">
                         {(pkg.features || []).map((feature, i) => (
-                          <li key={i} className="flex items-start gap-3">
-                            <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
-                              <Check className="w-3 h-3 text-green-600" />
-                            </div>
-                            <span className="text-gray-700">{feature}</span>
+                          <li key={i} className="flex items-center gap-3">
+                            {feature.included ? (
+                              <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center">
+                                <Check className="w-3 h-3 text-green-600" />
+                              </div>
+                            ) : (
+                              <div className="flex-shrink-0 w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center">
+                                <X className="w-3 h-3 text-gray-400" />
+                              </div>
+                            )}
+                            <span className={feature.included ? 'text-gray-700' : 'text-gray-400'}>{feature.text}</span>
                           </li>
                         ))}
                       </ul>
@@ -366,8 +364,8 @@ export function SellPage() {
       {packages.boost_private?.length > 0 && (
         <section className="py-12 bg-gray-50">
           <div className="max-w-6xl mx-auto px-4">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2 text-center">{t.boostPackages}</h2>
-            <p className="text-gray-600 text-center mb-8">{t.privateBoost}</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2 text-center">Paketa za promocijo</h2>
+            <p className="text-gray-600 text-center mb-8">Za zasebne uporabnike</p>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {packages.boost_private.map((pkg, index) => {
@@ -407,12 +405,12 @@ export function SellPage() {
                         ) : (
                           <span className="text-3xl font-bold text-orange-600">€{pkg.price}</span>
                         )}
-                        <span className="text-gray-500 ml-1">{t.perDay}</span>
+                        <span className="text-gray-500 ml-1">/dan</span>
                       </div>
                       
                       {/* Duration */}
                       <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
-                        <span>{pkg.days}</span>
+                        <span>min {pkg.days}</span>
                       </div>
                       
                       <button 
@@ -434,8 +432,8 @@ export function SellPage() {
       {packages.boost_business?.length > 0 && (
         <section className="py-12 bg-white">
           <div className="max-w-6xl mx-auto px-4">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2 text-center">{t.boostPackages}</h2>
-            <p className="text-gray-600 text-center mb-8">{t.businessBoost}</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2 text-center">Paketa za promocijo</h2>
+            <p className="text-gray-600 text-center mb-8">Za poslovne uporabnike</p>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {packages.boost_business.map((pkg, index) => {
@@ -477,12 +475,12 @@ export function SellPage() {
                         ) : (
                           <span className={`text-3xl font-bold ${pkg.color === 'green' ? 'text-green-600' : pkg.color === 'blue' ? 'text-blue-600' : 'text-orange-600'}`}>€{pkg.price}</span>
                         )}
-                        <span className="text-gray-500 ml-1">{t.perDay}</span>
+                        <span className="text-gray-500 ml-1">/dan</span>
                       </div>
                       
                       {/* Duration */}
                       <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
-                        <span>{pkg.days}</span>
+                        <span>min {pkg.days}</span>
                       </div>
                       
                       <button 
