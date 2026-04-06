@@ -20,6 +20,72 @@ import { LineChart as RechartsLine, Line, XAxis, YAxis, CartesianGrid, Tooltip, 
 const isSl = true
 const COLORS = ['#ff6a00', '#3b82f6', '#22c55e', '#a855f7', '#ef4444', '#06b6d4']
 
+// Hardcoded package features for display
+const PUBLISHING_PACKAGES = [
+  { id: 'osnovni', name: 'OSNOVNI', features: [
+    { text: 'Objava do 100 oglasov', included: true },
+    { text: '10 fotografij na oglas', included: true },
+    { text: 'Neomejeno urejanje oglasov', included: true },
+    { text: 'Osnovne funkcije', included: true },
+    { text: 'Statistika ogledov', included: false },
+    { text: 'HD slike', included: false },
+    { text: '360 posnetki', included: false },
+    { text: 'Premium uvrstitev', included: false },
+  ]},
+  { id: 'premium', name: 'PREMIUM', features: [
+    { text: 'Neomejena objava oglasov', included: true },
+    { text: '30 fotografij na oglas', included: true },
+    { text: 'Neomejeno urejanje oglasov', included: true },
+    { text: 'Statistika ogledov', included: true },
+    { text: 'HD slike', included: true },
+    { text: '360 posnetki', included: true },
+    { text: 'Premium uvrstitev', included: true },
+    { text: 'Komentarji kupcev', included: true },
+  ]},
+]
+
+const BOOST_PRIVATE = [
+  { id: 'akcija_p', name: 'Paket vseh cen', features: [
+    { text: 'Prikaz na vrhu rezultatov', included: true },
+    { text: 'Vec vidljivosti med kupci', included: true },
+    { text: 'Hitreje prodajte vozilo', included: true },
+    { text: 'Prikaz v posebnem oknu', included: false },
+  ]},
+  { id: 'top_p', name: 'Top izbira', features: [
+    { text: 'Prikaz na vrhu rezultatov', included: true },
+    { text: 'Vec vidljivosti med kupci', included: true },
+    { text: 'Hitreje prodajte vozilo', included: true },
+    { text: 'Zlatorumen gradient', included: true },
+  ]},
+  { id: 'skok_p', name: 'Skok na vrh', features: [
+    { text: 'Takojsten skok na vrh', included: true },
+    { text: 'Enostavna promocija', included: true },
+    { text: 'Brez dodatnih okraskov', included: false },
+    { text: 'Premium oznaka', included: false },
+  ]},
+]
+
+const BOOST_BUSINESS = [
+  { id: 'akcija', name: 'Paket vseh cen', features: [
+    { text: 'Prikaz na vrhu rezultatov', included: true },
+    { text: 'Vec vidljivosti med kupci', included: true },
+    { text: 'Hitreje prodajte vozilo', included: true },
+    { text: 'Prikaz v posebnem oknu', included: false },
+  ]},
+  { id: 'top', name: 'Top izbira', features: [
+    { text: 'Prikaz na vrhu rezultatov', included: true },
+    { text: 'Vec vidljivosti med kupci', included: true },
+    { text: 'Hitreje prodajte vozilo', included: true },
+    { text: 'Zlatorumen gradient', included: true },
+  ]},
+  { id: 'skok', name: 'Skok na vrh', features: [
+    { text: 'Takojsten skok na vrh', included: true },
+    { text: 'Enostavna promocija', included: true },
+    { text: 'Brez dodatnih okraskov', included: false },
+    { text: 'Premium oznaka', included: false },
+  ]},
+]
+
 export default function AdminPage() {
   const navigate = useNavigate()
   const { user: authUser } = useAuth()
@@ -91,7 +157,25 @@ export default function AdminPage() {
       
       if (usersRes.data) setUsers(usersRes.data)
       if (carsRes.data) setCars(carsRes.data)
-      if (packagesRes.data) setPackages(packagesRes.data)
+      if (packagesRes.data) {
+        // Merge hardcoded features with Supabase data
+        const packagesWithFeatures = packagesRes.data.map(pkg => {
+          let hardcodedPkg = null
+          if (pkg.type === 'publishing') {
+            hardcodedPkg = PUBLISHING_PACKAGES.find(p => p.id === pkg.id || p.name === pkg.name)
+          } else if (pkg.type === 'boost_private') {
+            hardcodedPkg = BOOST_PRIVATE.find(p => p.id === pkg.id || p.name === pkg.name)
+          } else if (pkg.type === 'boost_business') {
+            hardcodedPkg = BOOST_BUSINESS.find(p => p.id === pkg.id || p.name === pkg.name)
+          }
+          return {
+            ...pkg,
+            features: hardcodedPkg?.features || [],
+            color: hardcodedPkg?.color || 'orange'
+          }
+        })
+        setPackages(packagesWithFeatures)
+      }
       if (messagesRes.data) setMessages(messagesRes.data)
       if (ordersRes.data) setOrders(ordersRes.data || [])
       

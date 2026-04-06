@@ -154,49 +154,14 @@ export function SellPage() {
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState(null)
   const [showSuccess, setShowSuccess] = useState(false)
-  const [packages, setPackages] = useState({ publishing: [], boost_private: [], boost_business: [] })
-  const [loading, setLoading] = useState(true)
+  const [packages, setPackages] = useState({ publishing: PUBLISHING_PACKAGES, boost_private: BOOST_PRIVATE, boost_business: BOOST_BUSINESS })
+  const [loading, setLoading] = useState(false)
   const { isAuthenticated, user } = useAuth()
   const navigate = useNavigate()
   
   const t = translations.sl
   
-  // Load packages from Supabase first, fallback to hardcoded
-  useEffect(() => {
-    const loadPackages = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('packages')
-          .select('*')
-          .eq('is_active', true)
-          .order('type')
-        
-        if (data && data.length > 0) {
-          const grouped = {
-            publishing: data.filter(p => p.type === 'publishing'),
-            boost_private: data.filter(p => p.type === 'boost_private'),
-            boost_business: data.filter(p => p.type === 'boost_business')
-          }
-          setPackages(grouped)
-        } else {
-          setPackages({
-            publishing: PUBLISHING_PACKAGES,
-            boost_private: BOOST_PRIVATE,
-            boost_business: BOOST_BUSINESS
-          })
-        }
-      } catch (err) {
-        console.error('Error loading packages:', err)
-        setPackages({
-          publishing: PUBLISHING_PACKAGES,
-          boost_private: BOOST_PRIVATE,
-          boost_business: BOOST_BUSINESS
-        })
-      }
-      setLoading(false)
-    }
-    loadPackages()
-  }, [])
+  // Packages are loaded from hardcoded data above with all features
   
   const getFinalPrice = (pkg) => {
     if (pkg.discount_active && pkg.discount_percent > 0) {
