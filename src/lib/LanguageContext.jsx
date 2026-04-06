@@ -302,13 +302,23 @@ const translations = {
 const LanguageContext = createContext()
 
 export function LanguageProvider({ children }) {
-  const [language, setLanguage] = useState(() => {
-    return localStorage.getItem('language') || 'sl' // Default to Slovenian
-  })
+  const [language, setLanguage] = useState('sl') // Default to Slovenian, avoid hydration mismatch
+  const [mounted, setMounted] = useState(false)
+
+  // Read from localStorage after mount to avoid hydration mismatch
+  useEffect(() => {
+    const saved = localStorage.getItem('language')
+    if (saved && (saved === 'sl' || saved === 'en' || saved === 'hr')) {
+      setLanguage(saved)
+    }
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
-    localStorage.setItem('language', language)
-  }, [language])
+    if (mounted) {
+      localStorage.setItem('language', language)
+    }
+  }, [language, mounted])
 
   const t = (key) => {
     return translations[language]?.[key] || translations.en[key] || key
