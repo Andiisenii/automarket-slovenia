@@ -603,7 +603,6 @@ export function DashboardPage() {
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              {!hasSubscription && <button onClick={() => setShowPackageModal(true)} className="px-3 py-2 bg-orange-500 hover:bg-orange-600 rounded-xl font-medium flex items-center gap-2 text-sm"><Package className="w-4 h-4" />Ble paketen</button>}
               <Link to="/cars"><Button className="bg-orange-500 hover:bg-orange-600 border-0 text-sm"><Car className="w-4 h-4 mr-1" />Browse</Button></Link>
               <Link to="/add-car"><Button className="bg-orange-500 hover:bg-orange-600 border-0 text-sm"><Plus className="w-4 h-4 mr-1" />Dodaj</Button></Link>
               <Button variant="ghost" onClick={handleLogout} className="text-white hover:bg-white/10 p-2"><LogOut className="w-4 h-4" /></Button>
@@ -654,8 +653,8 @@ export function DashboardPage() {
         
         {/* Removed Promocije in paketi banner - now in Tab */}
         
-        {/* Tabs */}
-        <div className="flex gap-1 bg-white rounded-xl p-1 mb-6 w-fit shadow-sm border overflow-x-auto">
+        {/* Tabs - Mobile Friendly */}
+        <div className="flex gap-1 bg-white rounded-xl p-1 mb-6 shadow-sm border overflow-x-auto scrollbar-hide">
           {[
             { id: 'overview', label: isSl ? 'Moje Objave' : 'My Listings', icon: Car },
             { id: 'messages', label: isSl ? 'Sporočila' : 'Messages', icon: MessageCircle },
@@ -664,8 +663,13 @@ export function DashboardPage() {
             { id: 'promo', label: isSl ? 'Promocije' : 'Promotions', icon: Zap },
             { id: 'settings', label: isSl ? 'Nastavitve' : 'Settings', icon: Settings }
           ].map((tab) => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2 whitespace-nowrap ${activeTab === tab.id ? 'bg-orange-500 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}>
-              <tab.icon className="w-4 h-4" />{tab.label}
+            <button 
+              key={tab.id} 
+              onClick={() => setActiveTab(tab.id)} 
+              className={`px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center gap-1.5 sm:gap-2 whitespace-nowrap flex-shrink-0 ${activeTab === tab.id ? 'bg-orange-500 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}
+            >
+              <tab.icon className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">{tab.label}</span>
             </button>
           ))}
         </div>
@@ -852,8 +856,13 @@ export function DashboardPage() {
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-4">
-                  <p className="text-gray-600 mb-4">{isSl ? 'Nimate paketa - mund të postoni deri 2 makina falas' : 'No package - you can post up to 2 cars for free'}</p>
+                <div className="text-center py-6">
+                  <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <p className="text-gray-600 mb-4">{isSl ? 'Nimate aktivno paketo' : 'No active package'}</p>
+                  <Button className="bg-orange-500 hover:bg-orange-600" onClick={() => navigate('/sell')}>
+                    <Package className="w-4 h-4 mr-2" />
+                    {isSl ? 'Blej paketen' : 'Buy Package'}
+                  </Button>
                 </div>
               )}
             </Card>
