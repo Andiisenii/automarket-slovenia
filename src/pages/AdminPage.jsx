@@ -18,13 +18,13 @@ import { supabase } from '@/lib/supabase'
 import { LineChart as RechartsLine, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart as RechartsBar, Bar, PieChart as RechartsPie, Pie, Cell, Legend } from 'recharts'
 
 const isSl = true
-
-// Colors for charts
 const COLORS = ['#ff6a00', '#3b82f6', '#22c55e', '#a855f7', '#ef4444', '#06b6d4']
 
 export default function AdminPage() {
   const navigate = useNavigate()
   const { user: authUser } = useAuth()
+  
+  // ALL STATE - MUST BE BEFORE ANY RETURNS
   const [adminUser, setAdminUser] = useState(null)
   const [mounted, setMounted] = useState(false)
   const [activeTab, setActiveTab] = useState('dashboard')
@@ -40,14 +40,14 @@ export default function AdminPage() {
   const [orders, setOrders] = useState([])
   
   // Date range for reports
-  const [dateRange, setDateRange] = useState('30') // days
+  const [dateRange, setDateRange] = useState('30')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
   
   // Search & filters
   const [searchTerm, setSearchTerm] = useState('')
-  const [userFilter, setUserFilter] = useState('all') // all, with_cars, with_packages, no_package
-  const [carFilter, setCarFilter] = useState('all') // all, active, pending, sold
+  const [userFilter, setUserFilter] = useState('all')
+  const [carFilter, setCarFilter] = useState('all')
   
   // Modals
   const [showUserModal, setShowUserModal] = useState(false)
@@ -66,14 +66,13 @@ export default function AdminPage() {
   const [broadcastForm, setBroadcastForm] = useState({ subject: '', content: '' })
   const [editUserForm, setEditUserForm] = useState({ name: '', email: '', phone: '', logo_url: '' })
 
-  // Load data from Supabase - stored in ref to avoid hook ordering issues
+  // Ref for loadData to avoid hook ordering issues
   const loadDataRef = useRef(null)
   
+  // Load data function stored in ref
   loadDataRef.current = async () => {
     setLoading(true)
     try {
-      console.log('Loading admin data from Supabase...')
-      
       const [
         usersRes, 
         carsRes, 
@@ -90,18 +89,12 @@ export default function AdminPage() {
         supabase.from('orders').select('*').order('created_at', { ascending: false })
       ])
       
-      console.log('Users:', usersRes.data?.length)
-      console.log('Cars:', carsRes.data?.length)
-      console.log('Packages:', packagesRes.data?.length)
-      console.log('Orders:', ordersRes.data?.length)
-      
       if (usersRes.data) setUsers(usersRes.data)
       if (carsRes.data) setCars(carsRes.data)
       if (packagesRes.data) setPackages(packagesRes.data)
       if (messagesRes.data) setMessages(messagesRes.data)
       if (ordersRes.data) setOrders(ordersRes.data || [])
       
-      // Group user packages by user_id
       const upMap = {}
       if (userPackagesRes.data) {
         userPackagesRes.data.forEach(up => {
@@ -117,8 +110,8 @@ export default function AdminPage() {
     setLoading(false)
     setRefreshing(false)
   }
-  
-  // Load admin user from localStorage
+
+  // ALL USEEFFECTS - MUST BE BEFORE ANY RETURNS
   useEffect(() => {
     setMounted(true)
     try {
@@ -138,58 +131,32 @@ export default function AdminPage() {
     }
   }, [navigate])
   
-  // Load data when adminUser is set
   useEffect(() => {
     if (adminUser) {
       loadDataRef.current()
     }
   }, [adminUser])
-  
-  const handleRefresh = () => { setRefreshing(true); loadDataRef.current() }
-  
-  // Show loading until mounted
-  if (!mounted) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p>Nalaganje...</p>
-        </div>
-      </div>
-    )
-  }
-  
-  if (!adminUser) {
-    return null
-  }
-  
-  const currentUser = adminUser
-  const loadData = loadDataRef.current
 
-  // Stats calculations
+  // ALL USEMEMO - MUST BE BEFORE ANY RETURNS
   const stats = useMemo(() => {
     const now = new Date()
     const daysAgo = parseInt(dateRange)
     const start = startDate ? new Date(startDate) : new Date(now.getTime() - daysAgo * 24 * 60 * 60 * 1000)
     const end = endDate ? new Date(endDate + 'T23:59:59') : now
     
-    // Filter orders by date
     const filteredOrders = orders.filter(o => {
       const orderDate = new Date(o.created_at)
       return orderDate >= start && orderDate <= end
     })
     
-    // Revenue from orders
     const totalRevenue = filteredOrders.reduce((sum, o) => sum + (o.amount || 0), 0)
     
-    // Active users (users with active packages or cars)
     const activeUsers = users.filter(u => {
       const hasPackage = (userPackages[u.id] || []).some(p => new Date(p.expires_at) > now)
       const hasCars = cars.some(c => c.user_id === u.id && c.status === 'active')
       return hasPackage || hasCars
     })
     
-    // Revenue by package type
     const revenueByPackage = {}
     filteredOrders.forEach(o => {
       if (o.package_type) {
@@ -197,20 +164,17 @@ export default function AdminPage() {
       }
     })
     
-    // Cars by status
     const carsByStatus = {
       active: cars.filter(c => c.status === 'active').length,
       pending: cars.filter(c => c.status === 'pending').length,
       sold: cars.filter(c => c.status === 'sold').length
     }
     
-    // New users per period
     const newUsers = users.filter(u => {
       const created = new Date(u.created_at)
       return created >= start && created <= end
     }).length
     
-    // New cars per period
     const newCars = cars.filter(c => {
       const created = new Date(c.created_at)
       return created >= start && created <= end
@@ -233,7 +197,6 @@ export default function AdminPage() {
     }
   }, [users, cars, packages, orders, messages, userPackages, dateRange, startDate, endDate])
 
-  // Chart data for revenue
   const revenueChartData = useMemo(() => {
     const now = new Date()
     const days = parseInt(dateRange)
@@ -254,7 +217,6 @@ export default function AdminPage() {
     return data
   }, [orders, dateRange])
 
-  // Chart data for users/cars
   const activityChartData = useMemo(() => {
     const now = new Date()
     const days = 7
@@ -275,7 +237,6 @@ export default function AdminPage() {
     return data
   }, [users, cars])
 
-  // Package distribution
   const packageDistribution = useMemo(() => {
     const dist = {}
     Object.values(userPackages).flat().forEach(up => {
@@ -286,185 +247,6 @@ export default function AdminPage() {
     return Object.entries(dist).map(([name, value]) => ({ name, value }))
   }, [userPackages])
 
-  // Tabs
-  const tabs = [
-    { id: 'dashboard', label: 'Nadzorna plošča', icon: BarChart3 },
-    { id: 'users', label: 'Uporabniki', icon: Users, count: users.length },
-    { id: 'cars', label: 'Vozila', icon: Car, count: cars.length },
-    { id: 'packages', label: 'Paketi', icon: Package },
-    { id: 'revenue', label: 'Prihodki', icon: DollarSign },
-    { id: 'messages', label: 'Sporočila', icon: Mail, count: stats.unreadMessages },
-  ]
-  
-  // Get user's active packages
-  const getUserActivePackages = (userId) => {
-    const ups = userPackages[userId] || []
-    return ups.filter(up => new Date(up.expires_at) > new Date())
-  }
-  
-  // Get user's cars
-  const getUserCars = (userId) => {
-    return cars.filter(c => c.user_id === userId)
-  }
-
-  // Send message to user
-  const sendMessage = async () => {
-    if (!messageForm.content.trim()) return
-    
-    try {
-      const { error } = await supabase.from('messages').insert({
-        sender_id: currentUser.id,
-        recipient_id: messageForm.recipientId,
-        subject: messageForm.subject || '',
-        content: messageForm.content,
-        is_system: false
-      })
-      
-      if (error) throw error
-      
-      setMessageForm({ recipientId: '', subject: '', content: '' })
-      setShowMessageModal(false)
-      loadData()
-      alert('Sporočilo poslano!')
-    } catch (err) {
-      console.error('Error sending message:', err)
-      alert('Napaka pri pošiljanju')
-    }
-  }
-  
-  // Send broadcast to all users
-  const sendBroadcast = async () => {
-    if (!broadcastForm.content.trim()) return
-    
-    try {
-      const { error: broadcastErr } = await supabase.from('broadcasts').insert({
-        subject: broadcastForm.subject,
-        content: broadcastForm.content,
-        sent_by: currentUser.id
-      })
-      
-      if (broadcastErr) throw broadcastErr
-      
-      // Send to all users
-      const messageInserts = users.map(u => ({
-        sender_id: currentUser.id,
-        recipient_id: u.id,
-        subject: broadcastForm.subject || 'Obvestilo',
-        content: broadcastForm.content,
-        is_system: true
-      }))
-      
-      await supabase.from('messages').insert(messageInserts)
-      
-      setBroadcastForm({ subject: '', content: '' })
-      setShowBroadcastModal(false)
-      loadData()
-      alert(`Sporočilo poslano ${users.length} uporabnikom!`)
-    } catch (err) {
-      console.error('Error sending broadcast:', err)
-      alert('Napaka pri pošiljanju')
-    }
-  }
-  
-  // Delete user
-  const deleteUser = async (userId) => {
-    if (!confirm('Ali ste prepričani, da želite izbrisati uporabnika?')) return
-    try {
-      await supabase.from('users').delete().eq('id', userId)
-      loadData()
-    } catch (err) {
-      console.error('Error deleting user:', err)
-    }
-  }
-  
-  // Delete car
-  const deleteCar = async (carId) => {
-    if (!confirm('Ali ste prepričani, da želite izbrisati vozilo?')) return
-    try {
-      await supabase.from('cars').delete().eq('id', carId)
-      loadData()
-    } catch (err) {
-      console.error('Error deleting car:', err)
-    }
-  }
-  
-  // Update car status
-  const updateCarStatus = async (carId, status) => {
-    try {
-      const { error } = await supabase.from('cars').update({ status }).eq('id', carId)
-      if (error) throw error
-      loadData()
-    } catch (err) {
-      console.error('Error updating car:', err)
-    }
-  }
-  
-  // Update package
-  const updatePackage = async () => {
-    if (!selectedPackage) return
-    try {
-      const { error } = await supabase.from('packages').update({
-        price: selectedPackage.price,
-        discount_percent: selectedPackage.discount_percent,
-        discount_active: selectedPackage.discount_active,
-        name: selectedPackage.name,
-        name_sl: selectedPackage.name_sl,
-        min_days: selectedPackage.min_days,
-        features: selectedPackage.features
-      }).eq('id', selectedPackage.id)
-      
-      if (error) throw error
-      
-      setShowPackageModal(false)
-      loadData()
-      alert('Paket posodobljen!')
-    } catch (err) {
-      console.error('Error updating package:', err)
-      alert('Napaka pri posodabljanju')
-    }
-  }
-  
-  // Update user
-  const updateUser = async () => {
-    if (!selectedUser) return
-    try {
-      const { error } = await supabase.from('users').update({
-        name: editUserForm.name,
-        email: editUserForm.email,
-        phone: editUserForm.phone,
-        logo_url: editUserForm.logo_url
-      }).eq('id', selectedUser.id)
-      
-      if (error) throw error
-      
-      setShowEditUserModal(false)
-      loadData()
-      alert('Uporabnik posodobljen!')
-    } catch (err) {
-      console.error('Error updating user:', err)
-      alert('Napaka pri posodabljanju')
-    }
-  }
-  
-  // Open edit user modal
-  const openEditUser = (user) => {
-    setSelectedUser(user)
-    setEditUserForm({
-      name: user.name || '',
-      email: user.email || '',
-      phone: user.phone || '',
-      logo_url: user.logo_url || ''
-    })
-    setShowEditUserModal(true)
-  }
-  
-  // Open send message modal
-  const openSendMessage = (userId) => {
-    setMessageForm({ recipientId: userId, subject: '', content: '' })
-    setShowMessageModal(true)
-  }
-
-  // Filter helpers
   const filteredUsers = useMemo(() => {
     let filtered = users.filter(u => 
       !searchTerm || 
@@ -500,6 +282,181 @@ export default function AdminPage() {
     
     return filtered
   }, [cars, searchTerm, carFilter])
+
+  const currentUser = adminUser
+  
+  const tabs = [
+    { id: 'dashboard', label: 'Nadzorna plošča', icon: BarChart3 },
+    { id: 'users', label: 'Uporabniki', icon: Users, count: users.length },
+    { id: 'cars', label: 'Vozila', icon: Car, count: cars.length },
+    { id: 'packages', label: 'Paketi', icon: Package },
+    { id: 'revenue', label: 'Prihodki', icon: DollarSign },
+    { id: 'messages', label: 'Sporočila', icon: Mail, count: stats.unreadMessages },
+  ]
+  
+  // NOW WE CAN DO CONDITIONAL RETURNS
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p>Nalaganje...</p>
+        </div>
+      </div>
+    )
+  }
+  
+  if (!adminUser) {
+    return null
+  }
+
+  // Helper functions
+  const handleRefresh = () => { setRefreshing(true); loadDataRef.current() }
+  
+  const getUserActivePackages = (userId) => {
+    const ups = userPackages[userId] || []
+    return ups.filter(up => new Date(up.expires_at) > new Date())
+  }
+  
+  const getUserCars = (userId) => {
+    return cars.filter(c => c.user_id === userId)
+  }
+
+  const sendMessage = async () => {
+    if (!messageForm.content.trim()) return
+    try {
+      const { error } = await supabase.from('messages').insert({
+        sender_id: currentUser.id,
+        recipient_id: messageForm.recipientId,
+        subject: messageForm.subject || '',
+        content: messageForm.content,
+        is_system: false
+      })
+      if (error) throw error
+      setMessageForm({ recipientId: '', subject: '', content: '' })
+      setShowMessageModal(false)
+      loadDataRef.current()
+      alert('Sporočilo poslano!')
+    } catch (err) {
+      console.error('Error sending message:', err)
+      alert('Napaka pri pošiljanju')
+    }
+  }
+  
+  const sendBroadcast = async () => {
+    if (!broadcastForm.content.trim()) return
+    try {
+      const { error: broadcastErr } = await supabase.from('broadcasts').insert({
+        subject: broadcastForm.subject,
+        content: broadcastForm.content,
+        sent_by: currentUser.id
+      })
+      if (broadcastErr) throw broadcastErr
+      
+      const messageInserts = users.map(u => ({
+        sender_id: currentUser.id,
+        recipient_id: u.id,
+        subject: broadcastForm.subject || 'Obvestilo',
+        content: broadcastForm.content,
+        is_system: true
+      }))
+      
+      await supabase.from('messages').insert(messageInserts)
+      setBroadcastForm({ subject: '', content: '' })
+      setShowBroadcastModal(false)
+      loadDataRef.current()
+      alert(`Sporočilo poslano ${users.length} uporabnikom!`)
+    } catch (err) {
+      console.error('Error sending broadcast:', err)
+      alert('Napaka pri pošiljanju')
+    }
+  }
+  
+  const deleteUser = async (userId) => {
+    if (!confirm('Ali ste prepričani, da želite izbrisati uporabnika?')) return
+    try {
+      await supabase.from('users').delete().eq('id', userId)
+      loadDataRef.current()
+    } catch (err) {
+      console.error('Error deleting user:', err)
+    }
+  }
+  
+  const deleteCar = async (carId) => {
+    if (!confirm('Ali ste prepričani, da želite izbrisati vozilo?')) return
+    try {
+      await supabase.from('cars').delete().eq('id', carId)
+      loadDataRef.current()
+    } catch (err) {
+      console.error('Error deleting car:', err)
+    }
+  }
+  
+  const updateCarStatus = async (carId, status) => {
+    try {
+      const { error } = await supabase.from('cars').update({ status }).eq('id', carId)
+      if (error) throw error
+      loadDataRef.current()
+    } catch (err) {
+      console.error('Error updating car:', err)
+    }
+  }
+  
+  const updatePackage = async () => {
+    if (!selectedPackage) return
+    try {
+      const { error } = await supabase.from('packages').update({
+        price: selectedPackage.price,
+        discount_percent: selectedPackage.discount_percent,
+        discount_active: selectedPackage.discount_active,
+        name: selectedPackage.name,
+        name_sl: selectedPackage.name_sl,
+        min_days: selectedPackage.min_days
+      }).eq('id', selectedPackage.id)
+      if (error) throw error
+      setShowPackageModal(false)
+      loadDataRef.current()
+      alert('Paket posodobljen!')
+    } catch (err) {
+      console.error('Error updating package:', err)
+      alert('Napaka pri posodabljanju')
+    }
+  }
+  
+  const updateUser = async () => {
+    if (!selectedUser) return
+    try {
+      const { error } = await supabase.from('users').update({
+        name: editUserForm.name,
+        email: editUserForm.email,
+        phone: editUserForm.phone,
+        logo_url: editUserForm.logo_url
+      }).eq('id', selectedUser.id)
+      if (error) throw error
+      setShowEditUserModal(false)
+      loadDataRef.current()
+      alert('Uporabnik posodobljen!')
+    } catch (err) {
+      console.error('Error updating user:', err)
+      alert('Napaka pri posodabljanju')
+    }
+  }
+  
+  const openEditUser = (user) => {
+    setSelectedUser(user)
+    setEditUserForm({
+      name: user.name || '',
+      email: user.email || '',
+      phone: user.phone || '',
+      logo_url: user.logo_url || ''
+    })
+    setShowEditUserModal(true)
+  }
+  
+  const openSendMessage = (userId) => {
+    setMessageForm({ recipientId: userId, subject: '', content: '' })
+    setShowMessageModal(true)
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -561,7 +518,6 @@ export default function AdminPage() {
         {/* ========== DASHBOARD TAB ========== */}
         {!loading && activeTab === 'dashboard' && (
           <div className="space-y-6">
-            {/* Date Range Selector */}
             <div className="bg-white rounded-xl p-4 shadow-sm border flex flex-wrap gap-4 items-center">
               <CalendarDays className="w-5 h-5 text-gray-400" />
               <select 
@@ -587,7 +543,6 @@ export default function AdminPage() {
               </div>
             </div>
             
-            {/* Stats Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <Card className="p-5">
                 <div className="flex items-center gap-3">
@@ -638,9 +593,7 @@ export default function AdminPage() {
               </Card>
             </div>
             
-            {/* Charts Row */}
             <div className="grid md:grid-cols-2 gap-6">
-              {/* Revenue Chart */}
               <Card className="p-5">
                 <h3 className="font-semibold mb-4 flex items-center gap-2">
                   <LineChartIcon className="w-5 h-5 text-orange-500" />
@@ -657,7 +610,6 @@ export default function AdminPage() {
                 </ResponsiveContainer>
               </Card>
               
-              {/* Activity Chart */}
               <Card className="p-5">
                 <h3 className="font-semibold mb-4 flex items-center gap-2">
                   <BarChart3 className="w-5 h-5 text-blue-500" />
@@ -676,12 +628,10 @@ export default function AdminPage() {
               </Card>
             </div>
             
-            {/* Bottom Row */}
             <div className="grid md:grid-cols-3 gap-6">
-              {/* Package Distribution */}
               <Card className="p-5">
                 <h3 className="font-semibold mb-4 flex items-center gap-2">
-                  <PieChart className="w-5 h-5 text-purple-500" />
+                  <PieChartIcon className="w-5 h-5 text-purple-500" />
                   Aktivni paketi
                 </h3>
                 {packageDistribution.length > 0 ? (
@@ -700,7 +650,6 @@ export default function AdminPage() {
                 )}
               </Card>
               
-              {/* Recent Orders */}
               <Card className="p-5 md:col-span-2">
                 <h3 className="font-semibold mb-4 flex items-center gap-2">
                   <ShoppingCart className="w-5 h-5 text-green-500" />
@@ -811,32 +760,16 @@ export default function AdminPage() {
                           </td>
                           <td className="px-4 py-3">
                             <div className="flex gap-1">
-                              <button 
-                                onClick={() => { setSelectedUser(user); setShowUserModal(true) }}
-                                className="p-1.5 hover:bg-gray-100 rounded"
-                                title="Pregled"
-                              >
+                              <button onClick={() => { setSelectedUser(user); setShowUserModal(true) }} className="p-1.5 hover:bg-gray-100 rounded" title="Pregled">
                                 <Eye className="w-4 h-4 text-gray-500" />
                               </button>
-                              <button 
-                                onClick={() => openEditUser(user)}
-                                className="p-1.5 hover:bg-gray-100 rounded"
-                                title="Uredi"
-                              >
+                              <button onClick={() => openEditUser(user)} className="p-1.5 hover:bg-gray-100 rounded" title="Uredi">
                                 <Edit className="w-4 h-4 text-blue-500" />
                               </button>
-                              <button 
-                                onClick={() => openSendMessage(user.id)}
-                                className="p-1.5 hover:bg-gray-100 rounded"
-                                title="Sporočilo"
-                              >
+                              <button onClick={() => openSendMessage(user.id)} className="p-1.5 hover:bg-gray-100 rounded" title="Sporočilo">
                                 <MessageSquare className="w-4 h-4 text-green-500" />
                               </button>
-                              <button 
-                                onClick={() => deleteUser(user.id)}
-                                className="p-1.5 hover:bg-red-50 rounded"
-                                title="Izbriši"
-                              >
+                              <button onClick={() => deleteUser(user.id)} className="p-1.5 hover:bg-red-50 rounded" title="Izbriši">
                                 <Trash2 className="w-4 h-4 text-red-500" />
                               </button>
                             </div>
@@ -905,7 +838,7 @@ export default function AdminPage() {
                             <select 
                               value={car.status || 'active'} 
                               onChange={(e) => updateCarStatus(car.id, e.target.value)}
-                              className={`px-2 py-1 rounded text-xs font-medium border-0 ${
+                              className={`px-2 py-1 rounded text-xs font-medium ${
                                 car.status === 'active' ? 'bg-green-100 text-green-700' : 
                                 car.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
                                 'bg-gray-100 text-gray-600'
@@ -919,18 +852,10 @@ export default function AdminPage() {
                           <td className="px-4 py-3 text-sm">{seller?.name || 'Neznan'}</td>
                           <td className="px-4 py-3">
                             <div className="flex gap-1">
-                              <button 
-                                onClick={() => navigate(`/cars/${car.id}`)}
-                                className="p-1.5 hover:bg-gray-100 rounded"
-                                title="Pregled"
-                              >
+                              <button onClick={() => navigate(`/cars/${car.id}`)} className="p-1.5 hover:bg-gray-100 rounded" title="Pregled">
                                 <Eye className="w-4 h-4 text-gray-500" />
                               </button>
-                              <button 
-                                onClick={() => deleteCar(car.id)}
-                                className="p-1.5 hover:bg-red-50 rounded"
-                                title="Izbriši"
-                              >
+                              <button onClick={() => deleteCar(car.id)} className="p-1.5 hover:bg-red-50 rounded" title="Izbriši">
                                 <Trash2 className="w-4 h-4 text-red-500" />
                               </button>
                             </div>
@@ -952,7 +877,6 @@ export default function AdminPage() {
               <h2 className="text-xl font-semibold">Upravljanje paketov</h2>
             </div>
             
-            {/* Publishing Packages */}
             <div>
               <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
                 <Package className="w-5 h-5 text-orange-500" />
@@ -966,17 +890,12 @@ export default function AdminPage() {
                         -{pkg.discount_percent}%
                       </div>
                     )}
-                    
                     <div className="flex items-center justify-between mb-3">
                       <h4 className="font-semibold">{pkg.name}</h4>
-                      <button 
-                        onClick={() => { setSelectedPackage(pkg); setShowPackageModal(true) }}
-                        className="p-1.5 hover:bg-gray-100 rounded"
-                      >
+                      <button onClick={() => { setSelectedPackage(pkg); setShowPackageModal(true) }} className="p-1.5 hover:bg-gray-100 rounded">
                         <Edit className="w-4 h-4 text-blue-500" />
                       </button>
                     </div>
-                    
                     <div className="flex items-baseline gap-2 mb-2">
                       {pkg.discount_active && pkg.discount_percent > 0 ? (
                         <>
@@ -988,9 +907,7 @@ export default function AdminPage() {
                       )}
                       <span className="text-gray-500 text-sm">/mesec</span>
                     </div>
-                    
                     <p className="text-sm text-gray-600">Min {pkg.min_days} dni</p>
-                    
                     <div className="mt-3 flex items-center gap-2">
                       {pkg.discount_active ? (
                         <>
@@ -1009,7 +926,6 @@ export default function AdminPage() {
               </div>
             </div>
             
-            {/* Boost Packages - Private */}
             <div>
               <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
                 <Zap className="w-5 h-5 text-blue-500" />
@@ -1023,17 +939,12 @@ export default function AdminPage() {
                         -{pkg.discount_percent}%
                       </div>
                     )}
-                    
                     <div className="flex items-center justify-between mb-3">
                       <h4 className="font-semibold">{pkg.name}</h4>
-                      <button 
-                        onClick={() => { setSelectedPackage(pkg); setShowPackageModal(true) }}
-                        className="p-1.5 hover:bg-gray-100 rounded"
-                      >
+                      <button onClick={() => { setSelectedPackage(pkg); setShowPackageModal(true) }} className="p-1.5 hover:bg-gray-100 rounded">
                         <Edit className="w-4 h-4 text-blue-500" />
                       </button>
                     </div>
-                    
                     <div className="flex items-baseline gap-2 mb-2">
                       {pkg.discount_active && pkg.discount_percent > 0 ? (
                         <>
@@ -1045,14 +956,12 @@ export default function AdminPage() {
                       )}
                       <span className="text-gray-500 text-sm">/dan</span>
                     </div>
-                    
                     <p className="text-sm text-gray-600">Min {pkg.min_days} dni</p>
                   </Card>
                 ))}
               </div>
             </div>
             
-            {/* Boost Packages - Business */}
             <div>
               <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
                 <Star className="w-5 h-5 text-purple-500" />
@@ -1066,17 +975,12 @@ export default function AdminPage() {
                         -{pkg.discount_percent}%
                       </div>
                     )}
-                    
                     <div className="flex items-center justify-between mb-3">
                       <h4 className="font-semibold">{pkg.name}</h4>
-                      <button 
-                        onClick={() => { setSelectedPackage(pkg); setShowPackageModal(true) }}
-                        className="p-1.5 hover:bg-gray-100 rounded"
-                      >
+                      <button onClick={() => { setSelectedPackage(pkg); setShowPackageModal(true) }} className="p-1.5 hover:bg-gray-100 rounded">
                         <Edit className="w-4 h-4 text-blue-500" />
                       </button>
                     </div>
-                    
                     <div className="flex items-baseline gap-2 mb-2">
                       {pkg.discount_active && pkg.discount_percent > 0 ? (
                         <>
@@ -1088,7 +992,6 @@ export default function AdminPage() {
                       )}
                       <span className="text-gray-500 text-sm">/dan</span>
                     </div>
-                    
                     <p className="text-sm text-gray-600">Min {pkg.min_days} dni</p>
                   </Card>
                 ))}
@@ -1100,7 +1003,6 @@ export default function AdminPage() {
         {/* ========== REVENUE TAB ========== */}
         {!loading && activeTab === 'revenue' && (
           <div className="space-y-6">
-            {/* Date Filter */}
             <div className="bg-white rounded-xl p-4 shadow-sm border flex flex-wrap gap-4 items-center">
               <CalendarDays className="w-5 h-5 text-gray-400" />
               <select 
@@ -1123,7 +1025,6 @@ export default function AdminPage() {
               )}
             </div>
             
-            {/* Revenue Summary */}
             <div className="grid md:grid-cols-4 gap-4">
               <Card className="p-5 bg-gradient-to-br from-green-50 to-green-100 border-green-200">
                 <p className="text-sm text-green-600 mb-1">Skupni prihodek</p>
@@ -1143,7 +1044,6 @@ export default function AdminPage() {
               </Card>
             </div>
             
-            {/* Revenue Chart */}
             <Card className="p-5">
               <h3 className="font-semibold mb-4">Prihodek po dnevih</h3>
               <ResponsiveContainer width="100%" height={300}>
@@ -1158,7 +1058,6 @@ export default function AdminPage() {
               </ResponsiveContainer>
             </Card>
             
-            {/* Revenue by Package Type */}
             <Card className="p-5">
               <h3 className="font-semibold mb-4">Prihodek po tipu paketa</h3>
               <div className="grid md:grid-cols-2 gap-4">
@@ -1227,16 +1126,11 @@ export default function AdminPage() {
       <AnimatePresence>
         {showUserModal && selectedUser && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }} 
-              animate={{ opacity: 1, scale: 1 }}
-              className="bg-white rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
-            >
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
               <div className="p-6 border-b flex justify-between items-center sticky top-0 bg-white">
                 <h3 className="text-lg font-semibold">Uporabnik #{selectedUser.id}</h3>
                 <button onClick={() => setShowUserModal(false)}><X className="w-5 h-5" /></button>
               </div>
-              
               <div className="p-6 space-y-4">
                 <div className="flex items-center gap-4 mb-6">
                   <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center">
@@ -1247,7 +1141,6 @@ export default function AdminPage() {
                     <p className="text-gray-500">{selectedUser.email}</p>
                   </div>
                 </div>
-                
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-gray-500">Telefon</p>
@@ -1268,7 +1161,6 @@ export default function AdminPage() {
                     <p className="font-medium">{getUserCars(selectedUser.id).length}</p>
                   </div>
                 </div>
-                
                 <div className="border-t pt-4">
                   <p className="text-sm text-gray-500 mb-2">Aktivni paketi ({getUserActivePackages(selectedUser.id).length})</p>
                   {getUserActivePackages(selectedUser.id).length > 0 ? (
@@ -1284,7 +1176,6 @@ export default function AdminPage() {
                     <p className="text-gray-400 text-sm">Ni aktivnih paketov</p>
                   )}
                 </div>
-                
                 <div className="border-t pt-4">
                   <p className="text-sm text-gray-500 mb-2">Vozila ({getUserCars(selectedUser.id).length})</p>
                   <div className="space-y-2 max-h-40 overflow-y-auto">
@@ -1298,7 +1189,6 @@ export default function AdminPage() {
                     ))}
                   </div>
                 </div>
-                
                 <div className="flex gap-2 pt-4">
                   <Button onClick={() => { setShowUserModal(false); openEditUser(selectedUser) }} className="flex-1">
                     <Edit className="w-4 h-4 mr-2" />
