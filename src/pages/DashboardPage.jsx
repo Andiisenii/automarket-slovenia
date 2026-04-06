@@ -553,23 +553,24 @@ export function DashboardPage() {
                   </span>
                 )}
                 {/* Package Badge */}
-                {isPremium ? (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/20 text-orange-400 text-sm font-medium">
-                    <Crown className="w-4 h-4" /> Premium
+                {/* Package Status */}
+                {hasSubscription ? (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-sm font-medium">
+                    <Package className="w-4 h-4" /> {userPackage.packageName || 'Aktivno'}
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-500/20 text-gray-300 text-sm font-medium">
-                    <Package className="w-4 h-4" /> Osnovni
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/20 text-red-400 text-sm font-medium">
+                    <Package className="w-4 h-4" /> Brez paketa
                   </span>
                 )}
                 {userPackage && <span className="text-xs text-gray-400">Velja do: {new Date(userPackage.expiresAt).toLocaleDateString('sl-SI')}</span>}
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              {!hasSubscription && <button onClick={() => setShowPackageModal(true)} className="px-4 py-2 bg-orange-500 hover:bg-orange-600 rounded-xl font-medium flex items-center gap-2"><Crown className="w-4 h-4" />Premium</button>}
-              <Link to="/cars"><Button className="bg-orange-500 hover:bg-orange-600 border-0"><Car className="w-4 h-4 mr-2" />Browse</Button></Link>
-              <Link to="/add-car"><Button className="bg-orange-500 hover:bg-orange-600 border-0"><Plus className="w-4 h-4 mr-2" />Dodaj Avto</Button></Link>
-              <Button variant="ghost" onClick={handleLogout} className="text-white hover:bg-white/10"><LogOut className="w-4 h-4" /></Button>
+            <div className="flex flex-wrap items-center gap-2">
+              {!hasSubscription && <button onClick={() => setShowPackageModal(true)} className="px-3 py-2 bg-orange-500 hover:bg-orange-600 rounded-xl font-medium flex items-center gap-2 text-sm"><Package className="w-4 h-4" />Ble paketen</button>}
+              <Link to="/cars"><Button className="bg-orange-500 hover:bg-orange-600 border-0 text-sm"><Car className="w-4 h-4 mr-1" />Browse</Button></Link>
+              <Link to="/add-car"><Button className="bg-orange-500 hover:bg-orange-600 border-0 text-sm"><Plus className="w-4 h-4 mr-1" />Dodaj</Button></Link>
+              <Button variant="ghost" onClick={handleLogout} className="text-white hover:bg-white/10 p-2"><LogOut className="w-4 h-4" /></Button>
             </div>
           </div>
         </div>
