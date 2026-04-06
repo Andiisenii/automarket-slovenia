@@ -154,14 +154,58 @@ export function SellPage() {
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState(null)
   const [showSuccess, setShowSuccess] = useState(false)
-  const [packages, setPackages] = useState({ publishing: PUBLISHING_PACKAGES, boost_private: BOOST_PRIVATE, boost_business: BOOST_BUSINESS })
-  const [loading, setLoading] = useState(false)
+  const [packages, setPackages] = useState({ publishing: [], boost_private: [], boost_business: [] })
+  const [loading, setLoading] = useState(true)
   const { isAuthenticated, user } = useAuth()
   const navigate = useNavigate()
   
   const t = translations.sl
   
-  // Packages are loaded from hardcoded data above with all features
+  // Load packages from Supabase and merge with hardcoded features
+  useEffect(() => {
+    const loadPackages = async () => {
+      try {
+        const { data } = await supabase
+          .from('packages')
+          .select('*')
+          .eq('is_active', true)
+          .order('type')
+        
+        if (data && data.length > 0) {
+          const merged = {
+            publishing: [],
+            boost_private: [],
+            boost_business: []
+          }
+          
+          data.forEach(pkg => {
+            let hardcoded = null
+            if (pkg.type === 'publishing') {
+              hardcoded = PUBLISHING_PACKAGES.find(p => p.name === pkg.name)
+            } else if (pkg.type === 'boost_private') {
+              hardcoded = BOOST_PRIVATE.find(p => p.name === pkg.name)
+            } else if (pkg.type === 'boost_business') {
+              hardcoded = BOOST_BUSINESS.find(p => p.name === pkg.name)
+            }
+            
+            merged[pkg.type].push({
+              ...pkg,
+              features: hardcoded?.features || [],
+              color: hardcoded?.color || 'orange',
+              subtitle: hardcoded?.subtitle || '',
+              days: pkg.min_days || 15
+            })
+          })
+          
+          setPackages(merged)
+        }
+      } catch (err) {
+        console.error('Error loading packages:', err)
+      }
+      setLoading(false)
+    }
+    loadPackages()
+  }, [])
   
   const getFinalPrice = (pkg) => {
     if (pkg.discount_active && pkg.discount_percent > 0) {
