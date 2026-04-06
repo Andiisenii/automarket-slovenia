@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Check, X, ArrowLeft, Star, Zap, Package, TrendingDown } from 'lucide-react'
+import { Check, X, ArrowLeft, Star, Zap, Package, TrendingDown, Sparkles } from 'lucide-react'
 import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabase'
 
@@ -23,7 +23,7 @@ const translations = {
   }
 }
 
-// Original publishing packages WITH features (included/excluded)
+// Publishing packages WITH features
 const PUBLISHING_PACKAGES = [
   { 
     id: 'osnovni', 
@@ -44,6 +44,7 @@ const PUBLISHING_PACKAGES = [
     id: 'premium', 
     name: 'PREMIUM', 
     price: 64.99, 
+    isPopular: true,
     features: [
       { text: 'Neomejena objava oglasov', included: true },
       { text: '30 fotografij na oglas', included: true },
@@ -57,18 +58,96 @@ const PUBLISHING_PACKAGES = [
   },
 ]
 
-// Original boost packages - PRIVATE
+// Boost packages PRIVATE with details
 const BOOST_PRIVATE = [
-  { id: 'akcija_p', name: 'Paket vseh cen', price: 1.50, subtitle: 'akcijska cena', days: 'po izbiri', color: 'orange' },
-  { id: 'top_p', name: 'Top izbira', price: 1.50, subtitle: '', days: 'min 15 dni', color: 'green' },
-  { id: 'skok_p', name: 'Skok na vrh', price: 1.00, subtitle: '', days: 'min 15 dni', color: 'blue' },
+  { 
+    id: 'akcija_p', 
+    name: 'Paket vseh cen', 
+    price: 1.50, 
+    subtitle: 'akcijska cena', 
+    days: 15, 
+    color: 'orange',
+    features: [
+      { text: 'Prikaz na vrhu rezultatov', included: true },
+      { text: 'Vec vidljivosti med kupci', included: true },
+      { text: 'Hitreje prodajte vozilo', included: true },
+      { text: 'Prikaz v posebnem oknu', included: false },
+    ]
+  },
+  { 
+    id: 'top_p', 
+    name: 'Top izbira', 
+    price: 1.50, 
+    subtitle: '', 
+    days: 15, 
+    color: 'green',
+    features: [
+      { text: 'Prikaz na vrhu rezultatov', included: true },
+      { text: 'Vec vidljivosti med kupci', included: true },
+      { text: 'Hitreje prodajte vozilo', included: true },
+      { text: 'Zlatorumen gradient', included: true },
+    ]
+  },
+  { 
+    id: 'skok_p', 
+    name: 'Skok na vrh', 
+    price: 1.00, 
+    subtitle: '', 
+    days: 15, 
+    color: 'blue',
+    features: [
+      { text: 'Takojsten skok na vrh', included: true },
+      { text: 'Enostavna promocija', included: true },
+      { text: 'Brez dodatnih okraskov', included: false },
+      { text: 'Premium oznaka', included: false },
+    ]
+  },
 ]
 
-// Original boost packages - BUSINESS
+// Boost packages BUSINESS with details
 const BOOST_BUSINESS = [
-  { id: 'akcija', name: 'Paket vseh cen', price: 0.75, subtitle: 'akcijska cena', days: 'po izbiri', color: 'orange' },
-  { id: 'top', name: 'Top izbira', price: 0.65, subtitle: '', days: 'min 30 dni', color: 'green' },
-  { id: 'skok', name: 'Skok na vrh', price: 0.50, subtitle: '', days: 'min 30 dni', color: 'blue' },
+  { 
+    id: 'akcija', 
+    name: 'Paket vseh cen', 
+    price: 0.75, 
+    subtitle: 'akcijska cena', 
+    days: 30, 
+    color: 'orange',
+    features: [
+      { text: 'Prikaz na vrhu rezultatov', included: true },
+      { text: 'Vec vidljivosti med kupci', included: true },
+      { text: 'Hitreje prodajte vozilo', included: true },
+      { text: 'Prikaz v posebnem oknu', included: false },
+    ]
+  },
+  { 
+    id: 'top', 
+    name: 'Top izbira', 
+    price: 0.65, 
+    subtitle: '', 
+    days: 30, 
+    color: 'green',
+    features: [
+      { text: 'Prikaz na vrhu rezultatov', included: true },
+      { text: 'Vec vidljivosti med kupci', included: true },
+      { text: 'Hitreje prodajte vozilo', included: true },
+      { text: 'Zlatorumen gradient', included: true },
+    ]
+  },
+  { 
+    id: 'skok', 
+    name: 'Skok na vrh', 
+    price: 0.50, 
+    subtitle: '', 
+    days: 30, 
+    color: 'blue',
+    features: [
+      { text: 'Takojsten skok na vrh', included: true },
+      { text: 'Enostavna promocija', included: true },
+      { text: 'Brez dodatnih okraskov', included: false },
+      { text: 'Premium oznaka', included: false },
+    ]
+  },
 ]
 
 export function SellPage() {
@@ -93,7 +172,6 @@ export function SellPage() {
           .order('type')
         
         if (data && data.length > 0) {
-          // Group Supabase packages
           const grouped = {
             publishing: data.filter(p => p.type === 'publishing'),
             boost_private: data.filter(p => p.type === 'boost_private'),
@@ -101,7 +179,6 @@ export function SellPage() {
           }
           setPackages(grouped)
         } else {
-          // Use hardcoded packages
           setPackages({
             publishing: PUBLISHING_PACKAGES,
             boost_private: BOOST_PRIVATE,
@@ -142,7 +219,7 @@ export function SellPage() {
     
     if (selectedPlan && userData.id) {
       const expiresAt = new Date()
-      expiresAt.setDate(expiresAt.getDate() + (selectedPlan.min_days || 30))
+      expiresAt.setDate(expiresAt.getDate() + (selectedPlan.days || 30))
       
       await supabase.from('user_packages').insert({
         user_id: userData.id,
@@ -290,6 +367,7 @@ export function SellPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
               {packages.publishing?.map((pkg, index) => {
                 const hasDiscount = pkg.discount_active && pkg.discount_percent > 0
+                const isPopular = pkg.isPopular
                 
                 return (
                   <motion.div 
@@ -297,8 +375,20 @@ export function SellPage() {
                     initial={{ opacity: 0, y: 20 }} 
                     whileInView={{ opacity: 1, y: 0 }} 
                     viewport={{ once: true }}
-                    className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden"
+                    className={`rounded-2xl shadow-lg overflow-hidden ${
+                      isPopular 
+                        ? 'border-2 border-orange-500 shadow-orange-500/20' 
+                        : 'border border-gray-200'
+                    }`}
                   >
+                    {/* Popular Badge */}
+                    {isPopular && !hasDiscount && (
+                      <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white text-center py-2 text-sm font-bold flex items-center justify-center gap-1">
+                        <Sparkles className="w-4 h-4" />
+                        Najbolj priljubljen
+                      </div>
+                    )}
+                    
                     {/* Discount Badge */}
                     {hasDiscount && (
                       <div className="bg-red-500 text-white text-center py-2 text-sm font-bold">
@@ -306,7 +396,7 @@ export function SellPage() {
                       </div>
                     )}
                     
-                    <div className="p-6">
+                    <div className={`p-6 ${isPopular ? 'bg-gradient-to-br from-orange-50 to-white' : ''}`}>
                       <h3 className="text-2xl font-bold text-gray-900 mb-2 text-center">{pkg.name}</h3>
                       
                       {/* Price */}
@@ -321,10 +411,10 @@ export function SellPage() {
                           </div>
                         ) : (
                           <div className="flex items-baseline justify-center gap-1">
-                            <span className="text-4xl font-bold text-orange-600">€{pkg.price}</span>
+                            <span className={`text-4xl font-bold ${isPopular ? 'text-orange-600' : 'text-orange-600'}`}>€{pkg.price}</span>
                           </div>
                         )}
-                        <p className="text-gray-500 text-sm mt-1">{t.monthly}</p>
+                        <p className="text-gray-500 text-sm mt-1">/mesec</p>
                       </div>
                       
                       {/* Features with Check/X */}
@@ -347,7 +437,11 @@ export function SellPage() {
                       
                       <button 
                         onClick={() => handleSelectPlan({...pkg, type: 'publishing'})}
-                        className="w-full py-3 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600 transition-colors"
+                        className={`w-full py-3 rounded-xl font-bold transition-colors ${
+                          isPopular 
+                            ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700' 
+                            : 'bg-orange-500 text-white hover:bg-orange-600'
+                        }`}
                       >
                         {t.select}
                       </button>
@@ -408,13 +502,27 @@ export function SellPage() {
                         <span className="text-gray-500 ml-1">/dan</span>
                       </div>
                       
-                      {/* Duration */}
-                      <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
-                        <span>min {pkg.days}</span>
-                      </div>
+                      {/* Min days */}
+                      <p className="text-sm text-gray-500 mb-4">min {pkg.days || 15} dni</p>
+                      
+                      {/* Features with Check/X */}
+                      {(pkg.features || []).length > 0 && (
+                        <ul className="space-y-2 mb-4">
+                          {pkg.features.map((feature, i) => (
+                            <li key={i} className="flex items-center gap-2 text-sm">
+                              {feature.included ? (
+                                <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
+                              ) : (
+                                <X className="w-4 h-4 text-gray-300 flex-shrink-0" />
+                              )}
+                              <span className={feature.included ? 'text-gray-700' : 'text-gray-400'}>{feature.text}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                       
                       <button 
-                        onClick={() => handleSelectPlan({...pkg, type: 'boost_private'})}
+                        onClick={() => handleSelectPlan({...pkg, type: 'boost_private', days: pkg.days || 15})}
                         className="w-full py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition-colors"
                       >
                         {t.select}
@@ -440,6 +548,7 @@ export function SellPage() {
                 const hasDiscount = pkg.discount_active && pkg.discount_percent > 0
                 const borderColor = pkg.color === 'green' ? 'border-green-300' : pkg.color === 'blue' ? 'border-blue-300' : 'border-orange-300'
                 const buttonColor = pkg.color === 'green' ? 'bg-green-600 hover:bg-green-700' : pkg.color === 'blue' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-orange-500 hover:bg-orange-600'
+                const textColor = pkg.color === 'green' ? 'text-green-600' : pkg.color === 'blue' ? 'text-blue-600' : 'text-orange-500'
                 
                 return (
                   <motion.div 
@@ -458,7 +567,7 @@ export function SellPage() {
                     
                     <div className={`p-6 ${hasDiscount ? 'pt-8' : ''}`}>
                       <div className="flex items-center gap-2 mb-2">
-                        <Zap className={`w-5 h-5 ${pkg.color === 'green' ? 'text-green-600' : pkg.color === 'blue' ? 'text-blue-600' : 'text-orange-500'}`} />
+                        <Zap className={`w-5 h-5 ${textColor}`} />
                         <h3 className="text-lg font-bold text-gray-900">{pkg.name}</h3>
                         {pkg.subtitle && (
                           <span className="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded">{pkg.subtitle}</span>
@@ -473,18 +582,32 @@ export function SellPage() {
                             <span className="text-lg text-gray-400 line-through">€{pkg.price}</span>
                           </div>
                         ) : (
-                          <span className={`text-3xl font-bold ${pkg.color === 'green' ? 'text-green-600' : pkg.color === 'blue' ? 'text-blue-600' : 'text-orange-600'}`}>€{pkg.price}</span>
+                          <span className={`text-3xl font-bold ${textColor}`}>€{pkg.price}</span>
                         )}
                         <span className="text-gray-500 ml-1">/dan</span>
                       </div>
                       
-                      {/* Duration */}
-                      <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
-                        <span>min {pkg.days}</span>
-                      </div>
+                      {/* Min days */}
+                      <p className="text-sm text-gray-500 mb-4">min {pkg.days || 30} dni</p>
+                      
+                      {/* Features with Check/X */}
+                      {(pkg.features || []).length > 0 && (
+                        <ul className="space-y-2 mb-4">
+                          {pkg.features.map((feature, i) => (
+                            <li key={i} className="flex items-center gap-2 text-sm">
+                              {feature.included ? (
+                                <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
+                              ) : (
+                                <X className="w-4 h-4 text-gray-300 flex-shrink-0" />
+                              )}
+                              <span className={feature.included ? 'text-gray-700' : 'text-gray-400'}>{feature.text}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                       
                       <button 
-                        onClick={() => handleSelectPlan({...pkg, type: 'boost_business'})}
+                        onClick={() => handleSelectPlan({...pkg, type: 'boost_business', days: pkg.days || 30})}
                         className={`w-full py-3 text-white rounded-xl font-bold transition-colors ${buttonColor}`}
                       >
                         {t.select}

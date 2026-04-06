@@ -877,124 +877,193 @@ export default function AdminPage() {
               <h2 className="text-xl font-semibold">Upravljanje paketov</h2>
             </div>
             
+            {/* Publishing Packages */}
             <div>
               <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
                 <Package className="w-5 h-5 text-orange-500" />
                 Paketi za objavo
               </h3>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {packages.filter(p => p.type === 'publishing').map(pkg => (
-                  <Card key={pkg.id} className="p-5 relative overflow-hidden">
-                    {pkg.discount_active && pkg.discount_percent > 0 && (
-                      <div className="absolute top-0 right-0 bg-red-500 text-white px-3 py-1 text-xs font-bold rounded-bl-lg">
-                        -{pkg.discount_percent}%
+                {packages.filter(p => p.type === 'publishing').map(pkg => {
+                  const hasDiscount = pkg.discount_active && pkg.discount_percent > 0
+                  const features = pkg.features || []
+                  return (
+                    <Card key={pkg.id} className="p-5 relative overflow-hidden">
+                      {hasDiscount && (
+                        <div className="absolute top-0 right-0 bg-red-500 text-white px-3 py-1 text-xs font-bold rounded-bl-lg">
+                          -{pkg.discount_percent}% Zbritja
+                        </div>
+                      )}
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-semibold">{pkg.name}</h4>
+                        <button onClick={() => { setSelectedPackage(pkg); setShowPackageModal(true) }} className="p-1.5 hover:bg-gray-100 rounded">
+                          <Edit className="w-4 h-4 text-blue-500" />
+                        </button>
                       </div>
-                    )}
-                    <div className="flex items-center justify-between mb-3">
-                      <h4 className="font-semibold">{pkg.name}</h4>
-                      <button onClick={() => { setSelectedPackage(pkg); setShowPackageModal(true) }} className="p-1.5 hover:bg-gray-100 rounded">
-                        <Edit className="w-4 h-4 text-blue-500" />
-                      </button>
-                    </div>
-                    <div className="flex items-baseline gap-2 mb-2">
-                      {pkg.discount_active && pkg.discount_percent > 0 ? (
-                        <>
-                          <span className="text-2xl font-bold text-red-500">€{(pkg.price * (1 - pkg.discount_percent / 100)).toFixed(2)}</span>
-                          <span className="text-lg text-gray-400 line-through">€{pkg.price}</span>
-                        </>
-                      ) : (
-                        <span className="text-2xl font-bold text-orange-600">€{pkg.price}</span>
+                      <div className="flex items-baseline gap-2 mb-2">
+                        {hasDiscount ? (
+                          <>
+                            <span className="text-2xl font-bold text-red-500">€{(pkg.price * (1 - pkg.discount_percent / 100)).toFixed(2)}</span>
+                            <span className="text-lg text-gray-400 line-through">€{pkg.price}</span>
+                          </>
+                        ) : (
+                          <span className="text-2xl font-bold text-orange-600">€{pkg.price}</span>
+                        )}
+                        <span className="text-gray-500 text-sm">/mesec</span>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-3">Min {pkg.min_days} dni</p>
+                      
+                      {/* Features */}
+                      {features.length > 0 && (
+                        <ul className="space-y-1 mb-3">
+                          {features.map((f, i) => (
+                            <li key={i} className="flex items-center gap-2 text-sm">
+                              {f.included ? (
+                                <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                              ) : (
+                                <X className="w-4 h-4 text-gray-300 flex-shrink-0" />
+                              )}
+                              <span className={f.included ? 'text-gray-700' : 'text-gray-400'}>{f.text}</span>
+                            </li>
+                          ))}
+                        </ul>
                       )}
-                      <span className="text-gray-500 text-sm">/mesec</span>
-                    </div>
-                    <p className="text-sm text-gray-600">Min {pkg.min_days} dni</p>
-                    <div className="mt-3 flex items-center gap-2">
-                      {pkg.discount_active ? (
-                        <>
-                          <CheckCircle className="w-4 h-4 text-green-500" />
-                          <span className="text-sm text-green-600">{pkg.discount_percent}% zbritja aktivna</span>
-                        </>
-                      ) : (
-                        <>
-                          <XCircle className="w-4 h-4 text-gray-400" />
-                          <span className="text-sm text-gray-400">Brez zbritve</span>
-                        </>
-                      )}
-                    </div>
-                  </Card>
-                ))}
+                      
+                      <div className="flex items-center gap-2 mt-2">
+                        {hasDiscount ? (
+                          <>
+                            <CheckCircle className="w-4 h-4 text-green-500" />
+                            <span className="text-sm text-green-600">{pkg.discount_percent}% zbritja aktivna</span>
+                          </>
+                        ) : (
+                          <>
+                            <XCircle className="w-4 h-4 text-gray-400" />
+                            <span className="text-sm text-gray-400">Brez zbritve</span>
+                          </>
+                        )}
+                      </div>
+                    </Card>
+                  )
+                })}
               </div>
             </div>
             
+            {/* Boost Packages - Private */}
             <div>
               <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
-                <Zap className="w-5 h-5 text-blue-500" />
-                Paketi za promocijo - Zasebni
+                <Zap className="w-5 h-5 text-orange-500" />
+                Paketi za promocijo - Zasebni (min 15 dni)
               </h3>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {packages.filter(p => p.type === 'boost_private').map(pkg => (
-                  <Card key={pkg.id} className="p-5 relative overflow-hidden">
-                    {pkg.discount_active && pkg.discount_percent > 0 && (
-                      <div className="absolute top-0 right-0 bg-red-500 text-white px-3 py-1 text-xs font-bold rounded-bl-lg">
-                        -{pkg.discount_percent}%
-                      </div>
-                    )}
-                    <div className="flex items-center justify-between mb-3">
-                      <h4 className="font-semibold">{pkg.name}</h4>
-                      <button onClick={() => { setSelectedPackage(pkg); setShowPackageModal(true) }} className="p-1.5 hover:bg-gray-100 rounded">
-                        <Edit className="w-4 h-4 text-blue-500" />
-                      </button>
-                    </div>
-                    <div className="flex items-baseline gap-2 mb-2">
-                      {pkg.discount_active && pkg.discount_percent > 0 ? (
-                        <>
-                          <span className="text-2xl font-bold text-red-500">€{(pkg.price * (1 - pkg.discount_percent / 100)).toFixed(2)}</span>
-                          <span className="text-lg text-gray-400 line-through">€{pkg.price}</span>
-                        </>
-                      ) : (
-                        <span className="text-2xl font-bold text-blue-600">€{pkg.price}</span>
+              <div className="grid md:grid-cols-3 gap-4">
+                {packages.filter(p => p.type === 'boost_private').map(pkg => {
+                  const hasDiscount = pkg.discount_active && pkg.discount_percent > 0
+                  const features = pkg.features || []
+                  return (
+                    <Card key={pkg.id} className="p-5 relative overflow-hidden">
+                      {hasDiscount && (
+                        <div className="absolute top-0 left-0 right-0 bg-red-500 text-white text-center py-1.5 text-xs font-bold">
+                          -{pkg.discount_percent}% Zbritja
+                        </div>
                       )}
-                      <span className="text-gray-500 text-sm">/dan</span>
-                    </div>
-                    <p className="text-sm text-gray-600">Min {pkg.min_days} dni</p>
-                  </Card>
-                ))}
+                      <div className={`${hasDiscount ? 'pt-6' : ''}`}>
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="font-semibold">{pkg.name}</h4>
+                          <button onClick={() => { setSelectedPackage(pkg); setShowPackageModal(true) }} className="p-1.5 hover:bg-gray-100 rounded">
+                            <Edit className="w-4 h-4 text-blue-500" />
+                          </button>
+                        </div>
+                        <div className="flex items-baseline gap-2 mb-2">
+                          {hasDiscount ? (
+                            <>
+                              <span className="text-2xl font-bold text-red-500">€{(pkg.price * (1 - pkg.discount_percent / 100)).toFixed(2)}</span>
+                              <span className="text-lg text-gray-400 line-through">€{pkg.price}</span>
+                            </>
+                          ) : (
+                            <span className="text-2xl font-bold text-orange-600">€{pkg.price}</span>
+                          )}
+                          <span className="text-gray-500 text-sm">/dan</span>
+                        </div>
+                        <p className="text-sm text-gray-600 mb-3">min {pkg.min_days || 15} dni</p>
+                        
+                        {/* Features */}
+                        {features.length > 0 && (
+                          <ul className="space-y-1 mb-3">
+                            {features.map((f, i) => (
+                              <li key={i} className="flex items-center gap-2 text-sm">
+                                {f.included ? (
+                                  <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                                ) : (
+                                  <X className="w-4 h-4 text-gray-300 flex-shrink-0" />
+                                )}
+                                <span className={f.included ? 'text-gray-700' : 'text-gray-400'}>{f.text}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    </Card>
+                  )
+                })}
               </div>
             </div>
             
+            {/* Boost Packages - Business */}
             <div>
               <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
                 <Star className="w-5 h-5 text-purple-500" />
-                Paketi za promocijo - Poslovni
+                Paketi za promocijo - Poslovni (min 30 dni)
               </h3>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {packages.filter(p => p.type === 'boost_business').map(pkg => (
-                  <Card key={pkg.id} className="p-5 relative overflow-hidden">
-                    {pkg.discount_active && pkg.discount_percent > 0 && (
-                      <div className="absolute top-0 right-0 bg-red-500 text-white px-3 py-1 text-xs font-bold rounded-bl-lg">
-                        -{pkg.discount_percent}%
-                      </div>
-                    )}
-                    <div className="flex items-center justify-between mb-3">
-                      <h4 className="font-semibold">{pkg.name}</h4>
-                      <button onClick={() => { setSelectedPackage(pkg); setShowPackageModal(true) }} className="p-1.5 hover:bg-gray-100 rounded">
-                        <Edit className="w-4 h-4 text-blue-500" />
-                      </button>
-                    </div>
-                    <div className="flex items-baseline gap-2 mb-2">
-                      {pkg.discount_active && pkg.discount_percent > 0 ? (
-                        <>
-                          <span className="text-2xl font-bold text-red-500">€{(pkg.price * (1 - pkg.discount_percent / 100)).toFixed(2)}</span>
-                          <span className="text-lg text-gray-400 line-through">€{pkg.price}</span>
-                        </>
-                      ) : (
-                        <span className="text-2xl font-bold text-purple-600">€{pkg.price}</span>
+              <div className="grid md:grid-cols-3 gap-4">
+                {packages.filter(p => p.type === 'boost_business').map(pkg => {
+                  const hasDiscount = pkg.discount_active && pkg.discount_percent > 0
+                  const features = pkg.features || []
+                  const borderColor = pkg.color === 'green' ? 'border-green-300' : pkg.color === 'blue' ? 'border-blue-300' : 'border-orange-300'
+                  return (
+                    <Card key={pkg.id} className={`p-5 relative overflow-hidden border-2 ${borderColor}`}>
+                      {hasDiscount && (
+                        <div className="absolute top-0 left-0 right-0 bg-red-500 text-white text-center py-1.5 text-xs font-bold">
+                          -{pkg.discount_percent}% Zbritja
+                        </div>
                       )}
-                      <span className="text-gray-500 text-sm">/dan</span>
-                    </div>
-                    <p className="text-sm text-gray-600">Min {pkg.min_days} dni</p>
-                  </Card>
-                ))}
+                      <div className={`${hasDiscount ? 'pt-6' : ''}`}>
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="font-semibold">{pkg.name}</h4>
+                          <button onClick={() => { setSelectedPackage(pkg); setShowPackageModal(true) }} className="p-1.5 hover:bg-gray-100 rounded">
+                            <Edit className="w-4 h-4 text-blue-500" />
+                          </button>
+                        </div>
+                        <div className="flex items-baseline gap-2 mb-2">
+                          {hasDiscount ? (
+                            <>
+                              <span className="text-2xl font-bold text-red-500">€{(pkg.price * (1 - pkg.discount_percent / 100)).toFixed(2)}</span>
+                              <span className="text-lg text-gray-400 line-through">€{pkg.price}</span>
+                            </>
+                          ) : (
+                            <span className="text-2xl font-bold text-purple-600">€{pkg.price}</span>
+                          )}
+                          <span className="text-gray-500 text-sm">/dan</span>
+                        </div>
+                        <p className="text-sm text-gray-600 mb-3">min {pkg.min_days || 30} dni</p>
+                        
+                        {/* Features */}
+                        {features.length > 0 && (
+                          <ul className="space-y-1 mb-3">
+                            {features.map((f, i) => (
+                              <li key={i} className="flex items-center gap-2 text-sm">
+                                {f.included ? (
+                                  <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                                ) : (
+                                  <X className="w-4 h-4 text-gray-300 flex-shrink-0" />
+                                )}
+                                <span className={f.included ? 'text-gray-700' : 'text-gray-400'}>{f.text}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    </Card>
+                  )
+                })}
               </div>
             </div>
           </div>
