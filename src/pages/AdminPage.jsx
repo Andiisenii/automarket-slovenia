@@ -157,45 +157,28 @@ export default function AdminPage() {
       
       if (usersRes.data) setUsers(usersRes.data)
       if (carsRes.data) setCars(carsRes.data)
-      // Always include hardcoded packages and merge with Supabase data
-      const allPackages = []
-      
-      // Add Supabase packages with merged hardcoded features
+      // Use only Supabase packages, merge with hardcoded features for display
       if (packagesRes.data) {
-        packagesRes.data.forEach(pkg => {
+        const packagesWithFeatures = packagesRes.data.map(pkg => {
           let hardcodedPkg = null
           if (pkg.type === 'publishing') {
-            hardcodedPkg = PUBLISHING_PACKAGES.find(p => p.id === pkg.id || p.name === pkg.name)
+            hardcodedPkg = PUBLISHING_PACKAGES.find(p => p.name === pkg.name)
           } else if (pkg.type === 'boost_private') {
-            hardcodedPkg = BOOST_PRIVATE.find(p => p.id === pkg.id || p.name === pkg.name)
+            hardcodedPkg = BOOST_PRIVATE.find(p => p.name === pkg.name)
           } else if (pkg.type === 'boost_business') {
-            hardcodedPkg = BOOST_BUSINESS.find(p => p.id === pkg.id || p.name === pkg.name)
+            hardcodedPkg = BOOST_BUSINESS.find(p => p.name === pkg.name)
           }
-          allPackages.push({
+          return {
             ...pkg,
             price: pkg.price || hardcodedPkg?.price,
             min_days: pkg.min_days || hardcodedPkg?.min_days,
             subtitle: hardcodedPkg?.subtitle || '',
             features: hardcodedPkg?.features || pkg.features || [],
             color: hardcodedPkg?.color || 'orange'
-          })
+          }
         })
+        setPackages(packagesWithFeatures)
       }
-      
-      // Add missing hardcoded packages (boost_private and boost_business from Supabase might be missing)
-      const supabasePackageNames = packagesRes.data?.map(p => p.name) || []
-      BOOST_PRIVATE.forEach(pkg => {
-        if (!supabasePackageNames.includes(pkg.name)) {
-          allPackages.push({ ...pkg, type: 'boost_private' })
-        }
-      })
-      BOOST_BUSINESS.forEach(pkg => {
-        if (!supabasePackageNames.includes(pkg.name)) {
-          allPackages.push({ ...pkg, type: 'boost_business' })
-        }
-      })
-      
-      setPackages(allPackages)
       if (messagesRes.data) setMessages(messagesRes.data)
       if (ordersRes.data) setOrders(ordersRes.data || [])
       
