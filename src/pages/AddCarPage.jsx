@@ -41,14 +41,16 @@ export function AddCarPage() {
   const [errors, setErrors] = useState({})
   const [selectedBoost, setSelectedBoost] = useState(null)
   const [boostDays, setBoostDays] = useState(30)
+  const [monthlyCarCount, setMonthlyCarCount] = useState(0)
+  const [currentUserCarCount, setCurrentUserCarCount] = useState(0)
 
   
 
   const userId = user?.id
 
-  // Package check
-  const userPackage = packageDB.getCurrentPackage()
-  const isPremium = packageDB.isPremium()
+  // Package check - use state to avoid hydration mismatch
+  const [userPackage, setUserPackage] = useState(null)
+  const [isPremium, setIsPremium] = useState(false)
   const isBusiness = user?.userType === 'business'
 
   useEffect(() => {
@@ -64,6 +66,25 @@ export function AddCarPage() {
     }
     fetchData()
   }, [])
+
+  // Load package and car count data from localStorage (avoid hydration mismatch)
+  useEffect(() => {
+    const pkg = packageDB.getCurrentPackage()
+    setUserPackage(pkg)
+    setIsPremium(packageDB.isPremium())
+    
+    // Load monthly car count
+    if (userId) {
+      const myCars = JSON.parse(localStorage.getItem('myListings') || '[]')
+      const now = new Date()
+      const count = myCars.filter(car => {
+        const carDate = new Date(car.createdAt || Date.now())
+        return car.seller?.id === userId && carDate.getMonth() === now.getMonth() && carDate.getFullYear() === now.getFullYear()
+      }).length
+      setMonthlyCarCount(count)
+      setCurrentUserCarCount(carDB.getMyCarCount())
+    }
+  }, [userId])
 
   useEffect(() => {
     if (formData.brand && !brandModels[formData.brand]) {
@@ -90,18 +111,6 @@ export function AddCarPage() {
     if (isBusiness) return boostPackages.business
     return boostPackages.private
   }
-
-  const getMonthlyCarCount = () => {
-    if (!userId) return 0
-    const myCars = JSON.parse(localStorage.getItem('myListings') || '[]')
-    const now = new Date()
-    return myCars.filter(car => {
-      const carDate = new Date(car.createdAt || Date.now())
-      return car.seller?.id === userId && carDate.getMonth() === now.getMonth() && carDate.getFullYear() === now.getFullYear()
-    }).length
-  }
-
-  const monthlyCarCount = getMonthlyCarCount()
 
   const [openDropdown, setOpenDropdown] = useState(null)
   const [brandSuggestions, setBrandSuggestions] = useState([])
@@ -281,8 +290,7 @@ export function AddCarPage() {
     return Object.keys(newErrors).length === 0
   }
 
-  // Note: userPackage, isPremium, isBusiness are declared at line ~50
-  const currentUserCarCount = carDB.getMyCarCount()
+  // Note: userPackage, isPremium, isBusiness, currentUserCarCount are declared as state
   
   // FREE_CAR_LIMIT = 2 cars without package, after that need to buy a package
   const FREE_CAR_LIMIT = 2

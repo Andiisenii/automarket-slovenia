@@ -18,6 +18,7 @@ export default function AdminPage() {
   const navigate = useNavigate()
   const { user: authUser } = useAuth()
   const [adminUser, setAdminUser] = useState(null)
+  const [mounted, setMounted] = useState(false)
   const [activeTab, setActiveTab] = useState('dashboard')
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
@@ -48,6 +49,7 @@ export default function AdminPage() {
   
   // Load admin user from localStorage
   useEffect(() => {
+    setMounted(true)
     try {
       const storedAdmin = localStorage.getItem('automarket_admin_user')
       if (storedAdmin) {
@@ -65,7 +67,8 @@ export default function AdminPage() {
     }
   }, [navigate])
   
-  if (!adminUser) {
+  // Show loading until mounted (avoids hydration mismatch)
+  if (!mounted || !adminUser) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">

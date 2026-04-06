@@ -22,12 +22,35 @@ import { TermsPage } from '@/pages/TermsPage'
 import { FinancingPage } from '@/pages/FinancingPage'
 import { CookieConsent } from '@/components/features/CookieConsent'
 
+import { useState, useEffect } from 'react'
+
 function ProtectedRoute({ children }) {
-  const auth = JSON.parse(localStorage.getItem('automarket_user') || 'null')
-  if (!auth) {
-    window.location.href = '/login'
-    return null
+  const [auth, setAuth] = useState(null)
+  const [loading, setLoading] = useState(true)
+  
+  useEffect(() => {
+    try {
+      const storedAuth = localStorage.getItem('automarket_user')
+      if (storedAuth) {
+        setAuth(JSON.parse(storedAuth))
+      } else {
+        window.location.href = '/login'
+      }
+    } catch (e) {
+      window.location.href = '/login'
+    }
+    setLoading(false)
+  }, [])
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+      </div>
+    )
   }
+  
+  if (!auth) return null
   return children
 }
 
