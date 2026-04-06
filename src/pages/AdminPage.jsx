@@ -22,7 +22,7 @@ const COLORS = ['#ff6a00', '#3b82f6', '#22c55e', '#a855f7', '#ef4444', '#06b6d4'
 
 // Hardcoded package features for display
 const PUBLISHING_PACKAGES = [
-  { id: 'osnovni', name: 'OSNOVNI', features: [
+  { id: 'osnovni', name: 'OSNOVNI', price: 34.99, min_days: 30, features: [
     { text: 'Objava do 100 oglasov', included: true },
     { text: '10 fotografij na oglas', included: true },
     { text: 'Neomejeno urejanje oglasov', included: true },
@@ -32,7 +32,7 @@ const PUBLISHING_PACKAGES = [
     { text: '360 posnetki', included: false },
     { text: 'Premium uvrstitev', included: false },
   ]},
-  { id: 'premium', name: 'PREMIUM', features: [
+  { id: 'premium', name: 'PREMIUM', price: 64.99, min_days: 30, features: [
     { text: 'Neomejena objava oglasov', included: true },
     { text: '30 fotografij na oglas', included: true },
     { text: 'Neomejeno urejanje oglasov', included: true },
@@ -45,19 +45,19 @@ const PUBLISHING_PACKAGES = [
 ]
 
 const BOOST_PRIVATE = [
-  { id: 'akcija_p', name: 'Paket vseh cen', features: [
+  { id: 'akcija_p', name: 'Paket vseh cen', price: 1.50, subtitle: 'akcijska cena', min_days: 15, color: 'orange', features: [
     { text: 'Prikaz na vrhu rezultatov', included: true },
     { text: 'Vec vidljivosti med kupci', included: true },
     { text: 'Hitreje prodajte vozilo', included: true },
     { text: 'Prikaz v posebnem oknu', included: false },
   ]},
-  { id: 'top_p', name: 'Top izbira', features: [
+  { id: 'top_p', name: 'Top izbira', price: 1.50, subtitle: '', min_days: 15, color: 'green', features: [
     { text: 'Prikaz na vrhu rezultatov', included: true },
     { text: 'Vec vidljivosti med kupci', included: true },
     { text: 'Hitreje prodajte vozilo', included: true },
     { text: 'Zlatorumen gradient', included: true },
   ]},
-  { id: 'skok_p', name: 'Skok na vrh', features: [
+  { id: 'skok_p', name: 'Skok na vrh', price: 1.00, subtitle: '', min_days: 15, color: 'blue', features: [
     { text: 'Takojsten skok na vrh', included: true },
     { text: 'Enostavna promocija', included: true },
     { text: 'Brez dodatnih okraskov', included: false },
@@ -66,19 +66,19 @@ const BOOST_PRIVATE = [
 ]
 
 const BOOST_BUSINESS = [
-  { id: 'akcija', name: 'Paket vseh cen', features: [
+  { id: 'akcija', name: 'Paket vseh cen', price: 0.75, subtitle: 'akcijska cena', min_days: 30, color: 'orange', features: [
     { text: 'Prikaz na vrhu rezultatov', included: true },
     { text: 'Vec vidljivosti med kupci', included: true },
     { text: 'Hitreje prodajte vozilo', included: true },
     { text: 'Prikaz v posebnem oknu', included: false },
   ]},
-  { id: 'top', name: 'Top izbira', features: [
+  { id: 'top', name: 'Top izbira', price: 0.65, subtitle: '', min_days: 30, color: 'green', features: [
     { text: 'Prikaz na vrhu rezultatov', included: true },
     { text: 'Vec vidljivosti med kupci', included: true },
     { text: 'Hitreje prodajte vozilo', included: true },
     { text: 'Zlatorumen gradient', included: true },
   ]},
-  { id: 'skok', name: 'Skok na vrh', features: [
+  { id: 'skok', name: 'Skok na vrh', price: 0.50, subtitle: '', min_days: 30, color: 'blue', features: [
     { text: 'Takojsten skok na vrh', included: true },
     { text: 'Enostavna promocija', included: true },
     { text: 'Brez dodatnih okraskov', included: false },
@@ -170,7 +170,10 @@ export default function AdminPage() {
           }
           return {
             ...pkg,
-            features: hardcodedPkg?.features || [],
+            price: pkg.price || hardcodedPkg?.price,
+            min_days: pkg.min_days || hardcodedPkg?.min_days,
+            subtitle: hardcodedPkg?.subtitle || '',
+            features: hardcodedPkg?.features || pkg.features || [],
             color: hardcodedPkg?.color || 'orange'
           }
         })
@@ -1036,7 +1039,7 @@ export default function AdminPage() {
             <div>
               <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
                 <Zap className="w-5 h-5 text-orange-500" />
-                Paketi za promocijo - Zasebni (min 15 dni)
+                Paketi za promocijo - Zasebni
               </h3>
               <div className="grid md:grid-cols-3 gap-4">
                 {packages.filter(p => p.type === 'boost_private').map(pkg => {
@@ -1050,9 +1053,12 @@ export default function AdminPage() {
                         </div>
                       )}
                       <div className={`${hasDiscount ? 'pt-6' : ''}`}>
-                        <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2 mb-1">
                           <h4 className="font-semibold">{pkg.name}</h4>
-                          <button onClick={() => { setSelectedPackage(pkg); setShowPackageModal(true) }} className="p-1.5 hover:bg-gray-100 rounded">
+                          {pkg.subtitle && (
+                            <span className="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded">{pkg.subtitle}</span>
+                          )}
+                          <button onClick={() => { setSelectedPackage(pkg); setShowPackageModal(true) }} className="ml-auto p-1 hover:bg-gray-100 rounded">
                             <Edit className="w-4 h-4 text-blue-500" />
                           </button>
                         </div>
@@ -1095,7 +1101,7 @@ export default function AdminPage() {
             <div>
               <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
                 <Star className="w-5 h-5 text-purple-500" />
-                Paketi za promocijo - Poslovni (min 30 dni)
+                Paketi za promocijo - Poslovni
               </h3>
               <div className="grid md:grid-cols-3 gap-4">
                 {packages.filter(p => p.type === 'boost_business').map(pkg => {
@@ -1110,9 +1116,12 @@ export default function AdminPage() {
                         </div>
                       )}
                       <div className={`${hasDiscount ? 'pt-6' : ''}`}>
-                        <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2 mb-1">
                           <h4 className="font-semibold">{pkg.name}</h4>
-                          <button onClick={() => { setSelectedPackage(pkg); setShowPackageModal(true) }} className="p-1.5 hover:bg-gray-100 rounded">
+                          {pkg.subtitle && (
+                            <span className="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded">{pkg.subtitle}</span>
+                          )}
+                          <button onClick={() => { setSelectedPackage(pkg); setShowPackageModal(true) }} className="ml-auto p-1 hover:bg-gray-100 rounded">
                             <Edit className="w-4 h-4 text-blue-500" />
                           </button>
                         </div>
