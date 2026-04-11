@@ -389,12 +389,19 @@ export function RegisterPage() {
   // Validation states
   const [touched, setTouched] = useState({})
 
-  // Validation for private (only email and geslo required)
+  // Validation for private (all fields required)
   const validatePrivate = () => {
     const errors = {}
+    if (!privateForm.ime) errors.ime = true
+    if (!privateForm.priimek) errors.priimek = true
+    if (!privateForm.posta) errors.posta = true
+    if (!privateForm.ulica) errors.ulica = true
+    if (!privateForm.hisna) errors.hisna = true
+    if (!privateForm.email) errors.email = true
     if (privateForm.email && !/\S+@\S+\.\S+/.test(privateForm.email)) errors.email = true
-    if (privateForm.geslo && privateForm.geslo.length > 0 && privateForm.geslo.length < 5) errors.geslo = true
-    if (privateForm.geslo !== privateForm.potrdiGeslo && privateForm.geslo.length > 0) errors.potrdiGeslo = true
+    if (!privateForm.geslo || privateForm.geslo.length < 5) errors.geslo = true
+    if (privateForm.geslo !== privateForm.potrdiGeslo) errors.potrdiGeslo = true
+    if (!privateForm.telefon || privateForm.telefon.replace(/\s/g, '').length < 10) errors.telefon = true
     return errors
   }
 
@@ -528,47 +535,61 @@ export function RegisterPage() {
             <>
               {/* Osnovni podatki */}
               <div className="mb-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Osnovni podatki</h3>
+                <h3 className="text-lg font-bold text-gray-900 mb-4">Osnovni podatki (*)</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormInput
                     label="Ime"
+                    required
                     value={privateForm.ime}
                     onChange={(v) => updatePrivate('ime', v)}
                     placeholder="Janez"
-                    helpText="podatek ni obvezen"
+                    helpText="podatek je obvezen, vendar ob objavi oglasov NE BO objavljen"
+                    success={isFieldValid('ime', privateForm) === true}
+                    error={isFieldValid('ime', privateForm) === false}
                   />
                   <FormInput
                     label="Priimek"
+                    required
                     value={privateForm.priimek}
                     onChange={(v) => updatePrivate('priimek', v)}
                     placeholder="Novak"
-                    helpText="podatek ni obvezen"
+                    helpText="podatek je obvezen, vendar ob objavi oglasov NE BO objavljen"
+                    success={isFieldValid('priimek', privateForm) === true}
+                    error={isFieldValid('priimek', privateForm) === false}
                   />
                   <CountrySelect
                     label="Država"
+                    required
                     value={privateForm.drzava}
                     onChange={(v) => updatePrivate('drzava', v)}
                     countries={countries}
                   />
                   <CityInput
                     label="Pošta oz. kraj"
+                    required
                     value={privateForm.posta}
                     onChange={(v) => updatePrivate('posta', v)}
                     helpText="izberite vašo lokacijo"
                   />
                   <FormInput
                     label="Ulica"
+                    required
                     value={privateForm.ulica}
                     onChange={(v) => updatePrivate('ulica', v)}
                     placeholder="Dunajska"
-                    helpText="podatek ni obvezen"
+                    helpText="podatek je obvezen, vendar ob objavi oglasov NE BO objavljen"
+                    success={isFieldValid('ulica', privateForm) === true}
+                    error={isFieldValid('ulica', privateForm) === false}
                   />
                   <FormInput
                     label="Hišna številka"
+                    required
                     value={privateForm.hisna}
                     onChange={(v) => updatePrivate('hisna', v)}
                     placeholder="15"
-                    helpText="podatek ni obvezen"
+                    helpText="podatek je obvezen, vendar ob objavi oglasov NE BO objavljen"
+                    success={isFieldValid('hisna', privateForm) === true}
+                    error={isFieldValid('hisna', privateForm) === false}
                   />
                 </div>
                 <p className="text-xs text-gray-500 mt-3 bg-blue-50 p-3 rounded-lg">
@@ -589,17 +610,22 @@ export function RegisterPage() {
                   />
                   <PhoneInput
                     label="Telefon"
+                    required
                     value={privateForm.telefon}
                     onChange={(v) => updatePrivate('telefon', v)}
+                    helpText="Podatek je obvezen"
                   />
                   <div className="md:col-span-2">
                     <FormInput
                       label="E-mail naslov"
+                      required
                       value={privateForm.email}
                       onChange={(v) => updatePrivate('email', v)}
                       placeholder="janez.novak@email.com"
                       type="email"
-                      helpText="podatek ni obvezen"
+                      helpText="podatek je obvezen, vendar ob objavi oglasov NE BO prikazan"
+                      success={isFieldValid('email', privateForm) === true}
+                      error={isFieldValid('email', privateForm) === false}
                     />
                   </div>
                 </div>
@@ -611,14 +637,18 @@ export function RegisterPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      Vaše geslo
+                      Vaše geslo <span className="text-red-500">(*)</span>
                     </label>
                     <div className="relative">
                       <input
                         type={showPassword ? 'text' : 'password'}
                         value={privateForm.geslo}
                         onChange={(e) => updatePrivate('geslo', e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ff6a00] pr-10"
+                        className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 pr-10 ${
+                          isFieldValid('geslo', privateForm) === true ? 'border-green-400 focus:ring-green-500' :
+                          isFieldValid('geslo', privateForm) === false ? 'border-red-400 focus:ring-red-500' :
+                          'border-gray-200 focus:ring-[#ff6a00]'
+                        }`}
                         placeholder="••••••••"
                       />
                       <button
@@ -632,14 +662,18 @@ export function RegisterPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      Ponovite geslo
+                      Ponovite geslo <span className="text-red-500">(*)</span>
                     </label>
                     <div className="relative">
                       <input
                         type={showConfirmPassword ? 'text' : 'password'}
                         value={privateForm.potrdiGeslo}
                         onChange={(e) => updatePrivate('potrdiGeslo', e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ff6a00] pr-10"
+                        className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 pr-10 ${
+                          isFieldValid('potrdiGeslo', privateForm) === true ? 'border-green-400 focus:ring-green-500' :
+                          isFieldValid('potrdiGeslo', privateForm) === false ? 'border-red-400 focus:ring-red-500' :
+                          'border-gray-200 focus:ring-[#ff6a00]'
+                        }`}
                         placeholder="••••••••"
                       />
                       <button
@@ -650,6 +684,9 @@ export function RegisterPage() {
                         {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                       </button>
                     </div>
+                    {isFieldValid('potrdiGeslo', privateForm) === false && (
+                      <p className="text-xs text-red-500 mt-1">Gesli se ne ujemata</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -660,11 +697,8 @@ export function RegisterPage() {
                 <p className="text-xs text-gray-600 mb-2">
                   Bistvena prednost registracije posameznika je možnost objave oglasa. V izogib kršitvam Zakona o preprečevanju dela in zaposlovanja na črno (ZPDZC) je potrebno ob registraciji vpisati anche podatke o naročniku oglasa. Ti podatki služijo le za potrebe spoštovanja določil 6.člena ZPDZC, in ob oglasu NE BODO objavljeni.
                 </p>
-                <p className="text-xs text-gray-600 mb-2">
-                  Izjavljam, da v primeru objave oglasa prodajam lastno vozilo/opremo kot fizična oseba posameznik in z naročilom objave ne bo oglaševano delo na črno v smislu ZPDZC.
-                </p>
                 <p className="text-xs text-gray-600">
-                  Potrjujem seznanitev z vsebino pravnega obvestila ter se z njim v celoti strinjam.
+                  Ob vlogi za registracijo Vas prosimo, da nam posredujete anche podpisano oz. ožigosano kopijo uradnega dokumenta, ki potrjuje registracijo podjetja oz. s.p. (vir: AJPES). Kopijo dokumenta lahko pošljete na email <a href="mailto:info@vozilo.si" className="text-[#ff6a00] underline">info@vozilo.si</a>.
                 </p>
               </div>
 
@@ -680,16 +714,30 @@ export function RegisterPage() {
                 </label>
               </div>
 
-              {/* Legal checkbox - Private */}
-              <div className="mb-6">
+              {/* Legal checkbox 1 - Bigger */}
+              <div className="mb-4 p-3 bg-gray-50 rounded-xl">
                 <label className="flex items-start gap-3">
                   <input
                     type="checkbox"
                     required
-                    className="w-5 h-5 mt-0.5 rounded border-gray-300 text-[#ff6a00] focus:ring-[#ff6a00]"
+                    className="w-5 h-5 mt-1 rounded border-gray-300 text-[#ff6a00] focus:ring-[#ff6a00]"
                   />
-                  <span className="text-sm text-gray-600">
-                    Izjavljam, da v primeru objave oglasa prodajam lastno vozilo/opremo kot fizična oseba posameznik in z naročilom objave ne bo oglaševano delo na črno v smislu ZPDZC. Potrjujem seznanitev z vsebino pravnega obvestila ter se z njim v celoti strinjam.
+                  <span className="text-sm text-gray-700 leading-relaxed">
+                    Izjavljam, da v primeru objave oglasa prodajam lastno vozilo/opremo kot fizična oseba posameznik in z naročilom objave ne bo oglaševano delo na črno v smislu ZPDZC.
+                  </span>
+                </label>
+              </div>
+
+              {/* Legal checkbox 2 - Smaller */}
+              <div className="mb-6">
+                <label className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    required
+                    className="w-4 h-4 rounded border-gray-300 text-[#ff6a00] focus:ring-[#ff6a00]"
+                  />
+                  <span className="text-xs text-gray-600">
+                    Potrjujem seznanitev z vsebino pravnega obvestila ter se z njim v celoti strinjam.
                   </span>
                 </label>
               </div>
@@ -860,18 +908,12 @@ export function RegisterPage() {
                 <p className="text-xs text-gray-600 mb-2">
                   Ob vlogi za registracijo Vas prosimo, da nam posredujete anche podpisano oz. ožigosano kopijo uradnega dokumenta, ki potrjuje registracijo podjetja oz. s.p. (vir: AJPES).
                 </p>
-                <p className="text-xs text-gray-600 mb-2">
-                  Kopijo dokumenta lahko pošljete na email <a href="mailto:info@vozilo.si" className="text-[#ff6a00] underline">info@vozilo.si</a>.
-                </p>
-                <p className="text-xs text-gray-600 mb-2">
-                  Skladno z določili 6.člena Zakona o preprečevanju dela in zaposlovanja na črno (ZPDZC-1, Ur.l.RS št. 32/2014) izjavljamo, da imamo dejavnost, vsebina katere se nanaša na objavo oglasov, opredeljeno v ustanovitvenem aktu oziroma vpisano v register.
-                </p>
                 <p className="text-xs text-gray-600">
-                  Potrjujem seznanitev z vsebino pravnega obvestila ter se z njim v celoti strinjam.
+                  Kopijo dokumenta lahko pošljete na email <a href="mailto:info@vozilo.si" className="text-[#ff6a00] underline">info@vozilo.si</a>.
                 </p>
               </div>
 
-              <div className="mb-6">
+              <div className="mb-4">
                 <label className="flex items-start gap-3">
                   <input
                     type="checkbox"
@@ -892,7 +934,7 @@ export function RegisterPage() {
                     className="w-5 h-5 mt-0.5 rounded border-gray-300 text-[#ff6a00] focus:ring-[#ff6a00]"
                   />
                   <span className="text-sm text-gray-600">
-                    Skladno z določili 6.člena Zakona o preprečevanju dela in zaposlovanja na črno (ZPDZC-1, Ur.l.RS št. 32/2014) izjavljamo, da imamo dejavnost, vsebina katere se nanaša na objavo oglasov, opredeljeno v ustanovitvenem aktu oziroma vpisano v register. Potrjujem seznanitev z vsebino pravnega obvestila ter se z njim v celoti strinjam.
+                    Potrjujem seznanitev z vsebino pravnega obvestila ter se z njim v celoti strinjam.
                   </span>
                 </label>
               </div>
