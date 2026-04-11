@@ -299,22 +299,22 @@ function PhoneInput({ label, required, value, onChange, helpText }) {
   
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+      <label className="block text-xs font-medium text-gray-700 mb-1">
         {label} {required && <span className="text-red-500">(*)</span>}
       </label>
-      <div className="flex gap-2">
+      <div className="flex gap-1">
         <div className="relative">
           <button
             type="button"
             onClick={() => document.getElementById('phone-country-dropdown').classList.toggle('hidden')}
-            className="flex items-center gap-2 px-3 py-3 border border-gray-200 rounded-xl hover:bg-gray-50 min-w-[90px]"
+            className="flex items-center gap-1 px-2 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 min-w-[70px] text-xs"
           >
             <span>{countries.find(c => c.code === countryCode)?.flag}</span>
-            <span className="text-sm text-gray-600">{countryCode}</span>
+            <span className="text-gray-600">{countryCode}</span>
           </button>
           <div
             id="phone-country-dropdown"
-            className="hidden absolute z-10 mt-1 w-48 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-auto"
+            className="hidden absolute z-10 mt-1 w-40 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-auto"
           >
             {countries.map((country) => (
               <button
@@ -324,11 +324,11 @@ function PhoneInput({ label, required, value, onChange, helpText }) {
                   setCountryCode(country.code)
                   document.getElementById('phone-country-dropdown').classList.add('hidden')
                 }}
-                className="flex items-center gap-2 w-full px-4 py-2 hover:bg-gray-100 text-left"
+                className="flex items-center gap-2 w-full px-3 py-1.5 hover:bg-gray-50 text-left text-xs"
               >
                 <span>{country.flag}</span>
-                <span className="text-sm">{country.name}</span>
-                <span className="ml-auto text-xs text-gray-400">{country.code}</span>
+                <span>{country.name}</span>
+                <span className="ml-auto text-gray-400">{country.code}</span>
               </button>
             ))}
           </div>
@@ -337,7 +337,7 @@ function PhoneInput({ label, required, value, onChange, helpText }) {
           type="tel"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ff6a00]"
+          className="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff6a00] text-sm"
           placeholder="40 123 456"
         />
       </div>
@@ -714,30 +714,42 @@ export function RegisterPage() {
                 </label>
               </div>
 
-              {/* Legal checkbox 1 - Bigger */}
-              <div className="mb-4 p-3 bg-gray-50 rounded-xl">
+              {/* Legal checkbox 1 */}
+              <div className="mb-3">
                 <label className="flex items-start gap-3">
                   <input
                     type="checkbox"
                     required
-                    className="w-5 h-5 mt-1 rounded border-gray-300 text-[#ff6a00] focus:ring-[#ff6a00]"
+                    className="w-4 h-4 mt-0.5 rounded border-gray-300 text-[#ff6a00] focus:ring-[#ff6a00]"
                   />
-                  <span className="text-sm text-gray-700 leading-relaxed">
+                  <span className="text-xs text-gray-600 leading-relaxed">
                     Izjavljam, da v primeru objave oglasa prodajam lastno vozilo/opremo kot fizična oseba posameznik in z naročilom objave ne bo oglaševano delo na črno v smislu ZPDZC.
                   </span>
                 </label>
               </div>
 
-              {/* Legal checkbox 2 - Smaller */}
-              <div className="mb-6">
-                <label className="flex items-center gap-3">
+              {/* Legal checkbox 2 */}
+              <div className="mb-3">
+                <label className="flex items-start gap-3">
                   <input
                     type="checkbox"
                     required
-                    className="w-4 h-4 rounded border-gray-300 text-[#ff6a00] focus:ring-[#ff6a00]"
+                    className="w-4 h-4 mt-0.5 rounded border-gray-300 text-[#ff6a00] focus:ring-[#ff6a00]"
                   />
                   <span className="text-xs text-gray-600">
                     Potrjujem seznanitev z vsebino pravnega obvestila ter se z njim v celoti strinjam.
+                  </span>
+                </label>
+              </div>
+
+              <div className="mb-6">
+                <label className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    className="w-4 h-4 mt-0.5 rounded border-gray-300 text-[#ff6a00] focus:ring-[#ff6a00]"
+                  />
+                  <span className="text-xs text-gray-600">
+                    Želim prejemati komentarje in ponudbe obiskovalcev na svoj e-mail naslov.
                   </span>
                 </label>
               </div>
@@ -902,39 +914,42 @@ export function RegisterPage() {
                 </div>
               </div>
 
-              {/* Important notice */}
-              <div className="mb-6 p-4 bg-orange-50 rounded-xl">
-                <p className="text-sm font-medium text-gray-900 mb-2">Pomembno:</p>
-                <p className="text-xs text-gray-600 mb-2">
-                  Ob vlogi za registracijo Vas prosimo, da nam posredujete anche podpisano oz. ožigosano kopijo uradnega dokumenta, ki potrjuje registracijo podjetja oz. s.p. (vir: AJPES).
-                </p>
-                <p className="text-xs text-gray-600">
-                  Kopijo dokumenta lahko pošljete na email <a href="mailto:info@vozilo.si" className="text-[#ff6a00] underline">info@vozilo.si</a>.
-                </p>
-              </div>
-
-              <div className="mb-4">
-                <label className="flex items-start gap-3">
-                  <input
-                    type="checkbox"
-                    className="w-5 h-5 mt-0.5 rounded border-gray-300 text-[#ff6a00] focus:ring-[#ff6a00]"
-                  />
-                  <span className="text-sm text-gray-600">
-                    Želim prejemati komentarje in ponudbe obiskovalcev na svoj e-mail naslov.
-                  </span>
-                </label>
-              </div>
-
-              {/* Legal checkbox */}
-              <div className="mb-6">
+              {/* Legal checkbox 1 - Bigger */}
+              <div className="mb-4 p-3 bg-gray-50 rounded-xl">
                 <label className="flex items-start gap-3">
                   <input
                     type="checkbox"
                     required
-                    className="w-5 h-5 mt-0.5 rounded border-gray-300 text-[#ff6a00] focus:ring-[#ff6a00]"
+                    className="w-5 h-5 mt-1 rounded border-gray-300 text-[#ff6a00] focus:ring-[#ff6a00]"
                   />
-                  <span className="text-sm text-gray-600">
+                  <span className="text-sm text-gray-700 leading-relaxed">
+                    Izjavljam, da v primeru objave oglasa prodajam lastno vozilo/opremo kot fizična oseba posameznik in z naročilom objave ne bo oglaševano delo na črno v smislu ZPDZC.
+                  </span>
+                </label>
+              </div>
+
+              {/* Legal checkbox 2 - Smaller */}
+              <div className="mb-4">
+                <label className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    required
+                    className="w-4 h-4 rounded border-gray-300 text-[#ff6a00] focus:ring-[#ff6a00]"
+                  />
+                  <span className="text-xs text-gray-600">
                     Potrjujem seznanitev z vsebino pravnega obvestila ter se z njim v celoti strinjam.
+                  </span>
+                </label>
+              </div>
+
+              <div className="mb-6">
+                <label className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    className="w-4 h-4 rounded border-gray-300 text-[#ff6a00] focus:ring-[#ff6a00]"
+                  />
+                  <span className="text-xs text-gray-600">
+                    Želim prejemati komentarje in ponudbe obiskovalcev na svoj e-mail naslov.
                   </span>
                 </label>
               </div>
