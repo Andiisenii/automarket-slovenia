@@ -368,7 +368,7 @@ export function SellPage() {
       {/* Publishing Packages */}
       <section className="py-12 md:py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center">Paketi za objavo</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center">IZBERI SVOJ PAKET</h2>
           
           {loading ? (
             <div className="flex justify-center py-8"><div className="animate-spin w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full"></div></div>
@@ -435,11 +435,11 @@ export function SellPage() {
                                 <Check className="w-3 h-3 text-green-600" />
                               </div>
                             ) : (
-                              <div className="flex-shrink-0 w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center">
-                                <X className="w-3 h-3 text-gray-400" />
+                              <div className="flex-shrink-0 w-5 h-5 rounded-full bg-red-100 flex items-center justify-center">
+                                <X className="w-3 h-3 text-red-500" />
                               </div>
                             )}
-                            <span className={feature.included ? 'text-gray-700' : 'text-gray-400'}>{feature.text}</span>
+                            <span className={feature.included ? 'text-gray-700' : 'text-red-500'}>{feature.text}</span>
                           </li>
                         ))}
                       </ul>
@@ -467,7 +467,7 @@ export function SellPage() {
       {packages.boost_private?.length > 0 && (
         <section className="py-12 bg-gray-50">
           <div className="max-w-6xl mx-auto px-4">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2 text-center">Paketa za promocijo</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2 text-center">DODATNA PONUDBA</h2>
             <p className="text-gray-600 text-center mb-8">Za zasebne uporabnike</p>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -482,57 +482,24 @@ export function SellPage() {
                     viewport={{ once: true }}
                     className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden"
                   >
-                    {/* Discount */}
-                    {hasDiscount && (
-                      <div className="bg-red-500 text-white text-center py-2 text-sm font-bold">
-                        -{pkg.discount_percent}% {t.discount}
-                      </div>
-                    )}
-                    
-                    <div className={`p-6 ${hasDiscount ? 'pt-8' : ''}`}>
-                      <div className="flex items-center gap-2 mb-2">
+                    <div className="p-6 flex flex-col items-center justify-center min-h-[180px]">
+                      <div className="flex items-center gap-2 mb-3">
                         <Zap className="w-5 h-5 text-orange-500" />
-                        <h3 className="text-lg font-bold text-gray-900">{pkg.name}</h3>
-                        {pkg.subtitle && (
-                          <span className="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded">{pkg.subtitle}</span>
-                        )}
+                        <h3 className="text-xl font-bold text-gray-900">{pkg.name}</h3>
                       </div>
                       
-                      {/* Price */}
-                      <div className="mb-4">
-                        {hasDiscount ? (
-                          <div className="flex items-baseline gap-2">
-                            <span className="text-3xl font-bold text-red-500">€{getFinalPrice(pkg)}</span>
-                            <span className="text-lg text-gray-400 line-through">€{pkg.price}</span>
-                          </div>
-                        ) : (
-                          <span className="text-3xl font-bold text-orange-600">€{pkg.price}</span>
-                        )}
+                      {/* Price - centered */}
+                      <div className="mb-3 text-center">
+                        <span className="text-3xl font-bold text-orange-600">€{pkg.price.toFixed(2)}</span>
                         <span className="text-gray-500 ml-1">/dan</span>
                       </div>
                       
                       {/* Min days */}
-                      <p className="text-sm text-gray-500 mb-4">min {pkg.days || 15} dni</p>
-                      
-                      {/* Features with Check/X */}
-                      {(pkg.features || []).length > 0 && (
-                        <ul className="space-y-2 mb-4">
-                          {pkg.features.map((feature, i) => (
-                            <li key={i} className="flex items-center gap-2 text-sm">
-                              {feature.included ? (
-                                <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
-                              ) : (
-                                <X className="w-4 h-4 text-gray-300 flex-shrink-0" />
-                              )}
-                              <span className={feature.included ? 'text-gray-700' : 'text-gray-400'}>{feature.text}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
+                      <p className="text-sm text-gray-500">min. naročilo {pkg.days || 15} dni</p>
                       
                       <button 
                         onClick={() => handleSelectPlan({...pkg, type: 'boost_private', days: pkg.days || 15})}
-                        className="w-full py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition-colors"
+                        className="w-full py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition-colors mt-4"
                       >
                         {t.select}
                       </button>
@@ -549,8 +516,8 @@ export function SellPage() {
       {packages.boost_business?.length > 0 && (
         <section className="py-12 bg-white">
           <div className="max-w-6xl mx-auto px-4">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2 text-center">Paketa za promocijo</h2>
-            <p className="text-gray-600 text-center mb-8">Za poslovne uporabnike</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2 text-center">DODATNA PONUDBA</h2>
+            <p className="text-gray-600 text-center mb-8">Za podjetja</p>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {packages.boost_business.map((pkg, index) => {
@@ -567,57 +534,24 @@ export function SellPage() {
                     viewport={{ once: true }}
                     className={`bg-white rounded-2xl border-2 ${borderColor} shadow-lg overflow-hidden`}
                   >
-                    {/* Discount */}
-                    {hasDiscount && (
-                      <div className="bg-red-500 text-white text-center py-2 text-sm font-bold">
-                        -{pkg.discount_percent}% {t.discount}
-                      </div>
-                    )}
-                    
-                    <div className={`p-6 ${hasDiscount ? 'pt-8' : ''}`}>
-                      <div className="flex items-center gap-2 mb-2">
+                    <div className={`p-6 flex flex-col items-center justify-center min-h-[180px]`}>
+                      <div className="flex items-center gap-2 mb-3">
                         <Zap className={`w-5 h-5 ${textColor}`} />
-                        <h3 className="text-lg font-bold text-gray-900">{pkg.name}</h3>
-                        {pkg.subtitle && (
-                          <span className="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded">{pkg.subtitle}</span>
-                        )}
+                        <h3 className="text-xl font-bold text-gray-900">{pkg.name}</h3>
                       </div>
                       
-                      {/* Price */}
-                      <div className="mb-4">
-                        {hasDiscount ? (
-                          <div className="flex items-baseline gap-2">
-                            <span className="text-3xl font-bold text-red-500">€{getFinalPrice(pkg)}</span>
-                            <span className="text-lg text-gray-400 line-through">€{pkg.price}</span>
-                          </div>
-                        ) : (
-                          <span className={`text-3xl font-bold ${textColor}`}>€{pkg.price}</span>
-                        )}
+                      {/* Price - centered */}
+                      <div className="mb-3 text-center">
+                        <span className={`text-3xl font-bold ${textColor}`}>€{pkg.price.toFixed(2)}</span>
                         <span className="text-gray-500 ml-1">/dan</span>
                       </div>
                       
                       {/* Min days */}
-                      <p className="text-sm text-gray-500 mb-4">min {pkg.days || 30} dni</p>
-                      
-                      {/* Features with Check/X */}
-                      {(pkg.features || []).length > 0 && (
-                        <ul className="space-y-2 mb-4">
-                          {pkg.features.map((feature, i) => (
-                            <li key={i} className="flex items-center gap-2 text-sm">
-                              {feature.included ? (
-                                <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
-                              ) : (
-                                <X className="w-4 h-4 text-gray-300 flex-shrink-0" />
-                              )}
-                              <span className={feature.included ? 'text-gray-700' : 'text-gray-400'}>{feature.text}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
+                      <p className="text-sm text-gray-500">min. naročilo {pkg.days || 30} dni</p>
                       
                       <button 
                         onClick={() => handleSelectPlan({...pkg, type: 'boost_business', days: pkg.days || 30})}
-                        className={`w-full py-3 text-white rounded-xl font-bold transition-colors ${buttonColor}`}
+                        className={`w-full py-3 text-white rounded-xl font-bold transition-colors ${buttonColor} mt-4`}
                       >
                         {t.select}
                       </button>
