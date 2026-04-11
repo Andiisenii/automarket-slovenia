@@ -679,6 +679,20 @@ export function RegisterPage() {
                   </span>
                 </label>
               </div>
+
+              {/* Legal checkbox - Private */}
+              <div className="mb-6">
+                <label className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    required
+                    className="w-5 h-5 mt-0.5 rounded border-gray-300 text-[#ff6a00] focus:ring-[#ff6a00]"
+                  />
+                  <span className="text-sm text-gray-600">
+                    Izjavljam, da v primeru objave oglasa prodajam lastno vozilo/opremo kot fizična oseba posameznik in z naročilom objave ne bo oglaševano delo na črno v smislu ZPDZC. Potrjujem seznanitev z vsebino pravnega obvestila ter se z njim v celoti strinjam.
+                  </span>
+                </label>
+              </div>
             </>
           )}
 
@@ -878,7 +892,7 @@ export function RegisterPage() {
                     className="w-5 h-5 mt-0.5 rounded border-gray-300 text-[#ff6a00] focus:ring-[#ff6a00]"
                   />
                   <span className="text-sm text-gray-600">
-                    Skladno z določili 6.člena Zakona o preprečevanju dela in zaposlovanja na črno (ZPDZC-1, Ur.l.RS št. 32/2014) izjavljamo, da imamo dejavnost, vsebina katere se nanaša na objavo oglasov, opredeljeno v ustanovitvenem aktu oziroma vpisano v register.
+                    Skladno z določili 6.člena Zakona o preprečevanju dela in zaposlovanja na črno (ZPDZC-1, Ur.l.RS št. 32/2014) izjavljamo, da imamo dejavnost, vsebina katere se nanaša na objavo oglasov, opredeljeno v ustanovitvenem aktu oziroma vpisano v register. Potrjujem seznanitev z vsebino pravnega obvestila ter se z njim v celoti strinjam.
                   </span>
                 </label>
               </div>
