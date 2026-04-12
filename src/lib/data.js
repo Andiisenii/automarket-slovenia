@@ -325,6 +325,7 @@ export const carEquipmentCategories = {
           'Sedežev: 5+2',
           'Sedežev: 7',
           'Sedežev: 8',
+          'Bus 30+',
           'Usnjeni sedeži',
           'Delno usnjeni sedeži',
           'Alcantara sedeži',

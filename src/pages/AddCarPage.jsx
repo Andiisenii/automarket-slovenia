@@ -8,7 +8,7 @@ import { useAuth } from '@/lib/AuthContext'
 import { useLanguage } from '@/lib/LanguageContext'
 import { useCars } from '@/lib/CarContext'
 import { packageDB, carDB } from '@/lib/database'
-import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, colors, doorCounts, vehicleConditionOptions, vehicleConditionSubOptions, carEquipmentCategories, emissionClasses, vehicleAgeOptions, ownerCountOptions, months, getYears, LUXURY_CAR_THRESHOLD } from '@/lib/data'
+import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, colors, vehicleConditionOptions, vehicleConditionSubOptions, carEquipmentCategories, emissionClasses, vehicleAgeOptions, ownerCountOptions, months, getYears, LUXURY_CAR_THRESHOLD } from '@/lib/data'
 
 export function AddCarPage() {
   const navigate = useNavigate()
@@ -26,7 +26,7 @@ export function AddCarPage() {
   
   const [formData, setFormData] = useState({
     brand: '', model: '', year: new Date().getFullYear(),
-    price: '', mileage: '', fuelType: '', transmission: '', bodyType: '', doorCount: '',
+    price: '', mileage: '', fuelType: '', transmission: '', bodyType: '',
     engine: '', horsepower: '', color: '', city: '', description: '',
     vehicleCondition: '', vehicleConditionSub: [], featureIds: [],
     // Fuel consumption
@@ -196,7 +196,6 @@ export function AddCarPage() {
         year: editCar.year || new Date().getFullYear(), price: editCar.price || '',
         mileage: editCar.mileage || '', fuelType: editCar.fuelType || editCar.fuel_type || '', 
         transmission: editCar.transmission || '', bodyType: editCar.bodyType || editCar.body_type || '', 
-        doorCount: editCar.doorCount || '',
         engine: editCar.engine || '', horsepower: editCar.horsepower || '',
         color: editCar.color || '', city: editCar.city || '', description: editCar.description || '',
         vehicleCondition: editCar.vehicleCondition || editCar.vehicle_condition || '',
@@ -774,25 +773,6 @@ export function AddCarPage() {
 
         {/* Nova Oprema vozila - Checkboxes by Categories */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
-          {/* Door count - single select */}
-          <div className="mb-6 pb-6 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <div className="w-1/2">
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Število vrat</label>
-                <select
-                  value={formData.doorCount}
-                  onChange={(e) => handleChange('doorCount', e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
-                >
-                  <option value="">Izberi število vrat...</option>
-                  {doorCounts.map(d => (
-                    <option key={d} value={d}>{d}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-          
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900">Oprema vozila</h2>
             <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
