@@ -8,7 +8,7 @@ import { useAuth } from '@/lib/AuthContext'
 import { useLanguage } from '@/lib/LanguageContext'
 import { useCars } from '@/lib/CarContext'
 import { packageDB, carDB } from '@/lib/database'
-import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, colors, vehicleConditions, LUXURY_CAR_THRESHOLD, carFeatures, featureCategoryNames } from '@/lib/data'
+import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, colors, vehicleConditionOptions, vehicleConditionSubOptions, carEquipmentCategories, LUXURY_CAR_THRESHOLD } from '@/lib/data'
 
 export function AddCarPage() {
   const navigate = useNavigate()
@@ -28,7 +28,7 @@ export function AddCarPage() {
     title: '', brand: '', model: '', year: new Date().getFullYear(),
     price: '', mileage: '', fuelType: '', transmission: '', bodyType: '',
     engine: '', horsepower: '', color: '', city: '', description: '',
-    vehicleCondition: '', featureIds: [],
+    vehicleCondition: '', vehicleConditionSub: [], featureIds: [],
   })
 
   const [openFeaturesCategory, setOpenFeaturesCategory] = useState('safety')
@@ -135,30 +135,53 @@ export function AddCarPage() {
     return [...new Set([...apiModels, ...custom])]
   }
 
-  // Feature selection helpers
-  const isFeatureSelected = (featureId) => formData.featureIds.includes(featureId)
+  // Feature selection helpers (using string feature names)
+  const isFeatureSelected = (featureName) => formData.featureIds.includes(featureName)
   
-  const toggleFeature = (featureId) => {
+  const toggleFeature = (featureName) => {
     setFormData(prev => ({
       ...prev,
-      featureIds: prev.featureIds.includes(featureId)
-        ? prev.featureIds.filter(id => id !== featureId)
-        : [...prev.featureIds, featureId]
+      featureIds: prev.featureIds.includes(featureName)
+        ? prev.featureIds.filter(name => name !== featureName)
+        : [...prev.featureIds, featureName]
     }))
   }
 
-  const selectAllInCategory = (category) => {
-    const categoryFeatureIds = carFeatures[category].map(f => f.id)
-    const allSelected = categoryFeatureIds.every(id => formData.featureIds.includes(id))
+  const selectAllInCategory = (categoryKey) => {
+    const categoryData = carEquipmentCategories[categoryKey]
+    if (!categoryData) return
+    
+    const allFeatureNames = []
+    Object.values(categoryData.subcategories || {}).forEach(sub => {
+      if (sub.features) {
+        allFeatureNames.push(...sub.features)
+      }
+    })
+    
+    const allSelected = allFeatureNames.every(name => formData.featureIds.includes(name))
     setFormData(prev => ({
       ...prev,
       featureIds: allSelected
-        ? prev.featureIds.filter(id => !categoryFeatureIds.includes(id))
-        : [...new Set([...prev.featureIds, ...categoryFeatureIds])]
+        ? prev.featureIds.filter(name => !allFeatureNames.includes(name))
+        : [...new Set([...prev.featureIds, ...allFeatureNames])]
     }))
   }
 
   const getSelectedCount = () => formData.featureIds.length
+  
+  const getSelectedInCategory = (categoryKey) => {
+    const categoryData = carEquipmentCategories[categoryKey]
+    if (!categoryData) return 0
+    
+    const allFeatureNames = []
+    Object.values(categoryData.subcategories || {}).forEach(sub => {
+      if (sub.features) {
+        allFeatureNames.push(...sub.features)
+      }
+    })
+    
+    return allFeatureNames.filter(name => formData.featureIds.includes(name)).length
+  }
 
   useEffect(() => {
     if (editCar) {
@@ -170,6 +193,8 @@ export function AddCarPage() {
         engine: editCar.engine || '', horsepower: editCar.horsepower || '',
         color: editCar.color || '', city: editCar.city || '', description: editCar.description || '',
         vehicleCondition: editCar.vehicleCondition || editCar.vehicle_condition || '',
+        vehicleConditionSub: editCar.vehicleConditionSub || [],
+        featureIds: editCar.featureIds || [],
       })
       setImages(editCar.images || [])
       if (editCar.hasFinancing) {
@@ -177,9 +202,6 @@ export function AddCarPage() {
         setMonthlyBudget(editCar.monthlyBudget || '')
         setDownPaymentType(editCar.downPaymentType || 'amount')
         setDownPaymentValue(editCar.downPaymentValue || '')
-      }
-      if (editCar.featureIds) {
-        setFormData(prev => ({ ...prev, featureIds: editCar.featureIds || [] }))
       }
     }
   }, [editCar])
@@ -516,14 +538,69 @@ export function AddCarPage() {
             <Dropdown label={t('fuelType_label') + ' *'} name="fuelType" value={formData.fuelType} options={fuelTypes} />
             <Dropdown label={t('transmission_label') + ' *'} name="transmission" value={formData.transmission} options={transmissions} />
             <Dropdown label={t('bodyType_label') + ' *'} name="bodyType" value={formData.bodyType} options={bodyTypes} />
-            <Dropdown label="Stanje vozila *" name="vehicleCondition" value={formData.vehicleCondition} options={vehicleConditions} />
+            
+            {/* Stanje vozila - Radio buttons */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-3">Stanje vozila *</label>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+                {vehicleConditionOptions.map((option) => (
+                  <label
+                    key={option.value}
+                    className={`flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all ${
+                      formData.vehicleCondition === option.value
+                        ? 'border-[#ff6a00] bg-orange-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="vehicleCondition"
+                      value={option.value}
+                      checked={formData.vehicleCondition === option.value}
+                      onChange={(e) => {
+                        handleChange('vehicleCondition', e.target.value)
+                        setFormData(prev => ({ ...prev, vehicleConditionSub: [] }))
+                      }}
+                      className="w-4 h-4 text-[#ff6a00] focus:ring-[#ff6a00]"
+                    />
+                    <div className="ml-3">
+                      <span className="block font-medium text-gray-900">{option.label}</span>
+                      <span className="block text-xs text-gray-500">{option.description}</span>
+                    </div>
+                  </label>
+                ))}
+              </div>
+              
+              {/* Sub-options checkboxes */}
+              {formData.vehicleCondition && vehicleConditionSubOptions[formData.vehicleCondition] && (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 p-4 bg-gray-50 rounded-xl">
+                  {vehicleConditionSubOptions[formData.vehicleCondition].map((subOpt) => (
+                    <label key={subOpt.id} className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 p-2 rounded-lg">
+                      <input
+                        type="checkbox"
+                        checked={formData.vehicleConditionSub.includes(subOpt.id)}
+                        onChange={(e) => {
+                          const newSubs = e.target.checked
+                            ? [...formData.vehicleConditionSub, subOpt.id]
+                            : formData.vehicleConditionSub.filter(id => id !== subOpt.id)
+                          setFormData(prev => ({ ...prev, vehicleConditionSub: newSubs }))
+                        }}
+                        className="w-4 h-4 rounded border-gray-300 text-[#ff6a00] focus:ring-[#ff6a00]"
+                      />
+                      <span className="text-sm text-gray-700">{subOpt.label}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+            
             <Dropdown label={t('color') + ' *'} name="color" value={formData.color} options={colors} color={true} />
             <Input label={t('engine')} placeholder={isSl ? 'npr. 2.0 TDI' : 'e.g. 2.0L TFSI'} value={formData.engine} onChange={(e) => handleChange('engine', e.target.value)} />
             <Input label={t('power') + ' (HP)'} type="number" placeholder="200" value={formData.horsepower} onChange={(e) => handleChange('horsepower', parseInt(e.target.value))} />
           </div>
         </div>
 
-        {/* Features Section */}
+        {/* Nova Oprema vozila - Checkboxes by Categories */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900">Oprema vozila</h2>
@@ -534,10 +611,8 @@ export function AddCarPage() {
           
           {/* Category tabs */}
           <div className="flex flex-wrap gap-2 mb-4">
-            {Object.entries(featureCategoryNames).map(([key, names]) => {
-              const categoryFeatures = carFeatures[key] || []
-              const selectedInCategory = categoryFeatures.filter(f => isFeatureSelected(f.id)).length
-              const totalInCategory = categoryFeatures.length
+            {Object.entries(carEquipmentCategories).map(([key, category]) => {
+              const selectedInCategory = getSelectedInCategory(key)
               const isActive = openFeaturesCategory === key
               
               return (
@@ -547,23 +622,19 @@ export function AddCarPage() {
                   onClick={() => setOpenFeaturesCategory(key)}
                   className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
                     isActive 
-                      ? 'bg-primary-100 text-primary-700' 
+                      ? 'bg-orange-100 text-orange-700' 
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
-                  {key === 'safety' && <Shield className="w-4 h-4" />}
-                  {key === 'comfort' && <Settings className="w-4 h-4" />}
-                  {key === 'technology' && <Wifi className="w-4 h-4" />}
-                  {key === 'exterior' && <Car className="w-4 h-4" />}
-                  {key === 'interior' && <Star className="w-4 h-4" />}
-                  {key === 'seats' && <Star className="w-4 h-4" />}
-                  {key === 'doors' && <Star className="w-4 h-4" />}
-                  {key === 'efficiency' && <Fuel className="w-4 h-4" />}
-                  {key === 'other' && <Star className="w-4 h-4" />}
-                  {names.sl}
+                  {key === 'notranjost' && <Car className="w-4 h-4" />}
+                  {key === 'info_multimedia' && <Wifi className="w-4 h-4" />}
+                  {key === 'uporabnost' && <Settings className="w-4 h-4" />}
+                  {key === 'podvozje' && <Settings className="w-4 h-4" />}
+                  {key === 'varnost' && <Shield className="w-4 h-4" />}
+                  {category.name}
                   {selectedInCategory > 0 && (
                     <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-                      isActive ? 'bg-primary-200 text-primary-800' : 'bg-gray-200 text-gray-700'
+                      isActive ? 'bg-orange-200 text-orange-800' : 'bg-gray-200 text-gray-700'
                     }`}>
                       {selectedInCategory}
                     </span>
@@ -573,7 +644,7 @@ export function AddCarPage() {
             })}
           </div>
 
-          {/* Features grid for selected category */}
+          {/* Features for selected category */}
           <AnimatePresence mode="wait">
             <motion.div
               key={openFeaturesCategory}
@@ -582,75 +653,72 @@ export function AddCarPage() {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
             >
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-sm text-gray-500">
-                  {carFeatures[openFeaturesCategory]?.length || 0} možnosti v {featureCategoryNames[openFeaturesCategory]?.sl}
-                </p>
-                <button
-                  type="button"
-                  onClick={() => selectAllInCategory(openFeaturesCategory)}
-                  className="text-xs text-primary-600 hover:text-primary-700 font-medium"
-                >
-                  {carFeatures[openFeaturesCategory]?.every(f => isFeatureSelected(f.id)) 
-                    ? 'Ponastavi vse' 
-                    : 'Izberi vse'}
-                </button>
-              </div>
-              
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 max-h-[300px] overflow-y-auto p-1">
-                {(carFeatures[openFeaturesCategory] || []).map((feature) => {
-                  const selected = isFeatureSelected(feature.id)
-                  return (
-                    <button
-                      key={feature.id}
-                      type="button"
-                      onClick={() => toggleFeature(feature.id)}
-                      className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border text-left transition-all text-sm ${
-                        selected 
-                          ? 'border-primary-500 bg-primary-50 text-primary-700' 
-                          : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50'
-                      }`}
-                    >
-                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
-                        selected 
-                          ? 'border-primary-500 bg-primary-500' 
-                          : 'border-gray-300'
-                      }`}>
-                        {selected && <Check className="w-3 h-3 text-white" />}
+              {carEquipmentCategories[openFeaturesCategory] && (
+                <>
+                  {Object.entries(carEquipmentCategories[openFeaturesCategory].subcategories || {}).map(([subKey, subCategory]) => (
+                    <div key={subKey} className="mb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-sm font-semibold text-gray-700">{subCategory.name}</h3>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const allSelected = subCategory.features.every(f => isFeatureSelected(f))
+                            if (allSelected) {
+                              // Deselect all
+                              setFormData(prev => ({
+                                ...prev,
+                                featureIds: prev.featureIds.filter(id => !subCategory.features.includes(id))
+                              }))
+                            } else {
+                              // Select all
+                              setFormData(prev => ({
+                                ...prev,
+                                featureIds: [...new Set([...prev.featureIds, ...subCategory.features])]
+                              }))
+                            }
+                          }}
+                          className="text-xs text-orange-600 hover:text-orange-700 font-medium"
+                        >
+                          {subCategory.features.every(f => isFeatureSelected(f)) ? 'Ponastavi' : 'Izberi vse'}
+                        </button>
                       </div>
-                      <span className="flex-1 truncate">{isSl ? feature.name_sl : feature.name_en}</span>
-                    </button>
-                  )
-                })}
-              </div>
+                      
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                        {subCategory.features.map((featureName) => {
+                          const selected = isFeatureSelected(featureName)
+                          return (
+                            <label
+                              key={featureName}
+                              className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border cursor-pointer transition-all text-sm ${
+                                selected 
+                                  ? 'border-orange-500 bg-orange-50 text-orange-700' 
+                                  : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50'
+                              }`}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={selected}
+                                onChange={() => toggleFeature(featureName)}
+                                className="sr-only"
+                              />
+                              <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                                selected 
+                                  ? 'border-orange-500 bg-orange-500' 
+                                  : 'border-gray-300'
+                              }`}>
+                                {selected && <Check className="w-3 h-3 text-white" />}
+                              </div>
+                              <span className="flex-1 truncate text-xs">{featureName}</span>
+                            </label>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </>
+              )}
             </motion.div>
           </AnimatePresence>
-          
-          {/* Popular features quick select */}
-          <div className="mt-4 pt-4 border-t border-gray-100">
-            <p className="text-xs text-gray-500 mb-2">Hitra izbira - pogoste opreme:</p>
-            <div className="flex flex-wrap gap-2">
-              {[1, 5, 6, 16, 18, 20, 24, 35, 41, 44, 50, 57].map(id => {
-                const feature = Object.values(carFeatures).flat().find(f => f.id === id)
-                if (!feature) return null
-                const selected = isFeatureSelected(id)
-                return (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => toggleFeature(id)}
-                    className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
-                      selected 
-                        ? 'bg-primary-100 text-primary-700' 
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
-                  >
-                    {isSl ? feature.name_sl : feature.name_en}
-                  </button>
-                )
-              })}
-            </div>
-          </div>
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
