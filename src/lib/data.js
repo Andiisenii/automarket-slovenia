@@ -7,12 +7,91 @@ let citiesCache = null
 let lastFetchTime = 0
 const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
 
+// ============ FALLBACK DATA (when API fails) ============
+export const FALLBACK_BRANDS = [
+  'Alfa Romeo', 'Aston Martin', 'Audi', 'BMW', 'Bentley', 'Bugatti', 'Buick', 'Cadillac',
+  'Chevrolet', 'Chrysler', 'Citroën', 'Dacia', 'Daewoo', 'Daihatsu', 'Dodge', 'Ferrari',
+  'Fiat', 'Ford', 'Geely', 'GMC', 'Honda', 'Hyundai', 'Infiniti', 'Isuzu', 'Iveco',
+  'Jaguar', 'Jeep', 'Kia', 'Koenigsegg', 'Lamborghini', 'Lancia', 'Land Rover',
+  'Lexus', 'Lincoln', 'Lotus', 'Maserati', 'Maybach', 'Mazda', 'McLaren',
+  'Mercedes-Benz', 'Mini', 'Mitsubishi', 'Nissan', 'Opel', 'Peugeot', 'Porsche',
+  'Ram', 'Renault', 'Rolls-Royce', 'Saab', 'Seat', 'Skoda', 'Smart', 'SsangYong',
+  'Subaru', 'Suzuki', 'Tesla', 'Toyota', 'Volkswagen', 'Volvo',
+  // Buses
+  'MAN', 'Mercedes-Benz Bus', 'Setra', 'Van Hool', 'Iveco Bus', 'Solaris',
+  // Trucks
+  'DAF', 'Scania', 'Volvo Trucks', 'Renault Trucks',
+  // Vans
+  'Mercedes-Benz Sprinter', 'Volkswagen Transporter', 'Ford Transit', 'Renault Master',
+  'Iveco Daily', 'Fiat Ducato', 'Peugeot Boxer', 'Citroen Jumper'
+]
+
+export const FALLBACK_MODELS = {
+  'Audi': ['A1', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'Q2', 'Q3', 'Q5', 'Q7', 'Q8', 'e-tron', 'e-tron GT', 'TT', 'R8'],
+  'BMW': ['Serija 1', 'Serija 2', 'Serija 3', 'Serija 4', 'Serija 5', 'Serija 6', 'Serija 7', 'Serija 8', 'X1', 'X2', 'X3', 'X4', 'X5', 'X6', 'X7', 'Z4', 'i3', 'i4', 'i7', 'iX', 'iX3'],
+  'Mercedes-Benz': ['A-Class', 'B-Class', 'C-Class', 'E-Class', 'S-Class', 'CLA', 'CLS', 'GLA', 'GLB', 'GLC', 'GLE', 'GLS', 'G-Class', 'AMG GT', 'SL', 'SLC', 'EQS', 'EQC', 'EQA', 'EQB', 'EQE', 'V-Class', 'Sprinter'],
+  'Volkswagen': ['Polo', 'Golf', 'Passat', 'Arteon', 'T-Roc', 'T-Cross', 'Tiguan', 'Touareg', 'Teramont', 'Up!', 'Fox', 'Lupo', 'Transporter', 'Multivan', 'Caravelle', 'California', 'ID.3', 'ID.4', 'ID.5', 'ID.Buzz'],
+  'Opel': ['Corsa', 'Astra', 'Insignia', 'Grandland', 'Crossland', 'Mokka', 'Mokka-e', 'Combo', 'Movano', 'Zafira', 'Vivaro', 'Zafira Life'],
+  'Renault': ['Twingo', 'Clio', 'Megane', 'Talisman', 'Laguna', 'Captur', 'Kadjar', 'Koleos', 'Arkana', 'ZOE', 'Megane E-Tech', 'Austral', 'Espace', 'Master', 'Trafic', 'Kangoo'],
+  'Peugeot': ['108', '208', '308', '408', '508', '2008', '3008', '5008', 'e-208', 'e-2008', 'e-308', 'Rifter', 'Partner', 'Expert', 'Boxer', '508 PSE', '508 SW'],
+  'Ford': ['Fiesta', 'Focus', 'Mondeo', 'Mustang', 'Puma', 'Kuga', 'Explorer', 'Edge', 'Bronco', 'Bronco Sport', 'Mustang Mach-E', 'Transit', 'Transit Custom', 'Tourneo', 'S-Max', 'Galaxy', 'Ranger', 'F-150', 'Maverick'],
+  'Toyota': ['Aygo', 'Yaris', 'Corolla', 'Camry', 'Prius', 'C-HR', 'RAV4', 'Highlander', 'Land Cruiser', 'Sequoia', 'Hilux', 'Tacoma', 'Tundra', 'Proace', 'Proace City', 'Sienna', 'GR Supra', 'GR86', 'GR Yaris', 'Mirai', 'bZ4X', 'Urban Cruiser'],
+  'Hyundai': ['i10', 'i20', 'i30', 'i40', 'IONIQ', 'Kona', 'Tucson', 'Santa Fe', 'Palisade', 'Bayon', 'Nexo', 'Staria', 'IONIQ 5', 'IONIQ 6', 'Kona Electric'],
+  'Kia': ['Picanto', 'Rio', 'Ceed', 'K5', 'Stinger', 'XCeed', 'Niro', 'Sportage', 'Sorento', 'Telluride', 'Soul', 'EV6', 'EV9', 'e-Soul', 'Niro EV', 'Carens', 'Carnival'],
+  'Skoda': ['Citigo', 'Fabia', 'Scala', 'Octavia', 'Superb', 'Kamiq', 'Karoq', 'Kodiaq', 'Enyaq', 'Rapid', 'Yeti'],
+  'Seat': ['Mii', 'Ibiza', 'Leon', 'Ateca', 'Tarraco', 'Ateca FR', 'Cupra Formentor', 'Cupra Leon', 'Born'],
+  'Fiat': ['500', '500L', '500X', '500e', 'Panda', 'Tipo', 'Punto', 'Doblo', 'Ducato', 'Talento', 'Scudo', '124 Spider', '595 Abarth'],
+  'Honda': ['Jazz', 'Civic', 'Accord', 'HR-V', 'CR-V', 'Pilot', 'Ridgeline', 'Passport', 'Odyssey', 'e:Ny1', 'Civic Type R', 'ZR-V'],
+  'Nissan': ['Micra', 'Note', 'Leaf', 'Juke', 'Qashqai', 'X-Trail', 'Ariya', 'Navara', 'Pathfinder', 'Patrol', 'Armada', '370Z', 'GT-R', 'Z', 'Townstar'],
+  'Mazda': ['Mazda2', 'Mazda3', 'Mazda6', 'MX-30', 'CX-3', 'CX-30', 'CX-5', 'CX-50', 'CX-60', 'CX-90', 'MX-5', 'MX-5 RF'],
+  'Porsche': ['911', '718 Cayman', '718 Boxster', 'Panamera', 'Cayenne', 'Macan', 'Taycan', '911 GT3', '911 Turbo'],
+  'Volvo': ['XC40', 'XC60', 'XC90', 'XC40 Recharge', 'S60', 'S90', 'V60', 'V90', 'V60 Cross Country', 'C40', 'EX30', 'EX90'],
+  'Tesla': ['Model S', 'Model 3', 'Model X', 'Model Y', 'Cybertruck', 'Roadster', 'Semi'],
+  'Alfa Romeo': ['Giulia', 'Stelvio', 'Giulietta', 'Giulia Quadrifoglio', 'Stelvio Quadrifoglio', 'Tonale', 'Giulietta', 'MiTo', 'Giulia Veloce'],
+  'Jaguar': ['XE', 'XF', 'F-Type', 'E-Pace', 'F-Pace', 'I-Pace'],
+  'Land Rover': ['Defender', 'Discovery', 'Discovery Sport', 'Range Rover', 'Range Rover Sport', 'Range Rover Velar', 'Range Rover Evoque', 'Defender 90', 'Defender 110', 'Defender 130'],
+  'Mini': ['Cooper', 'Cooper S', 'Clubman', 'Countryman', 'Electric', 'John Cooper Works', 'Clubman JCW', 'Countryman JCW', 'Convertible', 'Paceman'],
+  'Subaru': ['Impreza', 'Legacy', 'Outback', 'Forester', 'XV', 'Solterra', 'WRX', 'WRX STI', 'BRZ', 'Levorg'],
+  'Suzuki': ['Swift', 'Baleno', 'Liana', 'Ciaz', 'Alto', 'Vitara', 'S-Cross', 'Across', 'Swace', 'Jimny', 'Ignis', 'e Vitara'],
+  'Mitsubishi': ['Space Star', 'Mirage', 'Attrage', 'Lancer', 'Galant', 'ASX', 'Eclipse Cross', 'Outlander', 'Pajero', 'Pajero Sport', 'L200', 'Triton', 'i-MiEV'],
+  'Jeep': ['Renegade', 'Compass', 'Cherokee', 'Grand Cherokee', 'Wrangler', 'Gladiator', 'Wagoneer', 'Grand Wagoneer', 'Avenger'],
+  'Lexus': ['CT', 'IS', 'ES', 'GS', 'LS', 'UX', 'NX', 'RX', 'GX', 'LX', 'RZ', 'LFA', 'RC', 'LC', 'NX PHEV'],
+  'Chevrolet': ['Spark', 'Beat', 'Sonic', 'Cruze', 'Malibu', 'Trax', 'Equinox', 'Blazer', 'Traverse', 'Tahoe', 'Suburban', 'Camaro', 'Corvette', 'Bolt', 'Bolt EUV', 'Colorado', 'Silverado'],
+  'Dodge': ['Journey', 'Avenger', 'Challenger', 'Charger', 'Durango', 'Hornet', 'Charger SRT', 'Challenger SRT', 'Viper', 'Ram 1500'],
+  'Chrysler': ['300', 'Pacifica', 'Voyager', '200', 'Sebring'],
+  'Cadillac': ['CT4', 'CT5', 'Escalade', 'XT4', 'XT5', 'XT6', 'Lyriq', 'Celestiq', 'CT4-V', 'CT5-V', 'Escalade-V'],
+  'Infiniti': ['Q50', 'Q60', 'Q70', 'QX30', 'QX50', 'QX55', 'QX60', 'QX80'],
+  'Aston Martin': ['DB11', 'DBS', 'Vantage', 'DBX', 'Valkyrie', 'DBS Superleggera', 'DB11 AMR'],
+  'Bentley': ['Continental GT', 'Flying Spur', 'Bentayga', 'Mulliner', 'Continental GTC'],
+  'Ferrari': ['488 GTB', '812 Superfast', 'SF90 Stradale', 'Roma', 'Portofino', '296 GTB', 'F8 Tributo', 'Purosangue'],
+  'Lamborghini': ['Huracan', 'Aventador', 'Urus', 'Sian', 'Revuelto', 'Huracan STO', 'Huracan EVO'],
+  'Maserati': ['Ghibli', 'Quattroporte', 'Levante', 'MC20', 'GranTurismo', 'GranCabrio'],
+  'McLaren': ['720S', '570S', '600LT', '720S Spider', '765LT', 'Artura', 'P1', 'Senna', 'Speedtail'],
+  'Rolls-Royce': ['Phantom', 'Ghost', 'Wraith', 'Dawn', 'Cullinan', 'Spectre', 'Ghost Black Badge'],
+  'Bugatti': ['Chiron', 'Divo', 'Centodieci', 'Bolide'],
+  'Koenigsegg': ['Jesko', 'Gemera', 'Regera', 'Agera RS'],
+  'MAN': ['TGE', 'TGX', 'TGS', 'TGL', 'Lion\'s City', 'Lion\'s Coach'],
+  'Mercedes-Benz Bus': ['Intouro', 'Tourismo', 'Travego', 'Citaro', 'eCitaro', 'Setra S 517'],
+  'Setra': ['MultiClass', 'TopClass', 'ComfortClass', 'S 515 HDH'],
+  'Van Hool': ['A-series', 'T-series', 'EX', 'CX'],
+  'DAF': ['XF', 'XG', 'XG+', 'LF', 'CF', 'XB'],
+  'Scania': ['R-series', 'S-series', 'G-series', 'P-series', 'L-series'],
+  'Mercedes-Benz Sprinter': ['314 CDI', '316 CDI', '319 CDI', '516 CDI', '519 CDI', 'eSprinter'],
+  'Volkswagen Transporter': ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T6.1', 'T7'],
+  'Ford Transit': ['Transit', 'Transit Custom', 'Transit Connect', 'Transit Courier', 'Transit Chassis', 'Transit Trail'],
+  'Renault Master': ['Master', 'Master Z.E.', 'Master dCi'],
+  'Iveco Daily': ['Daily', 'Daily Electric', 'Daily Hi-Matic'],
+  'Fiat Ducato': ['Ducato', 'Ducato Electric', 'Ducato Maxi'],
+  'Peugeot Boxer': ['Boxer', 'Boxer Electric'],
+  'Citroen Jumper': ['Jumper', 'Jumper Electric']
+}
+
 // Get all brands with models from API
 export const getAllBrands = async () => {
   // Check cache first
   const now = Date.now()
   if (brandsCache && (now - lastFetchTime) < CACHE_DURATION) {
-    return brandsCache.map(b => b.name)
+    return brandsCache.map(b => b.name || b)
   }
   
   try {
@@ -20,12 +99,19 @@ export const getAllBrands = async () => {
       headers: { 'X-Pinggy-No-Screen': 'true' }
     })
     const data = await response.json()
-    brandsCache = data
-    lastFetchTime = now
-    return data.map(b => b.name)
+    if (data && data.brands) {
+      brandsCache = data.brands
+      lastFetchTime = now
+      return data.brands.map(b => b.name || b)
+    } else if (Array.isArray(data)) {
+      brandsCache = data
+      lastFetchTime = now
+      return data.map(b => b.name || b)
+    }
+    throw new Error('Invalid data format')
   } catch (error) {
-    console.error('Error fetching brands:', error)
-    return []
+    console.warn('API failed, using fallback brands:', error.message)
+    return FALLBACK_BRANDS
   }
 }
 
@@ -41,12 +127,23 @@ export const getBrandsWithModels = async () => {
       headers: { 'X-Pinggy-No-Screen': 'true' }
     })
     const data = await response.json()
-    brandsCache = data
-    lastFetchTime = now
-    return data
+    if (data && data.brands) {
+      brandsCache = data.brands
+      lastFetchTime = now
+      return data.brands
+    } else if (Array.isArray(data)) {
+      brandsCache = data
+      lastFetchTime = now
+      return data
+    }
+    throw new Error('Invalid data format')
   } catch (error) {
-    console.error('Error fetching brands:', error)
-    return []
+    console.warn('API failed, using fallback data:', error.message)
+    // Return fallback format
+    return FALLBACK_BRANDS.map(name => ({
+      name,
+      models: FALLBACK_MODELS[name] || []
+    }))
   }
 }
 
@@ -58,15 +155,24 @@ export const getModelsForBrand = async (brand) => {
     const response = await fetch(`${API_URL}/brands.php?action=models&brand=${encodeURIComponent(brand)}`, {
       headers: { 'X-Pinggy-No-Screen': 'true' }
     })
-    const models = await response.json()
-    // API returns array of objects like {name: "Ferrari"}, convert to strings
-    if (Array.isArray(models)) {
-      return models.map(m => typeof m === 'string' ? m : m.name)
+    const data = await response.json()
+    let models = []
+    
+    if (data && data.models) {
+      models = data.models
+    } else if (Array.isArray(data)) {
+      models = data
     }
-    return []
+    
+    if (Array.isArray(models) && models.length > 0) {
+      return models.map(m => typeof m === 'string' ? m : (m.name || m.model || '')).filter(Boolean)
+    }
+    
+    throw new Error('No models found')
   } catch (error) {
-    console.error('Error fetching models:', error)
-    return []
+    console.warn('API failed for models, using fallback:', error.message)
+    // Return fallback models for this brand
+    return FALLBACK_MODELS[brand] || []
   }
 }
 
