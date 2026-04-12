@@ -86,6 +86,23 @@ export function CarCard({ car, index = 0, featured = false }) {
               </div>
             )}
             
+            {/* Vehicle Condition Badge for Featured */}
+            {car.vehicleCondition === 'Vozno' && (
+              <div className="absolute top-[15px] z-10 bg-green-500 text-white text-xs font-semibold px-3 py-1.5 rounded-[10px]" style={{ left: (car.has_financing || car.hasFinancing) ? '175px' : '100px' }}>
+                ✅ Vozno
+              </div>
+            )}
+            {car.vehicleCondition === 'NEvozno' && (
+              <div className="absolute top-[15px] z-10 bg-red-500 text-white text-xs font-semibold px-3 py-1.5 rounded-[10px]" style={{ left: (car.has_financing || car.hasFinancing) ? '175px' : '100px' }}>
+                ❌ NEvozno
+              </div>
+            )}
+            {car.vehicleCondition === 'V okvari' && (
+              <div className="absolute top-[15px] z-10 bg-yellow-500 text-white text-xs font-semibold px-3 py-1.5 rounded-[10px]" style={{ left: (car.has_financing || car.hasFinancing) ? '175px' : '100px' }}>
+                ⚠️ V okvari
+              </div>
+            )
+            
             {/* Favorite Heart */}
             <button 
               className="absolute top-[15px] right-[15px] z-10 w-[35px] h-[35px] bg-white rounded-full flex items-center justify-center shadow-[0_5px_15px_rgba(0,0,0,0.1)]"
@@ -183,6 +200,17 @@ export function CarCard({ car, index = 0, featured = false }) {
             )}
             {car.promoted && car.boostPackage?.includes('_p') && (
               <span className="absolute top-3 left-3 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded">🔥 AKCIJA</span>
+            )}
+            
+            {/* Vehicle Condition Badge */}
+            {car.vehicleCondition === 'Vozno' && (
+              <span className="absolute top-3 left-3 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">✅ Vozno</span>
+            )}
+            {car.vehicleCondition === 'NEvozno' && (
+              <span className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">❌ NEvozno</span>
+            )}
+            {car.vehicleCondition === 'V okvari' && (
+              <span className="absolute top-3 left-3 bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded">⚠️ V okvari</span>
             )}
             
             {/* Financing Badge */}

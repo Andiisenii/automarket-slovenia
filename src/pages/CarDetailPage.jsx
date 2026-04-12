@@ -6,7 +6,7 @@ import {
   ArrowLeft, Heart, Share2, Eye, Calendar, Gauge, Fuel, 
   Settings, Shield, Phone, MessageCircle, 
   Star, Check, Clock, AlertCircle, X, Send, Phone as PhoneIcon, MessageSquare, CreditCard,
-  Wifi, Car, Wind, Leaf, Users
+  Wifi, Car, Wind, Leaf, Users, AlertTriangle
 } from 'lucide-react'
 import { getFeatureNameById, getFeatureById } from '@/lib/data'
 import { Button } from '@/components/ui/Button'
@@ -57,6 +57,7 @@ export function CarDetailPage() {
             engine: carData.engine || carData.engine || '',
             horsepower: carData.horsepower || carData.horsepower || 0,
             color: carData.color || carData.color || '',
+            vehicleCondition: carData.vehicle_condition || carData.vehicleCondition || '',
             hasFinancing: carData.has_financing ?? carData.hasFinancing ?? false,
             monthlyBudget: carData.monthly_budget ?? carData.monthlyBudget ?? 0,
             downPaymentType: carData.down_payment_type || carData.downPaymentType || 'amount',
@@ -149,6 +150,7 @@ export function CarDetailPage() {
     { icon: Shield, label: t('power'), value: car.horsepower ? `${car.horsepower} HP` : 'N/A' },
     { icon: Shield, label: t('color'), value: car.color || 'N/A' },
     { icon: Shield, label: t('bodyType'), value: car.bodyType || 'N/A' },
+    { icon: AlertTriangle, label: 'Stanje vozila', value: car.vehicleCondition || 'N/A' },
   ]
   
   // Get selected features with names

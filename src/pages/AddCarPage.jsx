@@ -8,7 +8,7 @@ import { useAuth } from '@/lib/AuthContext'
 import { useLanguage } from '@/lib/LanguageContext'
 import { useCars } from '@/lib/CarContext'
 import { packageDB, carDB } from '@/lib/database'
-import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, colors, LUXURY_CAR_THRESHOLD, carFeatures, featureCategoryNames } from '@/lib/data'
+import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, colors, vehicleConditions, LUXURY_CAR_THRESHOLD, carFeatures, featureCategoryNames } from '@/lib/data'
 
 export function AddCarPage() {
   const navigate = useNavigate()
@@ -28,7 +28,7 @@ export function AddCarPage() {
     title: '', brand: '', model: '', year: new Date().getFullYear(),
     price: '', mileage: '', fuelType: '', transmission: '', bodyType: '',
     engine: '', horsepower: '', color: '', city: '', description: '',
-    featureIds: [],
+    vehicleCondition: '', featureIds: [],
   })
 
   const [openFeaturesCategory, setOpenFeaturesCategory] = useState('safety')
@@ -169,6 +169,7 @@ export function AddCarPage() {
         transmission: editCar.transmission || '', bodyType: editCar.bodyType || editCar.body_type || '', 
         engine: editCar.engine || '', horsepower: editCar.horsepower || '',
         color: editCar.color || '', city: editCar.city || '', description: editCar.description || '',
+        vehicleCondition: editCar.vehicleCondition || editCar.vehicle_condition || '',
       })
       setImages(editCar.images || [])
       if (editCar.hasFinancing) {
@@ -284,6 +285,7 @@ export function AddCarPage() {
     if (!formData.fuelType) newErrors.fuelType = 'Fuel type is required'
     if (!formData.transmission) newErrors.transmission = 'Transmission is required'
     if (!formData.bodyType) newErrors.bodyType = 'Body type is required'
+    if (!formData.vehicleCondition) newErrors.vehicleCondition = 'Stanje vozila je obvezno'
     if (!formData.city) newErrors.city = 'City is required'
     if (!formData.description) newErrors.description = 'Description is required'
     setErrors(newErrors)
@@ -514,6 +516,7 @@ export function AddCarPage() {
             <Dropdown label={t('fuelType_label') + ' *'} name="fuelType" value={formData.fuelType} options={fuelTypes} />
             <Dropdown label={t('transmission_label') + ' *'} name="transmission" value={formData.transmission} options={transmissions} />
             <Dropdown label={t('bodyType_label') + ' *'} name="bodyType" value={formData.bodyType} options={bodyTypes} />
+            <Dropdown label="Stanje vozila *" name="vehicleCondition" value={formData.vehicleCondition} options={vehicleConditions} />
             <Dropdown label={t('color') + ' *'} name="color" value={formData.color} options={colors} color={true} />
             <Input label={t('engine')} placeholder={isSl ? 'npr. 2.0 TDI' : 'e.g. 2.0L TFSI'} value={formData.engine} onChange={(e) => handleChange('engine', e.target.value)} />
             <Input label={t('power') + ' (HP)'} type="number" placeholder="200" value={formData.horsepower} onChange={(e) => handleChange('horsepower', parseInt(e.target.value))} />

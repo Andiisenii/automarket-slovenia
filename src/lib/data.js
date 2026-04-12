@@ -120,6 +120,7 @@ export const fuelTypes = ['Bencin', 'Dizel', 'Hybrid', 'Električni', 'Plin (LPG
 export const transmissions = ['Avtomatski', 'Ročni', 'Polavtomatski', 'CVT']
 export const bodyTypes = ['SUV', 'Sedan', 'Hatchback', 'Kupe', 'Kombi', 'Van', 'Pickup', 'Minivan']
 export const colors = ['Bela', 'Črna', 'Siva', 'Rdeča', 'Modra', 'Zelena', 'Rumena', 'Oranžna', 'Rjava', 'Bež']
+export const vehicleConditions = ['Vozno', 'NEvozno', 'V okvari']
 
 export const pricingPlans = [
   {
