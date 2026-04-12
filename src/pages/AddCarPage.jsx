@@ -8,7 +8,7 @@ import { useAuth } from '@/lib/AuthContext'
 import { useLanguage } from '@/lib/LanguageContext'
 import { useCars } from '@/lib/CarContext'
 import { packageDB, carDB } from '@/lib/database'
-import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, colors, vehicleConditionOptions, vehicleConditionSubOptions, carEquipmentCategories, emissionClasses, vehicleAgeOptions, ownerCountOptions, months, getYears, LUXURY_CAR_THRESHOLD } from '@/lib/data'
+import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, colors, vehicleConditionOptions, vehicleConditionSubOptions, carEquipmentCategories, emissionClasses, vehicleAgeOptions, ownerCountOptions, months, getYears, LUXURY_CAR_THRESHOLD, FALLBACK_BRANDS, FALLBACK_MODELS } from '@/lib/data'
 
 export function AddCarPage() {
   const navigate = useNavigate()
@@ -18,9 +18,9 @@ export function AddCarPage() {
   const { t, language } = useLanguage()
   const isSl = language === 'sl'
 
-  const [allBrands, setAllBrands] = useState([])
+  const [allBrands, setAllBrands] = useState(FALLBACK_BRANDS || [])
   const [allCities, setAllCities] = useState([])
-  const [brandModels, setBrandModels] = useState({})
+  const [brandModels, setBrandModels] = useState(FALLBACK_MODELS || {})
   const [boostPackages, setBoostPackages] = useState({ private: [], business: [] })
   const [publishingPackages, setPublishingPackages] = useState([])
   
