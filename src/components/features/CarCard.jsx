@@ -101,7 +101,7 @@ export function CarCard({ car, index = 0, featured = false }) {
               <div className="absolute top-[15px] z-10 bg-yellow-500 text-white text-xs font-semibold px-3 py-1.5 rounded-[10px]" style={{ left: (car.has_financing || car.hasFinancing) ? '175px' : '100px' }}>
                 ⚠️ V okvari
               </div>
-            )
+            )}
             
             {/* Favorite Heart */}
             <button 
