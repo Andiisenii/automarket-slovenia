@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, Upload, X, Check, CreditCard, ChevronDown, Shield, Settings, Wifi, Car, Fuel, Star, ChevronUp } from 'lucide-react'
+import { ArrowLeft, Upload, X, Check, CreditCard, ChevronDown, Shield, Settings, Wifi, Car, Fuel, Star, ChevronUp, Sun, Award } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { useAuth } from '@/lib/AuthContext'
@@ -629,8 +629,11 @@ export function AddCarPage() {
                   {key === 'notranjost' && <Car className="w-4 h-4" />}
                   {key === 'info_multimedia' && <Wifi className="w-4 h-4" />}
                   {key === 'uporabnost' && <Settings className="w-4 h-4" />}
+                  {key === 'sedeži_in_vrata' && <Star className="w-4 h-4" />}
                   {key === 'podvozje' && <Settings className="w-4 h-4" />}
                   {key === 'varnost' && <Shield className="w-4 h-4" />}
+                  {key === 'zunanjost' && <Sun className="w-4 h-4" />}
+                  {key === 'garancija_stanje' && <Award className="w-4 h-4" />}
                   {category.name}
                   {selectedInCategory > 0 && (
                     <span className={`text-xs px-1.5 py-0.5 rounded-full ${
@@ -683,7 +686,7 @@ export function AddCarPage() {
                         </button>
                       </div>
                       
-                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                         {subCategory.features.map((featureName) => {
                           const selected = isFeatureSelected(featureName)
                           return (
@@ -701,14 +704,14 @@ export function AddCarPage() {
                                 onChange={() => toggleFeature(featureName)}
                                 className="sr-only"
                               />
-                              <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                              <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors flex-shrink-0 ${
                                 selected 
                                   ? 'border-orange-500 bg-orange-500' 
                                   : 'border-gray-300'
                               }`}>
                                 {selected && <Check className="w-3 h-3 text-white" />}
                               </div>
-                              <span className="flex-1 truncate text-xs">{featureName}</span>
+                              <span className="flex-1 text-xs leading-relaxed whitespace-normal">{featureName}</span>
                             </label>
                           )
                         })}

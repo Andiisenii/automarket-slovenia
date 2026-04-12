@@ -213,7 +213,7 @@ export const carEquipmentCategories = {
     icon: 'radio',
     subcategories: {
       avtoradio: {
-        name: 'Avtoradio',
+        name: 'Avtoradio in povezovanje',
         features: [
           'Avtoradio',
           'Avtoradio / CD',
@@ -268,6 +268,46 @@ export const carEquipmentCategories = {
           'Bone stopnice',
           'Vlecna kijuka',
           'Vozilo priagojeno invalidu',
+        ]
+      }
+    }
+  },
+  sedezi_in_vrata: {
+    name: 'Sedeži in vrata',
+    icon: 'users',
+    subcategories: {
+      sedeži: {
+        name: 'Sedeži',
+        features: [
+          'Sedežev: 2',
+          'Sedežev: 4',
+          'Sedežev: 5',
+          'Sedežev: 5+2',
+          'Sedežev: 7',
+          'Sedežev: 8',
+          'Usnjeni sedeži',
+          'Delno usnjeni sedeži',
+          'Alcantara sedeži',
+          'Sklopiva klop 60/40',
+          'Sklopiva klop 40/20/40',
+        ]
+      },
+      obloge_vrat: {
+        name: 'Obloge vrat',
+        features: [
+          'Obloga vrat - les',
+          'Obloga vrat - aluminij',
+          'Obloga vrat - karbon',
+          'Obloga vrat - krom',
+        ]
+      },
+      vrata: {
+        name: 'Število vrat',
+        features: [
+          'Vrat: 2',
+          'Vrat: 3',
+          'Vrat: 4',
+          'Vrat: 5',
         ]
       }
     }
@@ -368,6 +408,53 @@ export const carEquipmentCategories = {
         features: [
           'Rezervno kolo normalne dimenzije',
           'Run-Flat pnevmatike',
+        ]
+      }
+    }
+  },
+  zunanjost: {
+    name: 'Zunanjost',
+    icon: 'sun',
+    subcategories: {
+      zunanjost_main: {
+        name: 'Zunanjost',
+        features: [
+          'Roofracks - Strešne sani',
+          'Towbar - Vlecna kljuka',
+          'Zasenčena stekla',
+          'Privacy stekla',
+          'Karbon paket zunanj',
+          'Športni izpuh',
+          'Automatski žarometi',
+          'Označevalne luci LED',
+        ]
+      }
+    }
+  },
+  garancija_stanje: {
+    name: 'Garancija in stanje',
+    icon: 'award',
+    subcategories: {
+      garancija: {
+        name: 'Garancija',
+        features: [
+          'Vozilo ima garancio',
+          'Vozilo ima jamstvo',
+          'Vozilo ima oldtimer certifikat',
+          'Servisna knjiga',
+          'Poln servis',
+          'Garažirano',
+          'Brezhibno',
+          'Ne kadi',
+          'Prvi lastnik',
+        ]
+      },
+      registracija: {
+        name: 'Registracija',
+        features: [
+          'Vozilo je registrirano',
+          'Vozilo je tecnicno pregledano',
+          'Tehnicni pregled velja do',
         ]
       }
     }
