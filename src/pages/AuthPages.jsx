@@ -695,23 +695,11 @@ export function RegisterPage() {
               <div className="mb-6 p-4 bg-orange-50 rounded-xl">
                 <p className="text-sm font-medium text-gray-900 mb-2">Pomembno:</p>
                 <p className="text-xs text-gray-600 mb-2">
-                  Bistvena prednost registracije posameznika je možnost objave oglasa. V izogib kršitvam Zakona o preprečevanju dela in zaposlovanja na črno (ZPDZC) je potrebno ob registraciji vpisati anche podatke o naročniku oglasa. Ti podatki služijo le za potrebe spoštovanja določil 6.člena ZPDZC, in ob oglasu NE BODO objavljeni.
+                  Bistvena prednost registracije posameznika je možnost objave oglasa. V izogib kršitvam Zakona o preprečevanju dela in zaposlovanja na črno (ZPDZC) je potrebno ob registraciji vpisati juga podatke o naročniku oglasa. Ti podatki služijo le za potrebe spoštovanja določil 6.člena ZPDZC, in ob oglasu NE BODO objavljeni.
                 </p>
                 <p className="text-xs text-gray-600">
-                  Ob vlogi za registracijo Vas prosimo, da nam posredujete anche podpisano oz. ožigosano kopijo uradnega dokumenta, ki potrjuje registracijo podjetja oz. s.p. (vir: AJPES). Kopijo dokumenta lahko pošljete na email <a href="mailto:info@vozilo.si" className="text-[#ff6a00] underline">info@vozilo.si</a>.
+                  Ob vlogi za registracijo Vas prosimo, da nam posredujete juga podpisano oz. ožigosano kopijo uradnega dokumenta, ki potrjuje registracijo podjetja oz. s.p. (vir: AJPES). Kopijo dokumenta lahko pošljete na email <a href="mailto:info@vozilo.si" className="text-[#ff6a00] underline">info@vozilo.si</a>.
                 </p>
-              </div>
-
-              <div className="mb-6">
-                <label className="flex items-start gap-3">
-                  <input
-                    type="checkbox"
-                    className="w-5 h-5 mt-0.5 rounded border-gray-300 text-[#ff6a00] focus:ring-[#ff6a00]"
-                  />
-                  <span className="text-sm text-gray-600">
-                    Želim prejemati komentarje in ponudbe obiskovalcev na svoj e-mail naslov.
-                  </span>
-                </label>
               </div>
 
               {/* Legal checkbox 1 */}
@@ -720,9 +708,9 @@ export function RegisterPage() {
                   <input
                     type="checkbox"
                     required
-                    className="w-4 h-4 mt-0.5 rounded border-gray-300 text-[#ff6a00] focus:ring-[#ff6a00]"
+                    className="w-5 h-5 mt-0.5 rounded border-gray-300 text-[#ff6a00] focus:ring-[#ff6a00]"
                   />
-                  <span className="text-xs text-gray-600 leading-relaxed">
+                  <span className="text-sm text-gray-600 leading-relaxed">
                     Izjavljam, da v primeru objave oglasa prodajam lastno vozilo/opremo kot fizična oseba posameznik in z naročilom objave ne bo oglaševano delo na črno v smislu ZPDZC.
                   </span>
                 </label>
@@ -734,21 +722,22 @@ export function RegisterPage() {
                   <input
                     type="checkbox"
                     required
-                    className="w-4 h-4 mt-0.5 rounded border-gray-300 text-[#ff6a00] focus:ring-[#ff6a00]"
+                    className="w-5 h-5 mt-0.5 rounded border-gray-300 text-[#ff6a00] focus:ring-[#ff6a00]"
                   />
-                  <span className="text-xs text-gray-600">
+                  <span className="text-sm text-gray-600 leading-relaxed">
                     Potrjujem seznanitev z vsebino pravnega obvestila ter se z njim v celoti strinjam.
                   </span>
                 </label>
               </div>
 
+              {/* Email notifications checkbox */}
               <div className="mb-6">
                 <label className="flex items-start gap-3">
                   <input
                     type="checkbox"
-                    className="w-4 h-4 mt-0.5 rounded border-gray-300 text-[#ff6a00] focus:ring-[#ff6a00]"
+                    className="w-5 h-5 mt-0.5 rounded border-gray-300 text-[#ff6a00] focus:ring-[#ff6a00]"
                   />
-                  <span className="text-xs text-gray-600">
+                  <span className="text-sm text-gray-600 leading-relaxed">
                     Želim prejemati komentarje in ponudbe obiskovalcev na svoj e-mail naslov.
                   </span>
                 </label>
@@ -914,41 +903,51 @@ export function RegisterPage() {
                 </div>
               </div>
 
-              {/* Legal checkbox 1 - Bigger */}
-              <div className="mb-4 p-3 bg-gray-50 rounded-xl">
+              {/* Pomembno notice for business */}
+              <div className="mb-6 p-4 bg-orange-50 rounded-xl">
+                <p className="text-sm font-medium text-gray-900 mb-2">Pomembno:</p>
+                <p className="text-xs text-gray-600">
+                  Ob vlogi za registracijo Vas prosimo, da nam posredujete tudi podpisano oz. ožigosano kopijo uradnega dokumenta, ki potrjuje registracijo podjetja oz. s.p. (vir: AJPES).
+                  Kopijo dokumenta lahko pošljete na email <a href="mailto:info@vozilo.si" className="text-[#ff6a00] underline">info@vozilo.si</a>.
+                </p>
+              </div>
+
+              {/* Legal checkbox 1 */}
+              <div className="mb-3">
                 <label className="flex items-start gap-3">
                   <input
                     type="checkbox"
                     required
-                    className="w-5 h-5 mt-1 rounded border-gray-300 text-[#ff6a00] focus:ring-[#ff6a00]"
+                    className="w-5 h-5 mt-0.5 rounded border-gray-300 text-[#ff6a00] focus:ring-[#ff6a00]"
                   />
-                  <span className="text-sm text-gray-700 leading-relaxed">
-                    Izjavljam, da v primeru objave oglasa prodajam lastno vozilo/opremo kot fizična oseba posameznik in z naročilom objave ne bo oglaševano delo na črno v smislu ZPDZC.
+                  <span className="text-sm text-gray-600 leading-relaxed">
+                    Skladno z določili 6.člena Zakona o preprečevanju dela in zaposlovanja na črno (ZPDZC-1, Ur.l.RS št. 32/2014) izjavljamo, da imamo dejavnost, vsebina katere se nanaša na objavo oglasov, opredeljeno v ustanovitvenem aktu oziroma vpisano v register.
                   </span>
                 </label>
               </div>
 
-              {/* Legal checkbox 2 - Smaller */}
-              <div className="mb-4">
-                <label className="flex items-center gap-3">
+              {/* Legal checkbox 2 */}
+              <div className="mb-3">
+                <label className="flex items-start gap-3">
                   <input
                     type="checkbox"
                     required
-                    className="w-4 h-4 rounded border-gray-300 text-[#ff6a00] focus:ring-[#ff6a00]"
+                    className="w-5 h-5 mt-0.5 rounded border-gray-300 text-[#ff6a00] focus:ring-[#ff6a00]"
                   />
-                  <span className="text-xs text-gray-600">
+                  <span className="text-sm text-gray-600 leading-relaxed">
                     Potrjujem seznanitev z vsebino pravnega obvestila ter se z njim v celoti strinjam.
                   </span>
                 </label>
               </div>
 
+              {/* Email notifications checkbox */}
               <div className="mb-6">
-                <label className="flex items-center gap-3">
+                <label className="flex items-start gap-3">
                   <input
                     type="checkbox"
-                    className="w-4 h-4 rounded border-gray-300 text-[#ff6a00] focus:ring-[#ff6a00]"
+                    className="w-5 h-5 mt-0.5 rounded border-gray-300 text-[#ff6a00] focus:ring-[#ff6a00]"
                   />
-                  <span className="text-xs text-gray-600">
+                  <span className="text-sm text-gray-600 leading-relaxed">
                     Želim prejemati komentarje in ponudbe obiskovalcev na svoj e-mail naslov.
                   </span>
                 </label>
