@@ -319,7 +319,6 @@ export function AddCarPage() {
     if (!formData.fuelType) newErrors.fuelType = 'Gorivo je obvezno'
     if (!formData.transmission) newErrors.transmission = 'Menjalnik je obvezen'
     if (!formData.bodyType) newErrors.bodyType = 'Tip vozila je obvezen'
-    if (!formData.doorCount) newErrors.doorCount = 'Stevilo vrat je obvezno'
     if (!formData.vehicleCondition) newErrors.vehicleCondition = 'Stanje vozila je obvezno'
     if (!formData.city) newErrors.city = 'Kraj je obvezen'
     if (!formData.description) newErrors.description = 'Opis je obvezen'
@@ -553,7 +552,6 @@ export function AddCarPage() {
             <Dropdown label={t('fuelType_label') + ' *'} name="fuelType" value={formData.fuelType} options={fuelTypes} />
             <Dropdown label={t('transmission_label') + ' *'} name="transmission" value={formData.transmission} options={transmissions} />
             <Dropdown label={t('bodyType_label') + ' *'} name="bodyType" value={formData.bodyType} options={bodyTypes} />
-            <Dropdown label="Stevilo vrat *" name="doorCount" value={formData.doorCount} options={doorCounts} />
             
             {/* Stanje vozila - Radio buttons */}
             <div className="md:col-span-2">
@@ -776,6 +774,25 @@ export function AddCarPage() {
 
         {/* Nova Oprema vozila - Checkboxes by Categories */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+          {/* Door count - single select */}
+          <div className="mb-6 pb-6 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div className="w-1/2">
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Število vrat</label>
+                <select
+                  value={formData.doorCount}
+                  onChange={(e) => handleChange('doorCount', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
+                >
+                  <option value="">Izberi število vrat...</option>
+                  {doorCounts.map(d => (
+                    <option key={d} value={d}>{d}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+          
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900">Oprema vozila</h2>
             <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
