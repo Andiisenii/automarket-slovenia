@@ -398,6 +398,11 @@ export function CarDetailPage() {
                   <Badge className="bg-blue-500 text-white">🚀 SKOK NA VRH</Badge>
                 )}
                 
+                {/* Premium Comments Badge */}
+                {(car.package === 'premium' || car.package === 'Premium') && (
+                  <Badge className="bg-purple-500 text-white">💬 Komentarji na objavah</Badge>
+                )}
+                
                 <Badge variant="success">Active</Badge>
                 <Badge variant="primary">{car.bodyType}</Badge>
               </div>

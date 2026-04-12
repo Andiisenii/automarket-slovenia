@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, Upload, X, Check, CreditCard, ChevronDown, Shield, Settings, Wifi, Car, Fuel, Star, ChevronUp, Sun, Award } from 'lucide-react'
+import { ArrowLeft, Upload, X, Check, CreditCard, ChevronDown, Shield, Settings, Wifi, Car, Fuel, Star, ChevronUp, Sun, Award, XCircle } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { useAuth } from '@/lib/AuthContext'
 import { useLanguage } from '@/lib/LanguageContext'
 import { useCars } from '@/lib/CarContext'
 import { packageDB, carDB } from '@/lib/database'
-import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, colors, vehicleConditionOptions, vehicleConditionSubOptions, carEquipmentCategories, emissionClasses, vehicleAgeOptions, ownerCountOptions, months, getYears, LUXURY_CAR_THRESHOLD } from '@/lib/data'
+import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, colors, doorCounts, vehicleConditionOptions, vehicleConditionSubOptions, carEquipmentCategories, emissionClasses, vehicleAgeOptions, ownerCountOptions, months, getYears, LUXURY_CAR_THRESHOLD } from '@/lib/data'
 
 export function AddCarPage() {
   const navigate = useNavigate()
@@ -25,8 +25,8 @@ export function AddCarPage() {
   const [publishingPackages, setPublishingPackages] = useState([])
   
   const [formData, setFormData] = useState({
-    title: '', brand: '', model: '', year: new Date().getFullYear(),
-    price: '', mileage: '', fuelType: '', transmission: '', bodyType: '',
+    brand: '', model: '', year: new Date().getFullYear(),
+    price: '', mileage: '', fuelType: '', transmission: '', bodyType: '', doorCount: '',
     engine: '', horsepower: '', color: '', city: '', description: '',
     vehicleCondition: '', vehicleConditionSub: [], featureIds: [],
     // Fuel consumption
@@ -192,15 +192,22 @@ export function AddCarPage() {
   useEffect(() => {
     if (editCar) {
       setFormData({
-        title: editCar.title || '', brand: editCar.brand || '', model: editCar.model || '',
+        brand: editCar.brand || '', model: editCar.model || '',
         year: editCar.year || new Date().getFullYear(), price: editCar.price || '',
         mileage: editCar.mileage || '', fuelType: editCar.fuelType || editCar.fuel_type || '', 
         transmission: editCar.transmission || '', bodyType: editCar.bodyType || editCar.body_type || '', 
+        doorCount: editCar.doorCount || '',
         engine: editCar.engine || '', horsepower: editCar.horsepower || '',
         color: editCar.color || '', city: editCar.city || '', description: editCar.description || '',
         vehicleCondition: editCar.vehicleCondition || editCar.vehicle_condition || '',
         vehicleConditionSub: editCar.vehicleConditionSub || [],
         featureIds: editCar.featureIds || [],
+        // Fuel
+        fuelConsumption: editCar.fuelConsumption || '', emissionClass: editCar.emissionClass || '', co2Emissions: editCar.co2Emissions || '', autoPublishFuelData: editCar.autoPublishFuelData || false,
+        // Age & ownership
+        vehicleAge: editCar.vehicleAge || '', hasWarranty: editCar.hasWarranty || false, hasGuarantee: editCar.hasGuarantee || false, hasOldtimerCert: editCar.hasOldtimerCert || false,
+        // Registration
+        firstRegMonth: editCar.firstRegMonth || '', firstRegYear: editCar.firstRegYear || '', technicalValidUntil: editCar.technicalValidUntil || '', ownerCount: editCar.ownerCount || '',
       })
       setImages(editCar.images || [])
       if (editCar.hasFinancing) {
@@ -306,16 +313,16 @@ export function AddCarPage() {
 
   const validateForm = () => {
     const newErrors = {}
-    if (!formData.title) newErrors.title = 'Title is required'
-    if (!formData.brand) newErrors.brand = 'Brand is required'
-    if (!formData.year) newErrors.year = 'Year is required'
-    if (!formData.price) newErrors.price = 'Price is required'
-    if (!formData.fuelType) newErrors.fuelType = 'Fuel type is required'
-    if (!formData.transmission) newErrors.transmission = 'Transmission is required'
-    if (!formData.bodyType) newErrors.bodyType = 'Body type is required'
+    if (!formData.brand) newErrors.brand = 'Znamka je obvezna'
+    if (!formData.year) newErrors.year = 'Leto je obvezno'
+    if (!formData.price) newErrors.price = 'Cena je obvezna'
+    if (!formData.fuelType) newErrors.fuelType = 'Gorivo je obvezno'
+    if (!formData.transmission) newErrors.transmission = 'Menjalnik je obvezen'
+    if (!formData.bodyType) newErrors.bodyType = 'Tip vozila je obvezen'
+    if (!formData.doorCount) newErrors.doorCount = 'Stevilo vrat je obvezno'
     if (!formData.vehicleCondition) newErrors.vehicleCondition = 'Stanje vozila je obvezno'
-    if (!formData.city) newErrors.city = 'City is required'
-    if (!formData.description) newErrors.description = 'Description is required'
+    if (!formData.city) newErrors.city = 'Kraj je obvezen'
+    if (!formData.description) newErrors.description = 'Opis je obvezen'
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -427,14 +434,19 @@ export function AddCarPage() {
     <div className="relative">
       <label className="block text-sm font-medium text-gray-700 mb-1.5">{label} *</label>
       <button type="button" onClick={() => toggleDropdown(name)} className={"w-full px-4 py-3 bg-gray-50 border rounded-xl text-left flex items-center justify-between hover:bg-gray-100 transition-colors " + (!value ? 'text-gray-400' : '')} >
-        <span>{value || "Select " + label}</span>
+        <span>{value || "Izberi " + label}</span>
         <ChevronDown className={"w-4 h-4 transition-transform " + (openDropdown === name ? 'rotate-180' : '')} />
       </button>
       <AnimatePresence>
         {openDropdown === name && (
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="absolute z-10 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-[200px] overflow-y-auto" >
+            {value && (
+              <button key="deselect" type="button" onClick={() => { selectOption(name, ''); setOpenDropdown(null) }} className="w-full px-4 py-2.5 text-left hover:bg-gray-50 transition-colors flex items-center gap-2 text-gray-500 border-b border-gray-100 bg-gray-50" >
+                <X className="w-4 h-4" /> Ponastavi
+              </button>
+            )}
             {options.map((opt) => (
-              <button key={opt} type="button" onClick={() => selectOption(name, opt)} className={"w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-center gap-2 " + (value === opt ? 'bg-primary-50 text-primary-700' : '')} >
+              <button key={opt} type="button" onClick={() => selectOption(name, opt)} className={"w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-center gap-2 " + (value === opt ? 'bg-orange-50 text-orange-700' : '')} >
                 {color && <span className="w-4 h-4 rounded-full border border-gray-200" style={{ backgroundColor: opt.toLowerCase() }}></span>}
                 {opt}
                 {value === opt && <Check className="w-4 h-4 ml-auto" />}
@@ -464,9 +476,6 @@ export function AddCarPage() {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-6">{t('basicInfo')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="md:col-span-2">
-              <Input label={t('title_label') + ' *'} placeholder={isSl ? 'npr. BMW X5 M Sport' : 'e.g. 2023 BMW X5 xDrive40i'} value={formData.title} onChange={(e) => handleChange('title', e.target.value)} error={errors.title} />
-            </div>
             <div className="relative">
               <Input label={t('brand') + ' *'} placeholder={isSl ? 'Vnesi znamko...' : 'Type brand name...'} value={formData.brand} onChange={(e) => handleChange('brand', e.target.value)} error={errors.brand} />
               <AnimatePresence>
@@ -544,6 +553,7 @@ export function AddCarPage() {
             <Dropdown label={t('fuelType_label') + ' *'} name="fuelType" value={formData.fuelType} options={fuelTypes} />
             <Dropdown label={t('transmission_label') + ' *'} name="transmission" value={formData.transmission} options={transmissions} />
             <Dropdown label={t('bodyType_label') + ' *'} name="bodyType" value={formData.bodyType} options={bodyTypes} />
+            <Dropdown label="Stevilo vrat *" name="doorCount" value={formData.doorCount} options={doorCounts} />
             
             {/* Stanje vozila - Radio buttons */}
             <div className="md:col-span-2">

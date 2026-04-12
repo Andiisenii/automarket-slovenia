@@ -135,6 +135,13 @@ export function CarCard({ car, index = 0, featured = false }) {
                   ))}
                 </div>
               )}
+              
+              {/* Premium Comments Badge for Featured */}
+              {(car.package === 'premium' || car.package === 'Premium') && (
+                <div className="absolute bottom-2 left-2 right-2 bg-purple-600/90 text-white text-xs font-medium px-2 py-1.5 rounded-lg text-center">
+                  💬 Komentarji na objavah
+                </div>
+              )}
             </div>
             
             {/* Content */}
@@ -186,6 +193,13 @@ export function CarCard({ car, index = 0, featured = false }) {
               <span className="absolute top-3 left-3 bg-purple-500 text-white text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
                 ⚡ HD
               </span>
+            )}
+            
+            {/* Premium - Comments on Posts Badge */}
+            {(car.package === 'premium' || car.package === 'Premium') && (
+              <div className="absolute bottom-2 left-2 right-2 bg-purple-600/90 text-white text-xs font-medium px-2 py-1.5 rounded-lg text-center">
+                💬 Komentarji na objavah
+              </div>
             )}
             
             {/* Promotion Badges */}
