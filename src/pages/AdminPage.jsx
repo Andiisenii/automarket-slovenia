@@ -123,8 +123,21 @@ export default function AdminPage() {
   const [showBroadcastModal, setShowBroadcastModal] = useState(false)
   const [showEditUserModal, setShowEditUserModal] = useState(false)
   const [showRevenueModal, setShowRevenueModal] = useState(false)
+  const [showAddUserModal, setShowAddUserModal] = useState(false)
   const [selectedUser, setSelectedUser] = useState(null)
   const [selectedCar, setSelectedCar] = useState(null)
+  
+  // New user form state
+  const [newUserForm, setNewUserForm] = useState({
+    name: '',
+    surname: '',
+    username: '',
+    email: '',
+    password: '',
+    packageType: '',
+    freeDays: 30,
+    userType: 'private'
+  })
   const [selectedPackage, setSelectedPackage] = useState(null)
   
   // Forms
@@ -456,6 +469,79 @@ export default function AdminPage() {
     } catch (err) {
       console.error('Error sending broadcast:', err)
       alert('Napaka pri pošiljanju')
+    }
+  }
+  
+  // Add new user function
+  const handleAddUser = async () => {
+    if (!newUserForm.name || !newUserForm.surname || !newUserForm.username || !newUserForm.email || !newUserForm.password) {
+      alert('Izpolnite vsa obvezna polja!')
+      return
+    }
+    
+    try {
+      // Create auth user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: newUserForm.email,
+        password: newUserForm.password,
+      })
+      
+      if (authError) throw authError
+      
+      const userId = authData.user.id
+      
+      // Create user profile
+      const { error: userError } = await supabase.from('users').insert({
+        id: userId,
+        name: newUserForm.name,
+        surname: newUserForm.surname,
+        username: newUserForm.username,
+        email: newUserForm.email,
+        phone: '',
+        user_type: newUserForm.userType,
+        company_name: '',
+        tax_number: '',
+      })
+      
+      if (userError) throw userError
+      
+      // If package selected, add free package
+      if (newUserForm.packageType) {
+        const pkg = PUBLISHING_PACKAGES.find(p => p.id === newUserForm.packageType)
+        if (pkg) {
+          const startDate = new Date()
+          const endDate = new Date()
+          endDate.setDate(endDate.getDate() + parseInt(newUserForm.freeDays))
+          
+          await supabase.from('user_packages').insert({
+            user_id: userId,
+            package_id: newUserForm.packageType,
+            type: 'publishing',
+            status: 'active',
+            start_date: startDate.toISOString().split('T')[0],
+            end_date: endDate.toISOString().split('T')[0],
+            is_free: true,
+          })
+        }
+      }
+      
+      // Reset form and close modal
+      setNewUserForm({
+        name: '',
+        surname: '',
+        username: '',
+        email: '',
+        password: '',
+        packageType: '',
+        freeDays: 30,
+        userType: 'private'
+      })
+      setShowAddUserModal(false)
+      loadDataRef.current()
+      alert('Uporabnik uspešno dodan!')
+    } catch (err) {
+      console.error('Error adding user:', err)
+      alert('Napaka pri dodajanju uporabnika: ' + err.message)
     }
   }
   
@@ -801,6 +887,10 @@ export default function AdminPage() {
                 <Button onClick={() => { setBroadcastForm({ subject: '', content: '' }); setShowBroadcastModal(true) }}>
                   <SendHorizontal className="w-4 h-4 mr-2" />
                   Pošlji vsem
+                </Button>
+                <Button onClick={() => { setNewUserForm({ name: '', surname: '', username: '', email: '', password: '', packageType: '', freeDays: 30, userType: 'private' }); setShowAddUserModal(true) }}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Dodaj uporabnika
                 </Button>
               </div>
             </div>
@@ -1456,6 +1546,104 @@ export default function AdminPage() {
                 <Button onClick={sendBroadcast} className="w-full">
                   <SendHorizontal className="w-4 h-4 mr-2" />
                   Pošlji vsem
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+      
+      {/* Add User Modal */}
+      <AnimatePresence>
+        {showAddUserModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6 border-b flex justify-between items-center sticky top-0 bg-white">
+                <h3 className="text-lg font-semibold">Dodaj novega uporabnika</h3>
+                <button onClick={() => setShowAddUserModal(false)}><X className="w-5 h-5" /></button>
+              </div>
+              <div className="p-6 space-y-4">
+                {/* User Type */}
+                <div>
+                  <label className="block text-sm font-medium mb-2">Tip uporabnika</label>
+                  <div className="flex gap-4">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="radio" name="userType" value="private" checked={newUserForm.userType === 'private'} onChange={() => setNewUserForm({...newUserForm, userType: 'private'})} className="w-4 h-4" />
+                      <span>Zasebni</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="radio" name="userType" value="business" checked={newUserForm.userType === 'business'} onChange={() => setNewUserForm({...newUserForm, userType: 'business'})} className="w-4 h-4" />
+                      <span>Podjetje</span>
+                    </label>
+                  </div>
+                </div>
+                
+                {/* Name & Surname */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Ime *</label>
+                    <input type="text" value={newUserForm.name} onChange={e => setNewUserForm({...newUserForm, name: e.target.value})} className="w-full p-2 border rounded" placeholder="npr. Janez" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Priimek *</label>
+                    <input type="text" value={newUserForm.surname} onChange={e => setNewUserForm({...newUserForm, surname: e.target.value})} className="w-full p-2 border rounded" placeholder="npr. Novák" />
+                  </div>
+                </div>
+                
+                {/* Username */}
+                <div>
+                  <label className="block text-sm font-medium mb-1">Uporabniško ime *</label>
+                  <input type="text" value={newUserForm.username} onChange={e => setNewUserForm({...newUserForm, username: e.target.value})} className="w-full p-2 border rounded" placeholder="npr. janez.novak" />
+                </div>
+                
+                {/* Email */}
+                <div>
+                  <label className="block text-sm font-medium mb-1">Email *</label>
+                  <input type="email" value={newUserForm.email} onChange={e => setNewUserForm({...newUserForm, email: e.target.value})} className="w-full p-2 border rounded" placeholder="npr. janez@mail.si" />
+                </div>
+                
+                {/* Password */}
+                <div>
+                  <label className="block text-sm font-medium mb-1">Geslo *</label>
+                  <input type="password" value={newUserForm.password} onChange={e => setNewUserForm({...newUserForm, password: e.target.value})} className="w-full p-2 border rounded" placeholder="Vnesite geslo" />
+                </div>
+                
+                {/* Package Selection */}
+                <div className="border-t pt-4 mt-4">
+                  <label className="block text-sm font-medium mb-2">Brezplačen paket (kupon)</label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <label className={`flex flex-col items-center p-4 border-2 rounded-lg cursor-pointer transition ${newUserForm.packageType === 'osnovni' ? 'border-orange-500 bg-orange-50' : 'border-gray-200 hover:border-gray-300'}`}>
+                      <input type="radio" name="packageType" value="osnovni" checked={newUserForm.packageType === 'osnovni'} onChange={() => setNewUserForm({...newUserForm, packageType: 'osnovni'})} className="sr-only" />
+                      <span className="font-semibold">OSNOVNI</span>
+                      <span className="text-xs text-gray-500 mt-1">34.99 € / mesec</span>
+                    </label>
+                    <label className={`flex flex-col items-center p-4 border-2 rounded-lg cursor-pointer transition ${newUserForm.packageType === 'premium' ? 'border-purple-500 bg-purple-50' : 'border-gray-200 hover:border-gray-300'}`}>
+                      <input type="radio" name="packageType" value="premium" checked={newUserForm.packageType === 'premium'} onChange={() => setNewUserForm({...newUserForm, packageType: 'premium'})} className="sr-only" />
+                      <span className="font-semibold">PREMIUM</span>
+                      <span className="text-xs text-gray-500 mt-1">64.99 € / mesec</span>
+                    </label>
+                  </div>
+                  
+                  {/* Free Days Duration */}
+                  {newUserForm.packageType && (
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium mb-1">Trajanje paketa (dni)</label>
+                      <select value={newUserForm.freeDays} onChange={e => setNewUserForm({...newUserForm, freeDays: e.target.value})} className="w-full p-2 border rounded">
+                        <option value="7">7 dni</option>
+                        <option value="14">14 dni</option>
+                        <option value="30">30 dni (1 mesec)</option>
+                        <option value="60">60 dni (2 meseca)</option>
+                        <option value="90">90 dni (3 meseca)</option>
+                        <option value="180">180 dni (6 mesecev)</option>
+                        <option value="365">365 dni (1 leto)</option>
+                      </select>
+                    </div>
+                  )}
+                </div>
+                
+                <Button onClick={handleAddUser} className="w-full mt-4">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Dodaj uporabnika
                 </Button>
               </div>
             </motion.div>
