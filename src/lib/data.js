@@ -143,6 +143,45 @@ export const vehicleConditionSubOptions = {
   ],
 }
 
+// Emission classes for Slovenia
+export const emissionClasses = ['Euro 1', 'Euro 2', 'Euro 3', 'Euro 4', 'Euro 5', 'Euro 6', 'Euro 6d', 'Euro 6e', 'Euro 6e-TEMP']
+
+// Vehicle age / type
+export const vehicleAgeOptions = [
+  { value: 'Novo', label: 'Novo vozilo' },
+  { value: 'Rabljeno', label: 'Rabljeno vozilo' },
+  { value: 'Oldtimer', label: 'Oldtimer' },
+]
+
+// Number of previous owners
+export const ownerCountOptions = ['0', '1', '2', '3', '4+']
+
+// Months for date pickers
+export const months = [
+  { value: '01', label: 'Januar' },
+  { value: '02', label: 'Februar' },
+  { value: '03', label: 'Marec' },
+  { value: '04', label: 'April' },
+  { value: '05', label: 'Maj' },
+  { value: '06', label: 'Junij' },
+  { value: '07', label: 'Julij' },
+  { value: '08', label: 'Avgust' },
+  { value: '09', label: 'September' },
+  { value: '10', label: 'Oktober' },
+  { value: '11', label: 'November' },
+  { value: '12', label: 'December' },
+]
+
+// Years for date pickers (last 30 years)
+export const getYears = () => {
+  const currentYear = new Date().getFullYear()
+  const years = []
+  for (let y = currentYear; y >= currentYear - 30; y--) {
+    years.push(y.toString())
+  }
+  return years
+}
+
 // Nova struktura opreme - checkboxes by category
 export const carEquipmentCategories = {
   notranjost: {

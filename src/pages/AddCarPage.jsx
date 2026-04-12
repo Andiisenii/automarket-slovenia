@@ -8,7 +8,7 @@ import { useAuth } from '@/lib/AuthContext'
 import { useLanguage } from '@/lib/LanguageContext'
 import { useCars } from '@/lib/CarContext'
 import { packageDB, carDB } from '@/lib/database'
-import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, colors, vehicleConditionOptions, vehicleConditionSubOptions, carEquipmentCategories, LUXURY_CAR_THRESHOLD } from '@/lib/data'
+import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, colors, vehicleConditionOptions, vehicleConditionSubOptions, carEquipmentCategories, emissionClasses, vehicleAgeOptions, ownerCountOptions, months, getYears, LUXURY_CAR_THRESHOLD } from '@/lib/data'
 
 export function AddCarPage() {
   const navigate = useNavigate()
@@ -29,6 +29,12 @@ export function AddCarPage() {
     price: '', mileage: '', fuelType: '', transmission: '', bodyType: '',
     engine: '', horsepower: '', color: '', city: '', description: '',
     vehicleCondition: '', vehicleConditionSub: [], featureIds: [],
+    // Fuel consumption
+    fuelConsumption: '', emissionClass: '', co2Emissions: '', autoPublishFuelData: false,
+    // Vehicle age & ownership
+    vehicleAge: '', hasWarranty: false, hasGuarantee: false, hasOldtimerCert: false,
+    // Registration details
+    firstRegMonth: '', firstRegYear: '', technicalValidUntil: '', ownerCount: '',
   })
 
   const [openFeaturesCategory, setOpenFeaturesCategory] = useState('safety')
@@ -597,6 +603,164 @@ export function AddCarPage() {
             <Dropdown label={t('color') + ' *'} name="color" value={formData.color} options={colors} color={true} />
             <Input label={t('engine')} placeholder={isSl ? 'npr. 2.0 TDI' : 'e.g. 2.0L TFSI'} value={formData.engine} onChange={(e) => handleChange('engine', e.target.value)} />
             <Input label={t('power') + ' (HP)'} type="number" placeholder="200" value={formData.horsepower} onChange={(e) => handleChange('horsepower', parseInt(e.target.value))} />
+          </div>
+        </div>
+
+        {/* Poraba goriva in emisije */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Poraba goriva in emisije (NEDC)</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Kombinirana poraba (l/100km)</label>
+              <input
+                type="number"
+                step="0.01"
+                placeholder="npr. 5.5"
+                value={formData.fuelConsumption}
+                onChange={(e) => handleChange('fuelConsumption', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Emisijski razred</label>
+              <select
+                value={formData.emissionClass}
+                onChange={(e) => handleChange('emissionClass', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
+              >
+                <option value="">Izberi...</option>
+                {emissionClasses.map(cls => (
+                  <option key={cls} value={cls}>{cls}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">CO2 emisija (g/km)</label>
+              <input
+                type="number"
+                placeholder="npr. 120"
+                value={formData.co2Emissions}
+                onChange={(e) => handleChange('co2Emissions', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+            </div>
+          </div>
+          <div className="mt-4">
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.autoPublishFuelData}
+                onChange={(e) => handleChange('autoPublishFuelData', e.target.checked)}
+                className="w-5 h-5 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+              />
+              <span className="text-sm text-gray-700">Podatke o porabi želim avtomatično objaviti ob oglasu</span>
+            </label>
+          </div>
+        </div>
+
+        {/* Starost in lastništvo */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Starost in lastništvo</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Starost vozila</label>
+              <select
+                value={formData.vehicleAge}
+                onChange={(e) => handleChange('vehicleAge', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
+              >
+                <option value="">Izberi...</option>
+                {vehicleAgeOptions.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Število lastnikov</label>
+              <select
+                value={formData.ownerCount}
+                onChange={(e) => handleChange('ownerCount', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
+              >
+                <option value="">Izberi...</option>
+                {ownerCountOptions.map(count => (
+                  <option key={count} value={count}>{count}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          
+          {/* Garancija checkboxes */}
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+            <label className="flex items-center gap-2 p-3 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50">
+              <input
+                type="checkbox"
+                checked={formData.hasWarranty}
+                onChange={(e) => handleChange('hasWarranty', e.target.checked)}
+                className="w-4 h-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+              />
+              <span className="text-sm text-gray-700">Vozilo ima garancijo</span>
+            </label>
+            <label className="flex items-center gap-2 p-3 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50">
+              <input
+                type="checkbox"
+                checked={formData.hasGuarantee}
+                onChange={(e) => handleChange('hasGuarantee', e.target.checked)}
+                className="w-4 h-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+              />
+              <span className="text-sm text-gray-700">Vozilo ima jamstvo</span>
+            </label>
+            <label className="flex items-center gap-2 p-3 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50">
+              <input
+                type="checkbox"
+                checked={formData.hasOldtimerCert}
+                onChange={(e) => handleChange('hasOldtimerCert', e.target.checked)}
+                className="w-4 h-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+              />
+              <span className="text-sm text-gray-700">Vozilo ima oldtimer certifikat</span>
+            </label>
+          </div>
+        </div>
+
+        {/* Registracija */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Podatki o registraciji</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Prva registracija - mesec</label>
+              <select
+                value={formData.firstRegMonth}
+                onChange={(e) => handleChange('firstRegMonth', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
+              >
+                <option value="">Mesec...</option>
+                {months.map(m => (
+                  <option key={m.value} value={m.value}>{m.label}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Prva registracija - leto</label>
+              <select
+                value={formData.firstRegYear}
+                onChange={(e) => handleChange('firstRegYear', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
+              >
+                <option value="">Leto...</option>
+                {getYears().map(y => (
+                  <option key={y} value={y}>{y}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Tehnični pregled velja do</label>
+              <input
+                type="date"
+                value={formData.technicalValidUntil}
+                onChange={(e) => handleChange('technicalValidUntil', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+            </div>
           </div>
         </div>
 
