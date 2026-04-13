@@ -421,7 +421,7 @@ export function SellPage() {
                             <span className={`text-4xl font-bold ${isPopular ? 'text-orange-600' : 'text-orange-600'}`}>€{pkg.price}</span>
                           </div>
                         )}
-                        <p className="text-gray-500 text-sm mt-1">/mesec <span className="text-xs text-gray-400">(DDV)</span></p>
+                        <p className="text-gray-500 text-sm mt-1">/mesec brez (DDV)</p>
                       </div>
                       
                       {/* Features with Check/X */}

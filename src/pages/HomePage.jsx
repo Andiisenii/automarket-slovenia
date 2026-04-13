@@ -49,6 +49,10 @@ export function HomePage() {
   const [yearTo, setYearTo] = useState(isNewCarsFilter ? '2024' : '')
   const [selectedCities, setSelectedCities] = useState([])
   const [selectedFuel, setSelectedFuel] = useState([])
+  const [selectedBodyTypes, setSelectedBodyTypes] = useState([])
+  
+  // Body types
+  const bodyTypes = ['SUV', 'Limuzina', 'Hatchback', 'Coupe', 'Kombi', 'Van', 'Pickup', 'Minivan', 'Kabriolet', 'Roadster', 'Targa', 'Fastback', 'Liftback', 'Sportni coupe']
   
   // Filter brands based on vehicle type
   const filteredBrands = useMemo(() => {
@@ -183,6 +187,13 @@ export function HomePage() {
     )
   }
   
+  // Toggle body type selection
+  const toggleBodyType = (type) => {
+    setSelectedBodyTypes(prev => 
+      prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]
+    )
+  }
+  
   // Get promoted cars first, then regular cars (filtered by year/mileage for new cars)
   const getDisplayedCars = () => {
     if (cars.length === 0) return []
@@ -241,6 +252,13 @@ export function HomePage() {
     if (selectedCities.length > 0) {
       result = result.filter(car => 
         selectedCities.includes(car.location)
+      )
+    }
+    
+    // Filter by body type
+    if (selectedBodyTypes.length > 0) {
+      result = result.filter(car => 
+        selectedBodyTypes.includes(car.bodyType)
       )
     }
     
@@ -330,7 +348,7 @@ export function HomePage() {
               >
                 {language === 'sl' ? 'Poišči' : 'Search'}
               </button>
-              {(selectedBrands.length > 0 || selectedModels || selectedFuel.length > 0 || selectedCities.length > 0 || priceFrom || priceTo || mileageTo || yearFrom || yearTo) && (
+              {(selectedBrands.length > 0 || selectedModels || selectedFuel.length > 0 || selectedCities.length > 0 || selectedBodyTypes.length > 0 || priceFrom || priceTo || mileageTo || yearFrom || yearTo) && (
                 <button 
                   onClick={() => {
                     setSearchText('')
@@ -343,6 +361,7 @@ export function HomePage() {
                     setYearTo('')
                     setSelectedCities([])
                     setSelectedFuel([])
+                    setSelectedBodyTypes([])
                   }}
                   className="bg-gray-200 border-none text-gray-700 px-6 py-[15px] rounded-[14px] font-semibold cursor-pointer hover:bg-gray-300 transition-colors"
                 >
@@ -352,7 +371,7 @@ export function HomePage() {
             </div>
             
             {/* Matching Cars Count - only show when filters are selected */}
-            {(selectedBrands.length > 0 || Object.keys(selectedModels).length > 0 || selectedFuel.length > 0 || selectedCities.length > 0 || priceFrom || priceTo || mileageTo || yearFrom || yearTo || searchText) && matchingCount > 0 && (
+            {(selectedBrands.length > 0 || Object.keys(selectedModels).length > 0 || selectedFuel.length > 0 || selectedCities.length > 0 || selectedBodyTypes.length > 0 || priceFrom || priceTo || mileageTo || yearFrom || yearTo || searchText) && matchingCount > 0 && (
               <div className="text-center mt-3 text-sm text-green-600 font-medium">
                 {matchingCount} {language === 'sl' ? 'makina jan gjithsej' : 'vehicles total'}
               </div>
@@ -418,6 +437,33 @@ export function HomePage() {
                           </span>
                         ))
                       )}
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              {/* Body Type - Shows only when brand is selected */}
+              {selectedBrands.length > 0 && (
+                <div className="relative">
+                  <select 
+                    className="w-full px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer appearance-none"
+                    onChange={(e) => {
+                      if (e.target.value) toggleBodyType(e.target.value)
+                    }}
+                  >
+                    <option value="">{language === 'sl' ? 'Karoserijska oblika' : 'Body Type'} ({selectedBodyTypes.length})</option>
+                    {bodyTypes.map(type => (
+                      <option key={type} value={type}>{selectedBodyTypes.includes(type) ? '✓ ' : ''}{type}</option>
+                    ))}
+                  </select>
+                  {selectedBodyTypes.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {selectedBodyTypes.map(type => (
+                        <span key={type} className="text-xs bg-purple-500 text-white px-2 py-1 rounded-full flex items-center gap-1">
+                          {type}
+                          <button onClick={() => toggleBodyType(type)} className="ml-1">×</button>
+                        </span>
+                      ))}
                     </div>
                   )}
                 </div>
