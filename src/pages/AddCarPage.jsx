@@ -40,6 +40,7 @@ export function AddCarPage() {
   const [openFeaturesCategory, setOpenFeaturesCategory] = useState('safety')
 
   const [hasFinancing, setHasFinancing] = useState(false)
+  const [showFinancingModal, setShowFinancingModal] = useState(false)
   const [monthlyBudget, setMonthlyBudget] = useState('')
   const [downPaymentType, setDownPaymentType] = useState('amount')
   const [downPaymentValue, setDownPaymentValue] = useState('')
@@ -471,6 +472,104 @@ export function AddCarPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        {/* Financing Package Modal */}
+        <AnimatePresence>
+          {showFinancingModal && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }} 
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="bg-white rounded-2xl max-w-md w-full overflow-hidden"
+              >
+                <div className="p-6 border-b">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl font-bold text-gray-900">Financiranje - Paket vseh cen</h3>
+                    <button 
+                      onClick={() => setShowFinancingModal(false)}
+                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    >
+                      <X className="w-5 h-5 text-gray-500" />
+                    </button>
+                  </div>
+                </div>
+                <div className="p-6">
+                  <p className="text-gray-600 mb-4">
+                    Za dostop do financiranja potrebujete paket "Paket vseh cen".
+                  </p>
+                  
+                  {/* Package Details */}
+                  <div className="bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-xl p-4 mb-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Zap className="w-5 h-5 text-orange-500" />
+                      <h4 className="font-bold text-gray-900">Paket vseh cen</h4>
+                    </div>
+                    <ul className="space-y-2 mb-4">
+                      <li className="flex items-center gap-2 text-sm">
+                        <Check className="w-4 h-4 text-green-600" />
+                        <span>akcijska cena</span>
+                      </li>
+                      <li className="flex items-center gap-2 text-sm">
+                        <Check className="w-4 h-4 text-green-600" />
+                        <span>cena s financiranjem</span>
+                      </li>
+                      <li className="flex items-center gap-2 text-sm">
+                        <Check className="w-4 h-4 text-green-600" />
+                        <span>znizana cena</span>
+                      </li>
+                      <li className="flex items-center gap-2 text-sm">
+                        <Check className="w-4 h-4 text-green-600" />
+                        <span>ugodna cena</span>
+                      </li>
+                    </ul>
+                    
+                    {/* Price based on user type */}
+                    <div className="border-t border-orange-200 pt-3 mt-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600">Cena:</span>
+                        <div className="text-right">
+                          <span className="text-2xl font-bold text-orange-600">
+                            €{isBusiness ? '0.75' : '1.50'}
+                          </span>
+                          <span className="text-gray-500 ml-1">/dan</span>
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center mt-1">
+                        <span className="text-gray-500 text-sm">Minimalno naročilo:</span>
+                        <span className="text-gray-700 font-medium">{isBusiness ? '30' : '15'} dni</span>
+                      </div>
+                      <div className="flex justify-between items-center mt-1">
+                        <span className="text-gray-500 text-sm">Skupaj:</span>
+                        <span className="text-gray-700 font-bold">
+                          €{((isBusiness ? 0.75 : 1.50) * (isBusiness ? 30 : 15)).toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-3 mt-6">
+                    <button
+                      onClick={() => setShowFinancingModal(false)}
+                      className="flex-1 py-3 border border-gray-300 rounded-xl font-medium hover:bg-gray-50 transition-colors"
+                    >
+                      Preklici
+                    </button>
+                    <button
+                      onClick={() => {
+                        setHasFinancing(true)
+                        setShowFinancingModal(false)
+                      }}
+                      className="flex-1 py-3 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600 transition-colors"
+                    >
+                      Kupim paket
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-6">{t('basicInfo')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -522,7 +621,20 @@ export function AddCarPage() {
                       <p className="text-sm text-gray-500">Moznost obrocnega placevanja za to vozilo</p>
                     </div>
                   </div>
-                  <button type="button" onClick={() => setHasFinancing(!hasFinancing)} className={"relative inline-flex h-7 w-12 items-center rounded-full transition-colors " + (hasFinancing ? 'bg-green-500' : 'bg-gray-300')} >
+                  <button type="button" onClick={() => {
+                    if (!hasFinancing) {
+                      // Check if user is business or private, show modal accordingly
+                      if (isBusiness) {
+                        // Business users can use financing directly
+                        setHasFinancing(true)
+                      } else {
+                        // Private users need to see the package
+                        setShowFinancingModal(true)
+                      }
+                    } else {
+                      setHasFinancing(false)
+                    }
+                  }} className={"relative inline-flex h-7 w-12 items-center rounded-full transition-colors " + (hasFinancing ? 'bg-green-500' : 'bg-gray-300')} >
                     <span className={"inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform " + (hasFinancing ? 'translate-x-6' : 'translate-x-1')} />
                   </button>
                 </div>

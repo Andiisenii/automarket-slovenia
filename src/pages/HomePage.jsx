@@ -85,7 +85,7 @@ export function HomePage() {
   const fuelTypes = ['Bencin', 'Dizel', 'Hybrid', 'Električni', 'Plin (LPG)']
   
   // Year options (2025 to 2100)
-  const yearOptions = Array.from({ length: 76 }, (_, i) => 2026 + i)
+  const yearOptions = Array.from({ length: 37 }, (_, i) => 1990 + i)
   
   // Price options (simplified: 0 to 1M+)
   const priceOptions = [
@@ -425,27 +425,27 @@ export function HomePage() {
               
               {/* Cena (Price) - "od - do" */}
               <div className="flex gap-1 items-center">
-                <select 
-                  value={priceFrom}
-                  onChange={(e) => setPriceFrom(e.target.value)}
-                  className="flex-1 px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer"
-                >
-                  <option value="">{language === 'sl' ? 'Cena od' : 'Price from'}</option>
-                  {priceOptions.filter(p => p).map(price => (
-                    <option key={price} value={price}>{price === '1000000' ? '1.000.000+' : price}</option>
-                  ))}
-                </select>
+                <div className="relative flex-1">
+                  <input
+                    type="number"
+                    placeholder={language === 'sl' ? 'Cena od' : 'From'}
+                    value={priceFrom}
+                    onChange={(e) => setPriceFrom(e.target.value)}
+                    className="w-full px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">€</span>
+                </div>
                 <span className="text-gray-400">-</span>
-                <select 
-                  value={priceTo}
-                  onChange={(e) => setPriceTo(e.target.value)}
-                  className="flex-1 px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer"
-                >
-                  <option value="">{language === 'sl' ? 'do' : 'to'}</option>
-                  {priceOptions.filter(p => p).map(price => (
-                    <option key={price} value={price}>{price === '1000000' ? '1.000.000+' : price + ' €'}</option>
-                  ))}
-                </select>
+                <div className="relative flex-1">
+                  <input
+                    type="number"
+                    placeholder={language === 'sl' ? 'do' : 'To'}
+                    value={priceTo}
+                    onChange={(e) => setPriceTo(e.target.value)}
+                    className="w-full px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">€</span>
+                </div>
               </div>
               
               {/* Kilometri (Mileage) - Only "do" */}
@@ -462,27 +462,25 @@ export function HomePage() {
               
               {/* Letnik (Year) - "od - do" */}
               <div className="flex gap-1 items-center">
-                <select 
+                <input
+                  type="number"
+                  placeholder={language === 'sl' ? 'Letnik od' : 'From'}
                   value={yearFrom}
                   onChange={(e) => setYearFrom(e.target.value)}
-                  className="flex-1 px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer"
-                >
-                  <option value="">{language === 'sl' ? 'Letnik od' : 'Year from'}</option>
-                  {yearOptions.filter(y => y).map(year => (
-                    <option key={year} value={year}>{year}</option>
-                  ))}
-                </select>
+                  min="1990"
+                  max="2026"
+                  className="flex-1 px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700"
+                />
                 <span className="text-gray-400">-</span>
-                <select 
+                <input
+                  type="number"
+                  placeholder={language === 'sl' ? 'do' : 'To'}
                   value={yearTo}
                   onChange={(e) => setYearTo(e.target.value)}
-                  className="flex-1 px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer"
-                >
-                  <option value="">{language === 'sl' ? 'do' : 'to'}</option>
-                  {yearOptions.filter(y => y).map(year => (
-                    <option key={year} value={year}>{year}</option>
-                  ))}
-                </select>
+                  min="1990"
+                  max="2026"
+                  className="flex-1 px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700"
+                />
               </div>
               
               {/* Lokacija (City) - Multi Select */}
