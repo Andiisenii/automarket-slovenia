@@ -223,7 +223,7 @@ export const slovenianCities = ['Ljubljana', 'Maribor', 'Celje', 'Koper', 'Kranj
 
 // Re-export for convenience
 export const fuelTypes = ['Bencin', 'Dizel', 'Hybrid', 'Električni', 'Plin (LPG)']
-export const transmissions = ['Avtomatski', 'Ročni', 'Polavtomatski', 'CVT']
+export const transmissions = ['Avtomatski', 'Ročni', 'Polavtomatski']
 export const bodyTypes = ['SUV', 'Limuzina', 'Hatchback', 'Coupe', 'Kombi', 'Van', 'Pickup', 'Minivan', 'Kabriolet', 'Roadster', 'Targa', 'Fastback', 'Liftback', 'Športni coupe']
 export const doorCounts = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30+']
 export const colors = ['Bela', 'Črna', 'Siva', 'Rdeča', 'Modra', 'Zelena', 'Rumena', 'Oranžna', 'Rjava', 'Bež']

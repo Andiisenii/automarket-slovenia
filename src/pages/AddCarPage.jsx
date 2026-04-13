@@ -505,7 +505,10 @@ export function AddCarPage() {
               </AnimatePresence>
             </div>
             <Input label={t('yearOfProduction') + ' *'} type="number" placeholder="2024" value={formData.year} onChange={(e) => handleChange('year', parseInt(e.target.value))} error={errors.year} />
-            <Input label={t('price_label').replace('(€)', '') + ' *'} type="number" placeholder="50000" value={formData.price} onChange={(e) => handleChange('price', e.target.value)} error={errors.price} />
+            <div className="relative">
+              <Input label={t('price_label').replace('(€)', '') + ' *'} type="number" placeholder="50000" value={formData.price} onChange={(e) => handleChange('price', e.target.value)} error={errors.price} />
+              <span className="absolute right-4 top-9 text-gray-500 font-medium">€</span>
+            </div>
 
             <div className="md:col-span-2">
               <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4">

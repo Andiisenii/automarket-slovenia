@@ -73,6 +73,7 @@ function App() {
                     <Route path="cars" element={<CarsPage />} />
                     <Route path="cars/:id" element={<CarDetailPage />} />
                     <Route path="sell" element={<SellPage />} />
+                    <Route path="paketi" element={<SellPage />} />
                     <Route path="favorites" element={<FavoritesPage />} />
                     <Route path="about" element={<AboutPage />} />
                     <Route path="privacy" element={<PrivacyPage />} />

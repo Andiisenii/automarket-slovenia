@@ -36,6 +36,7 @@ export function Header() {
     { href: '/cars?fuel=Electric', label: language === 'sl' ? 'Električna' : 'Electric' },
     { href: '/financing', label: language === 'sl' ? 'Financiranje' : 'Financing' },
     { href: '/sell', label: language === 'sl' ? 'Paket' : 'Packages' },
+    { href: '/paketi', label: language === 'sl' ? 'Paketi' : 'Packages' },
   ]
   
   const handleLogout = () => {

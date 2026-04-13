@@ -32,12 +32,12 @@ const PUBLISHING_PACKAGES = [
     features: [
       { text: 'Objava do 100 oglasov', included: true },
       { text: '10 fotografij na oglas', included: true },
-      { text: 'Neomejeno urejanje oglasov', included: true },
-      { text: 'Osnovne funkcije', included: true },
-      { text: 'Statistika ogledov', included: false },
+      { text: 'Neomejeno urejanje vseh oglasov', included: true },
+      { text: 'Oglaševanje vseh vozil', included: true },
+      { text: 'Statistika', included: false },
       { text: 'HD slike', included: false },
-      { text: '360 posnetki', included: false },
-      { text: 'Premium uvrstitev', included: false },
+      { text: 'Slika virtual 360', included: false },
+      { text: 'Komentarji na objavah', included: false },
     ]
   },
   { 
@@ -48,12 +48,12 @@ const PUBLISHING_PACKAGES = [
     features: [
       { text: 'Neomejena objava oglasov', included: true },
       { text: '30 fotografij na oglas', included: true },
-      { text: 'Neomejeno urejanje oglasov', included: true },
-      { text: 'Statistika ogledov', included: true },
+      { text: 'Neomejeno urejanje vseh oglasov', included: true },
+      { text: 'Oglaševanje vseh vozil', included: true },
+      { text: 'Statistika', included: true },
       { text: 'HD slike', included: true },
-      { text: '360 posnetki', included: true },
-      { text: 'Premium uvrstitev', included: true },
-      { text: 'Komentarji kupcev', included: true },
+      { text: 'Slika virtual 360', included: true },
+      { text: 'Komentarji na objavah', included: true },
     ]
   },
 ]
@@ -68,10 +68,10 @@ const BOOST_PRIVATE = [
     days: 15, 
     color: 'orange',
     features: [
-      { text: 'Prikaz na vrhu rezultatov', included: true },
-      { text: 'Vec vidljivosti med kupci', included: true },
-      { text: 'Hitreje prodajte vozilo', included: true },
-      { text: 'Prikaz v posebnem oknu', included: false },
+      { text: 'akcijska cena', included: true },
+      { text: 'cena s financiranjem', included: true },
+      { text: 'znizana cena', included: true },
+      { text: 'ugodna cena', included: true },
     ]
   },
   { 
@@ -82,10 +82,9 @@ const BOOST_PRIVATE = [
     days: 15, 
     color: 'green',
     features: [
-      { text: 'Prikaz na vrhu rezultatov', included: true },
-      { text: 'Vec vidljivosti med kupci', included: true },
-      { text: 'Hitreje prodajte vozilo', included: true },
-      { text: 'Zlatorumen gradient', included: true },
+      { text: 'objava na prvih straneh večja vidljivost vozila', included: true },
+      { text: 'hitrejša prodaja vozila', included: true },
+      { text: 'zlatorumena vidna oznaka', included: true },
     ]
   },
   { 
@@ -96,10 +95,10 @@ const BOOST_PRIVATE = [
     days: 15, 
     color: 'blue',
     features: [
-      { text: 'Takojsten skok na vrh', included: true },
-      { text: 'Enostavna promocija', included: true },
-      { text: 'Brez dodatnih okraskov', included: false },
-      { text: 'Premium oznaka', included: false },
+      { text: 'takojšen skok oglasa na vrh', included: true },
+      { text: 'enostavna promocija', included: true },
+      { text: 'skok med prvih 50 oglasov', included: true },
+      { text: 'možnost promoviranja starega oglasa', included: true },
     ]
   },
 ]
@@ -114,10 +113,10 @@ const BOOST_BUSINESS = [
     days: 30, 
     color: 'orange',
     features: [
-      { text: 'Prikaz na vrhu rezultatov', included: true },
-      { text: 'Vec vidljivosti med kupci', included: true },
-      { text: 'Hitreje prodajte vozilo', included: true },
-      { text: 'Prikaz v posebnem oknu', included: false },
+      { text: 'akcijska cena', included: true },
+      { text: 'cena s financiranjem', included: true },
+      { text: 'znizana cena', included: true },
+      { text: 'ugodna cena', included: true },
     ]
   },
   { 
@@ -128,10 +127,9 @@ const BOOST_BUSINESS = [
     days: 30, 
     color: 'green',
     features: [
-      { text: 'Prikaz na vrhu rezultatov', included: true },
-      { text: 'Vec vidljivosti med kupci', included: true },
-      { text: 'Hitreje prodajte vozilo', included: true },
-      { text: 'Zlatorumen gradient', included: true },
+      { text: 'objava na prvih straneh večja vidljivost vozila', included: true },
+      { text: 'hitrejša prodaja vozila', included: true },
+      { text: 'zlatorumena vidna oznaka', included: true },
     ]
   },
   { 
@@ -142,10 +140,10 @@ const BOOST_BUSINESS = [
     days: 30, 
     color: 'blue',
     features: [
-      { text: 'Takojsten skok na vrh', included: true },
-      { text: 'Enostavna promocija', included: true },
-      { text: 'Brez dodatnih okraskov', included: false },
-      { text: 'Premium oznaka', included: false },
+      { text: 'takojšen skok oglasa na vrh', included: true },
+      { text: 'enostavna promocija', included: true },
+      { text: 'skok med prvih 50 oglasov', included: true },
+      { text: 'možnost promoviranja starega oglasa', included: true },
     ]
   },
 ]
@@ -423,7 +421,7 @@ export function SellPage() {
                             <span className={`text-4xl font-bold ${isPopular ? 'text-orange-600' : 'text-orange-600'}`}>€{pkg.price}</span>
                           </div>
                         )}
-                        <p className="text-gray-500 text-sm mt-1">/mesec</p>
+                        <p className="text-gray-500 text-sm mt-1">/mesec <span className="text-xs text-gray-400">(DDV)</span></p>
                       </div>
                       
                       {/* Features with Check/X */}
@@ -473,6 +471,9 @@ export function SellPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {packages.boost_private.map((pkg, index) => {
                 const hasDiscount = pkg.discount_active && pkg.discount_percent > 0
+                const borderColor = pkg.color === 'green' ? 'border-green-400' : pkg.color === 'blue' ? 'border-blue-400' : 'border-orange-400'
+                const buttonColor = pkg.color === 'green' ? 'bg-green-600 hover:bg-green-700' : pkg.color === 'blue' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-orange-500 hover:bg-orange-600'
+                const textColor = pkg.color === 'green' ? 'text-green-600' : pkg.color === 'blue' ? 'text-blue-600' : 'text-orange-500'
                 
                 return (
                   <motion.div 
@@ -480,26 +481,38 @@ export function SellPage() {
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden"
+                    className={`bg-white rounded-2xl border-2 ${borderColor} shadow-lg overflow-hidden`}
                   >
-                    <div className="p-6 flex flex-col items-center justify-center min-h-[180px]">
-                      <div className="flex items-center gap-2 mb-3">
-                        <Zap className="w-5 h-5 text-orange-500" />
+                    <div className="p-6">
+                      <div className="flex items-center gap-2 mb-3 justify-center">
+                        <Zap className={`w-5 h-5 ${textColor}`} />
                         <h3 className="text-xl font-bold text-gray-900">{pkg.name}</h3>
                       </div>
                       
                       {/* Price - centered */}
                       <div className="mb-3 text-center">
-                        <span className="text-3xl font-bold text-orange-600">€{pkg.price.toFixed(2)}</span>
+                        <span className={`text-3xl font-bold ${textColor}`}>€{pkg.price.toFixed(2)}</span>
                         <span className="text-gray-500 ml-1">/dan</span>
                       </div>
                       
                       {/* Min days */}
-                      <p className="text-sm text-gray-500">min. naročilo {pkg.days || 15} dni</p>
+                      <p className="text-sm text-gray-500 text-center mb-4">min. naročilo {pkg.days || 15} dni</p>
+                      
+                      {/* Features with green checkmarks */}
+                      <ul className="space-y-2 mb-4">
+                        {(pkg.features || []).map((feature, i) => (
+                          <li key={i} className="flex items-center gap-2">
+                            <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center">
+                              <Check className="w-3 h-3 text-green-600" />
+                            </div>
+                            <span className="text-sm text-gray-700">{feature.text}</span>
+                          </li>
+                        ))}
+                      </ul>
                       
                       <button 
                         onClick={() => handleSelectPlan({...pkg, type: 'boost_private', days: pkg.days || 15})}
-                        className="w-full py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition-colors mt-4"
+                        className={`w-full py-3 text-white rounded-xl font-bold transition-colors ${buttonColor}`}
                       >
                         {t.select}
                       </button>
@@ -522,7 +535,7 @@ export function SellPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {packages.boost_business.map((pkg, index) => {
                 const hasDiscount = pkg.discount_active && pkg.discount_percent > 0
-                const borderColor = pkg.color === 'green' ? 'border-green-300' : pkg.color === 'blue' ? 'border-blue-300' : 'border-orange-300'
+                const borderColor = pkg.color === 'green' ? 'border-green-400' : pkg.color === 'blue' ? 'border-blue-400' : 'border-orange-400'
                 const buttonColor = pkg.color === 'green' ? 'bg-green-600 hover:bg-green-700' : pkg.color === 'blue' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-orange-500 hover:bg-orange-600'
                 const textColor = pkg.color === 'green' ? 'text-green-600' : pkg.color === 'blue' ? 'text-blue-600' : 'text-orange-500'
                 
@@ -534,8 +547,8 @@ export function SellPage() {
                     viewport={{ once: true }}
                     className={`bg-white rounded-2xl border-2 ${borderColor} shadow-lg overflow-hidden`}
                   >
-                    <div className={`p-6 flex flex-col items-center justify-center min-h-[180px]`}>
-                      <div className="flex items-center gap-2 mb-3">
+                    <div className="p-6">
+                      <div className="flex items-center gap-2 mb-3 justify-center">
                         <Zap className={`w-5 h-5 ${textColor}`} />
                         <h3 className="text-xl font-bold text-gray-900">{pkg.name}</h3>
                       </div>
@@ -547,11 +560,23 @@ export function SellPage() {
                       </div>
                       
                       {/* Min days */}
-                      <p className="text-sm text-gray-500">min. naročilo {pkg.days || 30} dni</p>
+                      <p className="text-sm text-gray-500 text-center mb-4">min. naročilo {pkg.days || 30} dni</p>
+                      
+                      {/* Features with green checkmarks */}
+                      <ul className="space-y-2 mb-4">
+                        {(pkg.features || []).map((feature, i) => (
+                          <li key={i} className="flex items-center gap-2">
+                            <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center">
+                              <Check className="w-3 h-3 text-green-600" />
+                            </div>
+                            <span className="text-sm text-gray-700">{feature.text}</span>
+                          </li>
+                        ))}
+                      </ul>
                       
                       <button 
                         onClick={() => handleSelectPlan({...pkg, type: 'boost_business', days: pkg.days || 30})}
-                        className={`w-full py-3 text-white rounded-xl font-bold transition-colors ${buttonColor} mt-4`}
+                        className={`w-full py-3 text-white rounded-xl font-bold transition-colors ${buttonColor}`}
                       >
                         {t.select}
                       </button>

@@ -42,8 +42,10 @@ export function HomePage() {
   const [vehicleType, setVehicleType] = useState('avto')
   const [selectedBrands, setSelectedBrands] = useState([])
   const [selectedModels, setSelectedModels] = useState({}) // { brand: [models] }
+  const [priceFrom, setPriceFrom] = useState('')
   const [priceTo, setPriceTo] = useState('')
   const [mileageTo, setMileageTo] = useState(isNewCarsFilter ? '30000' : '')
+  const [yearFrom, setYearFrom] = useState('')
   const [yearTo, setYearTo] = useState(isNewCarsFilter ? '2024' : '')
   const [selectedCities, setSelectedCities] = useState([])
   const [selectedFuel, setSelectedFuel] = useState([])
@@ -83,7 +85,7 @@ export function HomePage() {
   const fuelTypes = ['Bencin', 'Dizel', 'Hybrid', 'Električni', 'Plin (LPG)']
   
   // Year options (2025 to 2100)
-  const yearOptions = Array.from({ length: 76 }, (_, i) => 2025 + i)
+  const yearOptions = Array.from({ length: 76 }, (_, i) => 2026 + i)
   
   // Price options (simplified: 0 to 1M+)
   const priceOptions = [
@@ -106,8 +108,10 @@ export function HomePage() {
       .map(([brand, models]) => `${brand}:${models.join(',')}`)
       .join('|')
     if (modelsParam) params.set('models', modelsParam)
+    if (priceFrom) params.set('priceFrom', priceFrom)
     if (priceTo) params.set('priceTo', priceTo)
     if (mileageTo) params.set('mileageTo', mileageTo)
+    if (yearFrom) params.set('yearFrom', yearFrom)
     if (yearTo) params.set('yearTo', yearTo)
     if (selectedCities.length) params.set('cities', selectedCities.join(','))
     if (selectedFuel.length) params.set('fuel', selectedFuel.join(','))
@@ -240,11 +244,19 @@ export function HomePage() {
       )
     }
     
-    // Filter by price
-    if (priceTo) {
-      result = result.filter(car => 
-        car.price && parseInt(car.price) <= parseInt(priceTo)
-      )
+    // Filter by price (od - do)
+    if (priceFrom || priceTo) {
+      result = result.filter(car => {
+        const carPrice = parseInt(car.price)
+        if (priceFrom && priceTo) {
+          return carPrice >= parseInt(priceFrom) && carPrice <= parseInt(priceTo)
+        } else if (priceFrom) {
+          return carPrice >= parseInt(priceFrom)
+        } else if (priceTo) {
+          return carPrice <= parseInt(priceTo)
+        }
+        return true
+      })
     }
     
     // Filter by mileage
@@ -254,16 +266,24 @@ export function HomePage() {
       )
     }
     
-    // Filter by year - for new cars filter: year >= 2024, otherwise year <= yearTo
+    // Filter by year (od - do) - for new cars filter: year >= 2026, otherwise year range
     if (isNewCarsFilter) {
-      // New cars: year >= 2024
+      // New cars: year >= 2026
       result = result.filter(car => 
-        car.year && car.year >= 2024
+        car.year && car.year >= 2026
       )
-    } else if (yearTo) {
-      result = result.filter(car => 
-        car.year && car.year <= parseInt(yearTo)
-      )
+    } else if (yearFrom || yearTo) {
+      result = result.filter(car => {
+        const carYear = parseInt(car.year)
+        if (yearFrom && yearTo) {
+          return carYear >= parseInt(yearFrom) && carYear <= parseInt(yearTo)
+        } else if (yearFrom) {
+          return carYear >= parseInt(yearFrom)
+        } else if (yearTo) {
+          return carYear <= parseInt(yearTo)
+        }
+        return true
+      })
     }
     
     return result.length
@@ -310,14 +330,16 @@ export function HomePage() {
               >
                 {language === 'sl' ? 'Poišči' : 'Search'}
               </button>
-              {(selectedBrands.length > 0 || selectedModels || selectedFuel.length > 0 || selectedCities.length > 0 || priceTo || mileageTo || yearTo) && (
+              {(selectedBrands.length > 0 || selectedModels || selectedFuel.length > 0 || selectedCities.length > 0 || priceFrom || priceTo || mileageTo || yearFrom || yearTo) && (
                 <button 
                   onClick={() => {
                     setSearchText('')
                     setSelectedBrands([])
                     setSelectedModels({})
+                    setPriceFrom('')
                     setPriceTo('')
                     setMileageTo('')
+                    setYearFrom('')
                     setYearTo('')
                     setSelectedCities([])
                     setSelectedFuel([])
@@ -330,7 +352,7 @@ export function HomePage() {
             </div>
             
             {/* Matching Cars Count - only show when filters are selected */}
-            {(selectedBrands.length > 0 || Object.keys(selectedModels).length > 0 || selectedFuel.length > 0 || selectedCities.length > 0 || priceTo || mileageTo || yearTo || searchText) && matchingCount > 0 && (
+            {(selectedBrands.length > 0 || Object.keys(selectedModels).length > 0 || selectedFuel.length > 0 || selectedCities.length > 0 || priceFrom || priceTo || mileageTo || yearFrom || yearTo || searchText) && matchingCount > 0 && (
               <div className="text-center mt-3 text-sm text-green-600 font-medium">
                 {matchingCount} {language === 'sl' ? 'makina jan gjithsej' : 'vehicles total'}
               </div>
@@ -401,17 +423,30 @@ export function HomePage() {
                 </div>
               )}
               
-              {/* Cena (Price) - Only "do" */}
-              <select 
-                value={priceTo}
-                onChange={(e) => setPriceTo(e.target.value)}
-                className="w-full px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer"
-              >
-                <option value="">{language === 'sl' ? 'Cena do' : 'Price up to'}</option>
-                {priceOptions.filter(p => p).map(price => (
-                  <option key={price} value={price}>{price === '1000000' ? '1.000.000+' : price + ' €'}</option>
-                ))}
-              </select>
+              {/* Cena (Price) - "od - do" */}
+              <div className="flex gap-1 items-center">
+                <select 
+                  value={priceFrom}
+                  onChange={(e) => setPriceFrom(e.target.value)}
+                  className="flex-1 px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer"
+                >
+                  <option value="">{language === 'sl' ? 'Cena od' : 'Price from'}</option>
+                  {priceOptions.filter(p => p).map(price => (
+                    <option key={price} value={price}>{price === '1000000' ? '1.000.000+' : price}</option>
+                  ))}
+                </select>
+                <span className="text-gray-400">-</span>
+                <select 
+                  value={priceTo}
+                  onChange={(e) => setPriceTo(e.target.value)}
+                  className="flex-1 px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer"
+                >
+                  <option value="">{language === 'sl' ? 'do' : 'to'}</option>
+                  {priceOptions.filter(p => p).map(price => (
+                    <option key={price} value={price}>{price === '1000000' ? '1.000.000+' : price + ' €'}</option>
+                  ))}
+                </select>
+              </div>
               
               {/* Kilometri (Mileage) - Only "do" */}
               <select 
@@ -425,17 +460,30 @@ export function HomePage() {
                 ))}
               </select>
               
-              {/* Registracija (Year) - Only "do" */}
-              <select 
-                value={yearTo}
-                onChange={(e) => setYearTo(e.target.value)}
-                className="w-full px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer"
-              >
-                <option value="">{language === 'sl' ? 'Registracija do' : 'Year up to'}</option>
-                {yearOptions.filter(y => y).map(year => (
-                  <option key={year} value={year}>{year}</option>
-                ))}
-              </select>
+              {/* Letnik (Year) - "od - do" */}
+              <div className="flex gap-1 items-center">
+                <select 
+                  value={yearFrom}
+                  onChange={(e) => setYearFrom(e.target.value)}
+                  className="flex-1 px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer"
+                >
+                  <option value="">{language === 'sl' ? 'Letnik od' : 'Year from'}</option>
+                  {yearOptions.filter(y => y).map(year => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
+                <span className="text-gray-400">-</span>
+                <select 
+                  value={yearTo}
+                  onChange={(e) => setYearTo(e.target.value)}
+                  className="flex-1 px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer"
+                >
+                  <option value="">{language === 'sl' ? 'do' : 'to'}</option>
+                  {yearOptions.filter(y => y).map(year => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
+              </div>
               
               {/* Lokacija (City) - Multi Select */}
               <div className="relative">
