@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import { API_URL } from './api'
+import { supabase } from './supabase'
 
 const PackagesContext = createContext(null)
 
@@ -13,12 +13,18 @@ export function PackagesProvider({ children }) {
 
   const fetchPackages = async () => {
     try {
-      const response = await fetch(`${API_URL}/packages.php`, {
-        headers: { 'X-Pinggy-No-Screen': 'true' }
-      })
-      const data = await response.json()
-      if (data.success) {
-        setPackages(data.packages || [])
+      const { data, error } = await supabase
+        .from('packages')
+        .select('*')
+        .eq('is_active', true)
+      
+      if (error) {
+        console.error('Error fetching packages:', error)
+        return
+      }
+      
+      if (data) {
+        setPackages(data || [])
       }
     } catch (error) {
       console.error('Error fetching packages:', error)

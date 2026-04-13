@@ -8,6 +8,7 @@ import { useAuth } from '@/lib/AuthContext'
 import { useLanguage } from '@/lib/LanguageContext'
 import { useCars } from '@/lib/CarContext'
 import { packageDB, carDB } from '@/lib/database'
+import { supabase } from '@/lib/supabase'
 import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, colors, vehicleConditionOptions, vehicleConditionSubOptions, carEquipmentCategories, emissionClasses, vehicleAgeOptions, ownerCountOptions, months, getYears, LUXURY_CAR_THRESHOLD, FALLBACK_BRANDS, FALLBACK_MODELS } from '@/lib/data'
 
 export function AddCarPage() {
@@ -219,19 +220,25 @@ export function AddCarPage() {
     }
   }, [editCar])
 
-  // Fetch packages from API - re-fetch when page becomes visible
+  // Fetch packages from Supabase - re-fetch when page becomes visible
   useEffect(() => {
     const fetchPackages = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost/api'}/packages.php?_=${Date.now()}`, {
-          headers: { 'X-Pinggy-No-Screen': 'true' }
-        })
-        const data = await res.json()
+        const { data, error } = await supabase
+          .from('packages')
+          .select('*')
+          .eq('is_active', true)
+        
+        if (error) {
+          console.error('Error fetching packages:', error)
+          return
+        }
+        
         console.log('Packages fetched:', JSON.stringify(data).substring(0, 200))
-        if (data.success && data.packages) {
-          const pubPkgs = data.packages.filter(p => p.type === 'publishing')
+        if (data && data.length > 0) {
+          const pubPkgs = data.filter(p => p.type === 'publishing')
           console.log('Publishing packages count:', pubPkgs.length, pubPkgs)
-          if (pubPkgs.length === 0) alert('No publishing packages! Check API response')
+          
           // Set publishing packages with discount info
           setPublishingPackages(pubPkgs.map(p => ({
             id: p.id,
@@ -244,14 +251,14 @@ export function AddCarPage() {
           })))
           
           setBoostPackages({
-            private: data.packages.filter(p => p.type === 'boost_private').map(p => ({
+            private: data.filter(p => p.type === 'boost_private').map(p => ({
               id: p.id,
               name: p.name,
               name_sl: p.name_sl || p.name,
               price: parseFloat(p.price),
               min_days: p.min_days || 1
             })),
-            business: data.packages.filter(p => p.type === 'boost_business').map(p => ({
+            business: data.filter(p => p.type === 'boost_business').map(p => ({
               id: p.id,
               name: p.name,
               name_sl: p.name_sl || p.name,
