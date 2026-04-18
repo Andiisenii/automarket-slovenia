@@ -1272,14 +1272,14 @@ const saveCustomModel = (brand, model) => {
             <div className="flex justify-between items-start">
               <div>
                 <p className="font-semibold text-gray-900">Top izbira</p>
-                <ul className="mt-2 space-y-1 text-sm text-gray-600">
+                <ul className="mt-3 space-y-2 text-sm text-gray-600">
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-green-600" />
-                    {isSl ? 'Objava na prvih straneh' : 'Listing on first pages'}
+                    <span className="font-medium">Objava na prvih straneh</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-green-600" />
-                    {isSl ? 'Večja vidljivost vozila' : 'Greater vehicle visibility'}
+                    <span className="font-medium">Večja vidljivost vozila</span>
                   </li>
                 </ul>
               </div>
@@ -1292,6 +1292,9 @@ const saveCustomModel = (brand, model) => {
               <p className="text-xs text-gray-500">
                 {isSl ? 'Skupaj za 30 dni: ' : 'Total for 30 days: '}
                 <span className="font-bold text-gray-700">€{(isBusiness ? 0.65 : 1.50) * (isBusiness ? 30 : 15).toFixed(2)}</span>
+              </p>
+            </div>
+          </div>
               </p>
             </div>
           </div>
@@ -1309,16 +1312,22 @@ const saveCustomModel = (brand, model) => {
                   <ul className="mt-2 space-y-1 text-sm text-gray-600">
                     <li className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-green-600" />
-                      {isSl ? 'Cena s financiranjem' : 'Price with financing'}
+                      Akcijska cena
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-green-600" />
-                      {isSl ? 'Akcijska cena' : 'Discount price'}
+                      Znizana cena
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-green-600" />
-                      {isSl ? 'Znizana cena' : 'Reduced price'}
+                      Ugodna cena
                     </li>
+                    {isBusiness && (
+                      <li className="flex items-center gap-2">
+                        <Check className="w-4 h-4 text-green-600" />
+                        Cena s financiranjem
+                      </li>
+                    )}
                   </ul>
                 </div>
                 <div className="text-right">

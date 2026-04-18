@@ -1,24 +1,23 @@
 import { twMerge } from 'tailwind-merge'
 
-// Real brand logos from mobile.de CDN
+// Local logo paths (from public/logos folder)
 const BRAND_LOGOS = {
-  'Volkswagen': 'https://verkaufen.a/fahrzeug/static/assets/logos/VWDarkMode.png',
-  'BMW': 'https://verkaufen.a/fahrzeug/static/assets/logos/BMWDarkMode.png',
-  'Mercedes-Benz': 'https://verkaufen.a/fahrzeug/static/assets/logos/MercedesDarkMode.png',
-  'Audi': 'https://verkaufen.a/fahrzeug/static/assets/logos/AudiDarkMode.png',
-  'Opel': 'https://verkaufen.a/fahrzeug/static/assets/logos/OpelDarkMode.png',
-  'Ford': 'https://verkaufen.a/fahrzeug/static/assets/logos/FordDarkMode.png',
+  'Volkswagen': '/logos/vw.svg',
+  'BMW': '/logos/bmw.svg',
+  'Mercedes-Benz': '/logos/mercedes.svg',
+  'Audi': '/logos/audi.svg',
+  'Opel': '/logos/opel.svg',
+  'Ford': '/logos/ford.svg',
 }
 
 export function BrandLogo({ name, className }) {
-  const logoUrl = BRAND_LOGOS[name]
+  const logoPath = BRAND_LOGOS[name]
   
-  if (logoUrl) {
+  if (logoPath) {
     return (
       <img 
-        src={logoUrl}
+        src={logoPath}
         alt={name}
-        height={40}
         className={twMerge('h-10 w-auto object-contain', className)}
       />
     )
