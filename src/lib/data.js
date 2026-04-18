@@ -29,7 +29,31 @@ export const FALLBACK_BRANDS = [
 export const FALLBACK_MODELS = {
   'Audi': ['A1', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'Q2', 'Q3', 'Q5', 'Q7', 'Q8', 'e-tron', 'e-tron GT', 'TT', 'R8'],
   'BMW': ['Serija 1', 'Serija 2', 'Serija 3', 'Serija 4', 'Serija 5', 'Serija 6', 'Serija 7', 'Serija 8', 'X1', 'X2', 'X3', 'X4', 'X5', 'X6', 'X7', 'Z4', 'i3', 'i4', 'i7', 'iX', 'iX3'],
-  'Mercedes-Benz': ['A-Class', 'B-Class', 'C-Class', 'E-Class', 'S-Class', 'CLA', 'CLS', 'GLA', 'GLB', 'GLC', 'GLE', 'GLS', 'G-Class', 'AMG GT', 'SL', 'SLC', 'EQS', 'EQC', 'EQA', 'EQB', 'EQE', 'V-Class', 'Sprinter'],
+  'Mercedes-Benz': [
+    'A 180', 'A 200', 'A 250 AMG', 'A 350', 'A 45 AMG',
+    'B 180', 'B 200', 'B 250 AMG',
+    'C 180', 'C 200', 'C 220d', 'C 300 AMG', 'C 350', 'C 63 AMG',
+    'E 200', 'E 220d', 'E 300', 'E 350 AMG', 'E 400', 'E 450', 'E 53 AMG', 'E 63 AMG',
+    'S 350', 'S 400', 'S 450', 'S 500 AMG', 'S 580', 'S 680 Maybach', 'S 63 AMG',
+    'CLA 180', 'CLA 200', 'CLA 250 AMG', 'CLA 45 AMG',
+    'CLS 300', 'CLS 350', 'CLS 450 AMG', 'CLS 53 AMG',
+    'GLA 180', 'GLA 200', 'GLA 250 AMG', 'GLA 45 AMG',
+    'GLB 180', 'GLB 200', 'GLB 250 AMG', 'GLB 35 AMG',
+    'GLC 220d', 'GLC 300', 'GLC 350de', 'GLC 400', 'GLC 450 AMG',
+    'GLE 300d', 'GLE 350de', 'GLE 400', 'GLE 450 AMG', 'GLE 53 AMG', 'GLE 63 AMG',
+    'GLS 400d', 'GLS 450', 'GLS 580', 'GLS 600 Maybach', 'GLS 63 AMG',
+    'G-Class G 350d', 'G-Class G 400', 'G-Class G 500', 'G 55 AMG', 'G 63 AMG',
+    'AMG GT 63', 'AMG GT 63 S', 'AMG GT 53',
+    'SL 350', 'SL 400', 'SL 450 AMG', 'SL 55 AMG', 'SL 63 AMG',
+    'SLC 180', 'SLC 200', 'SLC 300', 'SLC 43 AMG',
+    'EQS 350', 'EQS 450', 'EQS 580', 'EQS 600 Maybach',
+    'EQC 400',
+    'EQA 250', 'EQA 300', 'EQA 350',
+    'EQB 250', 'EQB 300', 'EQB 350',
+    'EQE 350', 'EQE 400', 'EQE 500',
+    'V-Class 200', 'V-Class 220d', 'V-Class 300', 'V-Class 350',
+    'Sprinter 314 CDI', 'Sprinter 316 CDI', 'Sprinter 319 CDI', 'Sprinter 516 CDI', 'Sprinter 519 CDI', 'eSprinter'
+  ],
   'Volkswagen': ['Polo', 'Golf', 'Passat', 'Arteon', 'T-Roc', 'T-Cross', 'Tiguan', 'Touareg', 'Teramont', 'Up!', 'Fox', 'Lupo', 'Transporter', 'Multivan', 'Caravelle', 'California', 'ID.3', 'ID.4', 'ID.5', 'ID.Buzz'],
   'Opel': ['Corsa', 'Astra', 'Insignia', 'Grandland', 'Crossland', 'Mokka', 'Mokka-e', 'Combo', 'Movano', 'Zafira', 'Vivaro', 'Zafira Life'],
   'Renault': ['Twingo', 'Clio', 'Megane', 'Talisman', 'Laguna', 'Captur', 'Kadjar', 'Koleos', 'Arkana', 'ZOE', 'Megane E-Tech', 'Austral', 'Espace', 'Master', 'Trafic', 'Kangoo'],
@@ -583,9 +607,10 @@ export const carEquipmentCategories = {
     icon: 'award',
     subcategories: {
       registracija: {
-        name: 'Tehnični pregled',
+        name: 'Registracija',
         features: [
-          'Tehnični pregled velja do',
+          'Vozilo je registrirano',
+          'Vozilo je tecnicno pregledano',
         ]
       }
     }
