@@ -8,7 +8,7 @@ import {
   Star, Check, Clock, AlertCircle, X, Send, Phone as PhoneIcon, MessageSquare, CreditCard,
   Wifi, Car, Wind, Leaf, Users, AlertTriangle
 } from 'lucide-react'
-import { getFeatureNameById, getFeatureById } from '@/lib/data'
+import { fuelTypes, transmissions, bodyTypes, doorCounts, colors, garancijaOptions, registracijaOptions } from '@/lib/data'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
