@@ -1,11 +1,31 @@
 // Data helpers - fetches from MySQL API
 import { API_URL } from './api'
 
+// Supabase configuration
+const SUPABASE_URL = 'https://pajbxchnenouxeaimsdr.supabase.co'
+const SUPABASE_KEY = 'sb_publishable_CQVFr7jAHNfQV5DXvxQiZg_h7Cq6MRH'
+
 // Cache for API data
 let brandsCache = null
 let citiesCache = null
 let lastFetchTime = 0
 const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
+
+// Supabase fetch helper
+const getFromSupabase = async (table, select = '*') => {
+  try {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}?select=${select}`, {
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      }
+    })
+    return await response.json()
+  } catch (error) {
+    console.warn('Supabase fetch failed:', error)
+    return null
+  }
+}
 
 // ============ FALLBACK DATA (when API fails) ============
 export const FALLBACK_BRANDS = [
@@ -290,6 +310,15 @@ export const getAllBrands = async () => {
   }
   
   try {
+    // Try Supabase first
+    const brands = await getFromSupabase('brands', 'id,name')
+    if (brands && brands.length > 0) {
+      brandsCache = brands
+      lastFetchTime = now
+      return brands.map(b => b.name)
+    }
+    
+    // Fallback to PHP API
     const response = await fetch(`${API_URL}/brands.php?action=all`, {
       headers: { 'X-Pinggy-No-Screen': 'true' }
     })
@@ -347,6 +376,19 @@ export const getModelsForBrand = async (brand) => {
   if (!brand) return []
   
   try {
+    // Try Supabase first
+    const brands = await getFromSupabase('brands', 'id,name')
+    if (brands && brands.length > 0) {
+      const brandData = brands.find(b => b.name === brand)
+      if (brandData) {
+        const models = await getFromSupabase('models', 'name,brand_id')
+        if (models && models.length > 0) {
+          return models.filter(m => m.brand_id === brandData.id).map(m => m.name)
+        }
+      }
+    }
+    
+    // Fallback to PHP API
     const response = await fetch(`${API_URL}/brands.php?action=models&brand=${encodeURIComponent(brand)}`, {
       headers: { 'X-Pinggy-No-Screen': 'true' }
     })
