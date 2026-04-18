@@ -49,18 +49,96 @@ const SUBSCRIPTION_PLANS = [
     ]},
 ]
 
-// Boost promotions for BUSINESS users
+// Boost packages BUSINESS with details (same as SellPage)
 const BOOST_PLANS_BUSINESS = [
-  { id: 'akcija', name: 'Paket vseh cen', price: 0.75, subtitle: 'akcijska cena', days: 'po izbiri', color: 'orange' },
-  { id: 'top', name: 'Top izbira', price: 0.65, subtitle: '', days: 'min 30 dni', color: 'green' },
-  { id: 'skok', name: 'Skok na vrh', price: 0.50, subtitle: '', days: 'min 30 dni', color: 'blue' },
+  { 
+    id: 'akcija', 
+    name: 'Paket vseh cen', 
+    price: 0.75, 
+    subtitle: 'akcijska cena', 
+    days: 30, 
+    color: 'orange',
+    features: [
+      { text: 'akcijska cena', included: true },
+      { text: 'cena s financiranjem', included: true },
+      { text: 'znizana cena', included: true },
+      { text: 'ugodna cena', included: true },
+    ]
+  },
+  { 
+    id: 'top', 
+    name: 'Top izbira', 
+    price: 0.65, 
+    subtitle: '', 
+    days: 30, 
+    color: 'green',
+    features: [
+      { text: 'objava na prvih straneh', included: true },
+      { text: 'večja vidljivost vozila', included: true },
+      { text: 'hitrejša prodaja vozila', included: true },
+      { text: 'zlatorumena vidna oznaka', included: true },
+    ]
+  },
+  { 
+    id: 'skok', 
+    name: 'Skok na vrh', 
+    price: 0.50, 
+    subtitle: '', 
+    days: 30, 
+    color: 'blue',
+    features: [
+      { text: 'takojšen skok oglasa na vrh', included: true },
+      { text: 'enostavna promocija', included: true },
+      { text: 'skok med prvih 50 oglasov', included: true },
+      { text: 'možnost promoviranja starega oglasa', included: true },
+    ]
+  },
 ]
 
-// Boost promotions for PRIVATE users
+// Boost packages PRIVATE with details (same as SellPage)
 const BOOST_PLANS_PRIVATE = [
-  { id: 'akcija_p', name: 'Paket vseh cen', price: 1.50, subtitle: 'akcijska cena', days: 'po izbiri', color: 'orange' },
-  { id: 'top_p', name: 'Top izbira', price: 1.50, subtitle: '', days: 'min 15 dni', color: 'green' },
-  { id: 'skok_p', name: 'Skok na vrh', price: 1.00, subtitle: '', days: 'min 15 dni', color: 'blue' },
+  { 
+    id: 'akcija_p', 
+    name: 'Paket vseh cen', 
+    price: 1.50, 
+    subtitle: 'akcijska cena', 
+    days: 15, 
+    color: 'orange',
+    features: [
+      { text: 'akcijska cena', included: true },
+      { text: 'cena s financiranjem (samo za avtosalone)', included: true },
+      { text: 'znizana cena', included: true },
+      { text: 'ugodna cena', included: true },
+    ]
+  },
+  { 
+    id: 'top_p', 
+    name: 'Top izbira', 
+    price: 1.50, 
+    subtitle: '', 
+    days: 15, 
+    color: 'green',
+    features: [
+      { text: 'objava na prvih straneh', included: true },
+      { text: 'večja vidljivost vozila', included: true },
+      { text: 'hitrejša prodaja vozila', included: true },
+      { text: 'zlatorumena vidna oznaka', included: true },
+    ]
+  },
+  { 
+    id: 'skok_p', 
+    name: 'Skok na vrh', 
+    price: 1.00, 
+    subtitle: '', 
+    days: 15, 
+    color: 'blue',
+    features: [
+      { text: 'takojšen skok oglasa na vrh', included: true },
+      { text: 'enostavna promocija', included: true },
+      { text: 'skok med prvih 50 oglasov', included: true },
+      { text: 'možnost promoviranja starega oglasa', included: true },
+    ]
+  },
 ]
 
 function SettingsTab({ user, updateProfile }) {
