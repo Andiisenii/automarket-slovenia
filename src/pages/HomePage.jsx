@@ -63,7 +63,7 @@ export function HomePage() {
       'motor': ['Harley-Davidson', 'Yamaha', 'Honda Motorcycle', 'Kawasaki', 'Suzuki Motorcycle', 'BMW Motorrad', 'Ducati', 'Triumph', 'KTM', 'Piaggio', 'Vespa', 'Motorcycle'],
       'kamion': ['Ford Trucks', 'Chevrolet Trucks', 'RAM Trucks', 'GMC Trucks', 'Toyota Trucks', 'Nissan Trucks', 'Truck'],
       'kombi': ['Mercedes-Benz Vans', 'Ford Vans', 'Renault Vans', 'Peugeot Vans', 'Citroen Vans', 'Van'],
-      'suv': ['Jeep SUV', 'Land Rover SUV', 'Range Rover', 'Toyota SUV', 'Ford SUV', 'Chevrolet SUV', 'SUV']
+      'traktor': ['Jeep SUV', 'Land Rover SUV', 'Range Rover', 'Toyota SUV', 'Ford SUV', 'Chevrolet SUV', 'SUV']
     }
     
     const allowedBrands = vehicleTypeBrands[vehicleType] || vehicleTypeBrands['avto']
@@ -469,64 +469,208 @@ export function HomePage() {
                 </div>
               )}
               
-              {/* Cena (Price) - "od - do" */}
+              {/* Cena (Price) - "od - do" DROPDOWN */}
               <div className="flex gap-1 items-center">
-                <div className="relative flex-1">
-                  <input
-                    type="number"
-                    placeholder={language === 'sl' ? 'Cena od' : 'From'}
-                    value={priceFrom}
-                    onChange={(e) => setPriceFrom(e.target.value)}
-                    className="w-full px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700"
-                  />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">€</span>
-                </div>
+                <select
+                  value={priceFrom}
+                  onChange={(e) => setPriceFrom(e.target.value)}
+                  className="flex-1 px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer appearance-none"
+                >
+                  <option value="">{language === 'sl' ? 'Cena od' : 'Price from'}</option>
+                  <option value="100">od 100 EUR</option>
+                  <option value="500">od 500 EUR</option>
+                  <option value="1000">od 1.000 EUR</option>
+                  <option value="1500">od 1.500 EUR</option>
+                  <option value="2000">od 2.000 EUR</option>
+                  <option value="2500">od 2.500 EUR</option>
+                  <option value="3000">od 3.000 EUR</option>
+                  <option value="3500">od 3.500 EUR</option>
+                  <option value="4000">od 4.000 EUR</option>
+                  <option value="4500">od 4.500 EUR</option>
+                  <option value="5000">od 5.000 EUR</option>
+                  <option value="6000">od 6.000 EUR</option>
+                  <option value="7000">od 7.000 EUR</option>
+                  <option value="8000">od 8.000 EUR</option>
+                  <option value="9000">od 9.000 EUR</option>
+                  <option value="10000">od 10.000 EUR</option>
+                  <option value="11000">od 11.000 EUR</option>
+                  <option value="12000">od 12.000 EUR</option>
+                  <option value="13000">od 13.000 EUR</option>
+                  <option value="14000">od 14.000 EUR</option>
+                  <option value="15000">od 15.000 EUR</option>
+                  <option value="16000">od 16.000 EUR</option>
+                  <option value="17000">od 17.000 EUR</option>
+                  <option value="18000">od 18.000 EUR</option>
+                  <option value="19000">od 19.000 EUR</option>
+                  <option value="20000">od 20.000 EUR</option>
+                  <option value="22500">od 22.500 EUR</option>
+                  <option value="25000">od 25.000 EUR</option>
+                  <option value="27500">od 27.500 EUR</option>
+                  <option value="30000">od 30.000 EUR</option>
+                  <option value="35000">od 35.000 EUR</option>
+                  <option value="40000">od 40.000 EUR</option>
+                  <option value="45000">od 45.000 EUR</option>
+                  <option value="50000">od 50.000 EUR</option>
+                  <option value="60000">od 60.000 EUR</option>
+                  <option value="70000">od 70.000 EUR</option>
+                  <option value="80000">od 80.000 EUR</option>
+                  <option value="90000">od 90.000 EUR</option>
+                  <option value="100000">od 100.000 EUR</option>
+                </select>
                 <span className="text-gray-400">-</span>
-                <div className="relative flex-1">
-                  <input
-                    type="number"
-                    placeholder={language === 'sl' ? 'do' : 'To'}
-                    value={priceTo}
-                    onChange={(e) => setPriceTo(e.target.value)}
-                    className="w-full px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700"
-                  />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">€</span>
-                </div>
+                <select
+                  value={priceTo}
+                  onChange={(e) => setPriceTo(e.target.value)}
+                  className="flex-1 px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer appearance-none"
+                >
+                  <option value="">{language === 'sl' ? 'do' : 'To'}</option>
+                  <option value="100">do 100 EUR</option>
+                  <option value="500">do 500 EUR</option>
+                  <option value="1000">do 1.000 EUR</option>
+                  <option value="1500">do 1.500 EUR</option>
+                  <option value="2000">do 2.000 EUR</option>
+                  <option value="2500">do 2.500 EUR</option>
+                  <option value="3000">do 3.000 EUR</option>
+                  <option value="3500">do 3.500 EUR</option>
+                  <option value="4000">do 4.000 EUR</option>
+                  <option value="4500">do 4.500 EUR</option>
+                  <option value="5000">do 5.000 EUR</option>
+                  <option value="6000">do 6.000 EUR</option>
+                  <option value="7000">do 7.000 EUR</option>
+                  <option value="8000">do 8.000 EUR</option>
+                  <option value="9000">do 9.000 EUR</option>
+                  <option value="10000">do 10.000 EUR</option>
+                  <option value="11000">do 11.000 EUR</option>
+                  <option value="12000">do 12.000 EUR</option>
+                  <option value="13000">do 13.000 EUR</option>
+                  <option value="14000">do 14.000 EUR</option>
+                  <option value="15000">do 15.000 EUR</option>
+                  <option value="16000">do 16.000 EUR</option>
+                  <option value="17000">do 17.000 EUR</option>
+                  <option value="18000">do 18.000 EUR</option>
+                  <option value="19000">do 19.000 EUR</option>
+                  <option value="20000">do 20.000 EUR</option>
+                  <option value="22500">do 22.500 EUR</option>
+                  <option value="25000">do 25.000 EUR</option>
+                  <option value="27500">do 27.500 EUR</option>
+                  <option value="30000">do 30.000 EUR</option>
+                  <option value="35000">do 35.000 EUR</option>
+                  <option value="40000">do 40.000 EUR</option>
+                  <option value="45000">do 45.000 EUR</option>
+                  <option value="50000">do 50.000 EUR</option>
+                  <option value="60000">do 60.000 EUR</option>
+                  <option value="70000">do 70.000 EUR</option>
+                  <option value="80000">do 80.000 EUR</option>
+                  <option value="90000">do 90.000 EUR</option>
+                  <option value="100000">do 100.000 EUR</option>
+                  <option value="150000">do 150.000 EUR</option>
+                  <option value="200000">do 200.000 EUR</option>
+                </select>
               </div>
               
-              {/* Kilometri (Mileage) - Only "do" */}
-              <select 
+              {/* Kilometri (Mileage) - Only "do" DROPDOWN */}
+              <select
                 value={mileageTo}
                 onChange={(e) => setMileageTo(e.target.value)}
-                className="w-full px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer"
+                className="w-full px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer appearance-none"
               >
-                <option value="">{language === 'sl' ? 'Kilometri do' : 'Mileage up to'}</option>
-                {mileageOptions.filter(m => m).map(mileage => (
-                  <option key={mileage} value={mileage}>{mileage === '1000000' ? '1.000.000+ km' : mileage + ' km'}</option>
-                ))}
+                <option value="9999999">{language === 'sl' ? 'Prevoženih km do' : 'Mileage up to'}</option>
+                <option value="5000">do 5.000 km</option>
+                <option value="10000">do 10.000 km</option>
+                <option value="20000">do 20.000 km</option>
+                <option value="25000">do 25.000 km</option>
+                <option value="50000">do 50.000 km</option>
+                <option value="75000">do 75.000 km</option>
+                <option value="100000">do 100.000 km</option>
+                <option value="125000">do 125.000 km</option>
+                <option value="150000">do 150.000 km</option>
+                <option value="200000">do 200.000 km</option>
+                <option value="250000">do 250.000 km</option>
               </select>
               
-              {/* Letnik (Year) - "od - do" */}
+              {/* Letnik (Year) - "od - do" DROPDOWN */}
               <div className="flex gap-1 items-center">
-                <input
-                  type="number"
-                  placeholder={language === 'sl' ? 'Letnik od' : 'From'}
+                <select
                   value={yearFrom}
                   onChange={(e) => setYearFrom(e.target.value)}
-                  min="1990"
-                  max="2026"
-                  className="flex-1 px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700"
-                />
+                  className="flex-1 px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer appearance-none"
+                >
+                  <option value="">{language === 'sl' ? 'Letnik od' : 'From'}</option>
+                  <option value="2026">od 2026</option>
+                  <option value="2025">od 2025</option>
+                  <option value="2024">od 2024</option>
+                  <option value="2023">od 2023</option>
+                  <option value="2022">od 2022</option>
+                  <option value="2021">od 2021</option>
+                  <option value="2020">od 2020</option>
+                  <option value="2019">od 2019</option>
+                  <option value="2018">od 2018</option>
+                  <option value="2017">od 2017</option>
+                  <option value="2016">od 2016</option>
+                  <option value="2015">od 2015</option>
+                  <option value="2014">od 2014</option>
+                  <option value="2013">od 2013</option>
+                  <option value="2012">od 2012</option>
+                  <option value="2011">od 2011</option>
+                  <option value="2010">od 2010</option>
+                  <option value="2009">od 2009</option>
+                  <option value="2008">od 2008</option>
+                  <option value="2007">od 2007</option>
+                  <option value="2006">od 2006</option>
+                  <option value="2005">od 2005</option>
+                  <option value="2004">od 2004</option>
+                  <option value="2003">od 2003</option>
+                  <option value="2002">od 2002</option>
+                  <option value="2001">od 2001</option>
+                  <option value="2000">od 2000</option>
+                  <option value="1990">od 1990</option>
+                  <option value="1985">od 1985</option>
+                  <option value="1980">od 1980</option>
+                  <option value="1975">od 1975</option>
+                  <option value="1970">od 1970</option>
+                  <option value="1960">od 1960</option>
+                </select>
                 <span className="text-gray-400">-</span>
-                <input
-                  type="number"
-                  placeholder={language === 'sl' ? 'do' : 'To'}
+                <select
                   value={yearTo}
                   onChange={(e) => setYearTo(e.target.value)}
-                  min="1990"
-                  max="2026"
-                  className="flex-1 px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700"
-                />
+                  className="flex-1 px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer appearance-none"
+                >
+                  <option value="">{language === 'sl' ? 'do' : 'To'}</option>
+                  <option value="2026">do 2026</option>
+                  <option value="2025">do 2025</option>
+                  <option value="2024">do 2024</option>
+                  <option value="2023">do 2023</option>
+                  <option value="2022">do 2022</option>
+                  <option value="2021">do 2021</option>
+                  <option value="2020">do 2020</option>
+                  <option value="2019">do 2019</option>
+                  <option value="2018">do 2018</option>
+                  <option value="2017">do 2017</option>
+                  <option value="2016">do 2016</option>
+                  <option value="2015">do 2015</option>
+                  <option value="2014">do 2014</option>
+                  <option value="2013">do 2013</option>
+                  <option value="2012">do 2012</option>
+                  <option value="2011">do 2011</option>
+                  <option value="2010">do 2010</option>
+                  <option value="2009">do 2009</option>
+                  <option value="2008">do 2008</option>
+                  <option value="2007">do 2007</option>
+                  <option value="2006">do 2006</option>
+                  <option value="2005">do 2005</option>
+                  <option value="2004">do 2004</option>
+                  <option value="2003">do 2003</option>
+                  <option value="2002">do 2002</option>
+                  <option value="2001">do 2001</option>
+                  <option value="2000">do 2000</option>
+                  <option value="1990">do 1990</option>
+                  <option value="1985">do 1985</option>
+                  <option value="1980">do 1980</option>
+                  <option value="1975">do 1975</option>
+                  <option value="1970">do 1970</option>
+                  <option value="1960">do 1960</option>
+                </select>
               </div>
               
               {/* Lokacija (City) - Multi Select */}
