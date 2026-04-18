@@ -583,7 +583,7 @@ export const carEquipmentCategories = {
     icon: 'award',
     subcategories: {
       registracija: {
-        name: 'Registracija',
+        name: 'Tehnični pregled',
         features: [
           'Tehnični pregled velja do',
         ]

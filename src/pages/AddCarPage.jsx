@@ -125,23 +125,51 @@ export function AddCarPage() {
   const [citySuggestions, setCitySuggestions] = useState([])
   const [modelSuggestions, setModelSuggestions] = useState([])
 
-  const getCustomModels = () => { try { return JSON.parse(localStorage.getItem('customCarModels') || '{}') } catch { return {} } }
+// Main brands with logos for /add-car
+const MAIN_BRANDS = [
+  { name: 'Volkswagen', emoji: '🪰' },
+  { name: 'BMW', emoji: '🏎️' },
+  { name: 'Mercedes-Benz', emoji: '⭐' },
+  { name: 'Audi', emoji: '④' },
+  { name: 'Opel', emoji: '⑪' },
+  { name: 'Ford', emoji: '🍴' },
+]
 
-  const saveCustomModel = (brand, model) => {
-    const customModels = getCustomModels()
-    if (!customModels[brand]) customModels[brand] = []
-    if (!customModels[brand].includes(model)) {
-      customModels[brand].push(model)
-      localStorage.setItem('customCarModels', JSON.stringify(customModels))
-    }
-  }
+const getBrandEmoji = (brandName) => {
+  const brand = MAIN_BRANDS.find(b => b.name === brandName)
+  return brand?.emoji || '🚗'
+}
 
-  const getAllModelsForBrand = (brand) => {
-    const customModels = getCustomModels()
-    const apiModels = brandModels[brand] || []
-    const custom = customModels[brand] || []
-    return [...new Set([...apiModels, ...custom])]
+const getGroupedModelsForBrand = (brand, brandModelsData, customModelsData) => {
+  const models = brandModelsData[brand] || []
+  const customModels = customModelsData[brand] || []
+  const allModels = [...new Set([...models, ...customModels])]
+  
+  // Group by first letter or common categories
+  const grouped = {}
+  allModels.forEach(model => {
+    const firstChar = model.charAt(0).toUpperCase()
+    if (!grouped[firstChar]) grouped[firstChar] = []
+    grouped[firstChar].push(model)
+  })
+  
+  return Object.entries(grouped).map(([category, models]) => ({
+    category: 'Modeli ' + category,
+    models: models.sort()
+  }))
+}
+
+const getCustomModels = () => { try { return JSON.parse(localStorage.getItem('customCarModels') || '{}') } catch { return {} } }
+
+
+const saveCustomModel = (brand, model) => {
+  const customModels = getCustomModels()
+  if (!customModels[brand]) customModels[brand] = []
+  if (!customModels[brand].includes(model)) {
+    customModels[brand].push(model)
+    localStorage.setItem('customCarModels', JSON.stringify(customModels))
   }
+}
 
   // Feature selection helpers (using string feature names)
   const isFeatureSelected = (featureName) => formData.featureIds.includes(featureName)
@@ -585,17 +613,26 @@ export function AddCarPage() {
               <select
                 value={formData.brand}
                 onChange={(e) => {
-                  handleChange('brand', e.target.value)
+                  const val = e.target.value
+                  handleChange('brand', val)
                   setFormData(prev => ({ ...prev, model: '' }))
                 }}
                 className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
               >
                 <option value="">Izberi znamko...</option>
-                {['Volkswagen', 'BMW', 'Mercedes-Benz', 'Audi', 'Opel', 'Ford'].map(b => (
-                  <option key={b} value={b}>{b}</option>
+                {MAIN_BRANDS.map(b => (
+                  <option key={b.name} value={b.name}>{b.name}</option>
                 ))}
-                <option value="__more__">-- Več znamk --</option>
               </select>
+              {/* Brand Logo Display */}
+              {formData.brand && (
+                <div className="mt-2 flex items-center gap-2">
+                  <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <span className="text-2xl">{getBrandEmoji(formData.brand)}</span>
+                  </div>
+                  <span className="text-sm font-medium text-gray-700">{formData.brand}</span>
+                </div>
+              )}
             </div>
             <div className="relative">
               <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('model')}</label>
@@ -606,8 +643,12 @@ export function AddCarPage() {
                 className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm disabled:bg-gray-100"
               >
                 <option value="">{formData.brand ? (isSl ? 'Izberi model...' : 'Select model...') : (isSl ? 'Najprej izberite znamko' : 'Select brand first')}</option>
-                {formData.brand && getAllModelsForBrand(formData.brand).map(m => (
-                  <option key={m} value={m}>{m}</option>
+                {formData.brand && getGroupedModelsForBrand(formData.brand, brandModels, getCustomModels()).map(group => (
+                  <optgroup key={group.category} label={group.category}>
+                    {group.models.map(m => (
+                      <option key={m} value={m}>{m}</option>
+                    ))}
+                  </optgroup>
                 ))}
               </select>
             </div>
