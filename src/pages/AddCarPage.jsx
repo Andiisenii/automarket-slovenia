@@ -1297,12 +1297,6 @@ const saveCustomModel = (brand, model) => {
               </div>
             </div>
           </div>
-              </p>
-            </div>
-          </div>
-              </p>
-            </div>
-          </div>
           
           {/* Akcija and Skok packages in a grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
