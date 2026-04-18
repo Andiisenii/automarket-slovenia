@@ -17,7 +17,7 @@ import { carDB } from '@/lib/database'
 import { formatPrice, formatNumber, getTimeAgo } from '@/lib/utils'
 import { supabase } from '@/lib/supabase'
 
-// Package configurations
+// Package configurations - IDENTICAL to SellPage
 const SUBSCRIPTION_PLANS = [
   { 
     id: 'osnovni', 
@@ -26,26 +26,27 @@ const SUBSCRIPTION_PLANS = [
     features: [
       { text: 'Objava do 100 oglasov', included: true },
       { text: '10 fotografij na oglas', included: true },
-      { text: 'Neomejeno urejanje oglasov', included: true },
-      { text: 'Osnovne funkcije', included: true },
-      { text: 'Statistika ogledov', included: false },
+      { text: 'Neomejeno urejanje vseh oglasov', included: true },
+      { text: 'Oglaševanje vseh vozil', included: true },
+      { text: 'Statistika', included: false },
       { text: 'HD slike', included: false },
-      { text: '360° posnetki', included: false },
-      { text: 'Komentarji kupcev', included: false },
+      { text: 'Slika virtual 360', included: false },
+      { text: 'Komentarji na objavah', included: false },
     ]},
   { 
     id: 'premium', 
     name: 'PREMIUM', 
     price: 64.99, 
+    isPopular: true,
     features: [
       { text: 'Neomejena objava oglasov', included: true },
       { text: '30 fotografij na oglas', included: true },
-      { text: 'Neomejeno urejanje oglasov', included: true },
-      { text: 'Statistika ogledov', included: true },
+      { text: 'Neomejeno urejanje vseh oglasov', included: true },
+      { text: 'Oglaševanje vseh vozil', included: true },
+      { text: 'Statistika', included: true },
       { text: 'HD slike', included: true },
-      { text: '360° posnetki', included: true },
-      { text: 'Komentarji kupcev', included: true },
-      { text: 'Premium uvrstitev', included: true },
+      { text: 'Slika virtual 360', included: true },
+      { text: 'Komentarji na objavah', included: true },
     ]},
 ]
 
