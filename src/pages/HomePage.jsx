@@ -102,14 +102,12 @@ export function HomePage() {
   
   // Filter brands based on vehicle type
   const filteredBrands = useMemo(() => {
-    if (!allBrands || allBrands.length === 0) return []
-    
     // Brands and models by vehicle type
     const vehicleTypeBrands = {
       'avto': ['Audi', 'BMW', 'Mercedes-Benz', 'Volkswagen', 'Porsche', 'Opel', 'Toyota', 'Honda', 'Mazda', 'Nissan', 'Lexus', 'Subaru', 'Mitsubishi', 'Suzuki', 'Ford', 'Chevrolet', 'Dodge', 'Jeep', 'Tesla', 'Renault', 'Peugeot', 'Citroen', 'Fiat', 'Alfa Romeo', 'Hyundai', 'Kia', 'Genesis', 'Jaguar', 'Land Rover', 'Mini', 'Volvo', 'Skoda', 'Seat', 'Cupra', 'Dacia', 'Smart', 'Chrysler', 'Cadillac', 'Buick', 'GMC', 'Lincoln', 'Acura', 'Infiniti', 'Maserati', 'Bentley', 'Ferrari', 'Lamborghini', 'Aston Martin', 'Rolls-Royce', 'McLaren', 'Bugatti', 'Pagani', 'Polestar', 'Lucid', 'Rivian', 'DS'],
       'motor': ['Harley-Davidson', 'Yamaha', 'Kawasaki', 'Suzuki', 'BMW Motorrad', 'Ducati', 'Triumph', 'KTM', 'Piaggio', 'Vespa', 'Honda', 'Indian', 'Victory', 'Benelli', 'CFMoto', 'Royal Enfield', 'Moto Guzzi', 'MV Agusta', 'Beta', 'Gas Gas', 'Sherco', 'Husqvarna', 'Malaguti', 'Sym', 'Keeway', 'Derbi', 'Gilera', 'Aprilia'],
-      'kamion': ['Ford', 'Chevrolet', 'RAM', 'GMC', 'Toyota', 'Nissan', 'Isuzu', 'Mitsubishi Fuso', 'Mercedes-Benz', 'MAN', 'Scania', 'Volvo', 'DAF', 'Iveco', 'Renault Trucks', 'Foton', 'BAW', 'NAVECO', 'King Long', 'Yutong', 'Higer', 'Golden Dragon'],
-      'kombi': ['Mercedes-Benz', 'Ford', 'Renault', 'Peugeot', 'Citroen', 'Fiat', 'Volkswagen', 'Opel', 'Toyota', 'Nissan', 'Iveco', 'Citroen', 'Vauxhall', 'Hyundai', 'Kia', 'SsangYong', 'Dacia'],
+      'kamion': ['DAF', 'Scania', 'Volvo Trucks', 'MAN', 'Mercedes-Benz Trucks', 'Iveco', 'Renault Trucks', 'Foton', 'Isuzu', 'Kenworth', 'Peterbilt', 'Mack', 'International', 'Freightliner', 'Western Star', 'Hino'],
+      'kombi': ['Mercedes-Benz Sprinter', 'Ford Transit', 'Renault Master', 'Iveco Daily', 'Fiat Ducato', 'Peugeot Boxer', 'Citroen Jumper', 'Volkswagen Transporter', 'Opel Movano', 'Toyota Proace', 'Nissan NV', 'Vauxhall Movano', 'Hyundai Starex', 'Dacia Dokker'],
       'traktor': ['John Deere', 'Massey Ferguson', 'Case IH', 'New Holland', 'Fendt', 'Kubota', 'Claas', 'Deutz-Fahr', 'Valtra', 'Steyr', 'JCB', 'McCormick', 'Landini', 'Zetor', 'SAME', 'Lamborghini', 'Agrale', 'Belarus', 'MTZ', 'YTO', 'Dongfeng', 'Mahindra', 'Indo Track', 'Farmtrac', 'Force Motors', 'Preeti', 'TAFE', 'Eicher', 'Sonalika']
     }
     
@@ -860,3 +858,6 @@ export function HomePage() {
 }
 
 export default HomePage
+
+
+
