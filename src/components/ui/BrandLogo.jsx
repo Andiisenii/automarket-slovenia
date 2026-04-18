@@ -1,28 +1,25 @@
 import { twMerge } from 'tailwind-merge'
 
-// Local logo paths (from public/logos folder)
+// Real brand logos from mobile.de CDN
 const BRAND_LOGOS = {
-  'Volkswagen': '/logos/vw.svg',
-  'BMW': '/logos/bmw.svg',
-  'Mercedes-Benz': '/logos/mercedes.svg',
-  'Audi': '/logos/audi.svg',
-  'Opel': '/logos/opel.svg',
-  'Ford': '/logos/ford.svg',
+  'Volkswagen': 'https://verkaufen.a/fahrzeug/static/assets/logos/VWDarkMode.png',
+  'BMW': 'https://verkaufen.a/fahrzeug/static/assets/logos/BMWDarkMode.png',
+  'Mercedes-Benz': 'https://verkaufen.a/fahrzeug/static/assets/logos/MercedesDarkMode.png',
+  'Audi': 'https://verkaufen.a/fahrzeug/static/assets/logos/AudiDarkMode.png',
+  'Opel': 'https://verkaufen.a/fahrzeug/static/assets/logos/OpelDarkMode.png',
+  'Ford': 'https://verkaufen.a/fahrzeug/static/assets/logos/FordDarkMode.png',
 }
 
 export function BrandLogo({ name, className }) {
-  const logoPath = BRAND_LOGOS[name]
+  const logoUrl = BRAND_LOGOS[name]
   
-  if (logoPath) {
+  if (logoUrl) {
     return (
       <img 
-        src={logoPath}
+        src={logoUrl}
         alt={name}
-        className={twMerge('h-10 w-10 object-contain', className)}
-        onError={(e) => {
-          e.target.style.display = 'none'
-          e.target.parentElement.innerHTML = `<div style="width:40px;height:40px;background:#333;border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:11px;">${name?.substring(0,3).toUpperCase() || 'BR'}</div>`
-        }}
+        height={40}
+        className={twMerge('h-10 w-auto object-contain', className)}
       />
     )
   }

@@ -611,31 +611,37 @@ const saveCustomModel = (brand, model) => {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-6">{t('basicInfo')}</h2>
           
-          {/* Brand Logo Selection - 6 Popular Brands as boxes */}
+          {/* Brand Logo Selection - mobile.de style */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-3">Priljubljene znamke</label>
             <div className="grid grid-cols-6 gap-3">
               {MAIN_BRANDS.map(brand => (
-                <button
+                <label
                   key={brand.name}
-                  type="button"
-                  onClick={() => {
-                    handleChange('brand', brand.name)
-                    setFormData(prev => ({ ...prev, brand: brand.name, model: '' }))
-                  }}
-                  className={`relative flex items-center justify-center p-3 rounded-xl border-2 transition-all min-h-[70px] ${
+                  className={`relative flex items-center justify-center p-3 rounded-xl border-2 cursor-pointer transition-all min-h-[70px] ${
                     formData.brand === brand.name
                       ? 'border-primary-500 bg-primary-50'
                       : 'border-gray-200 bg-gray-50 hover:border-gray-300 hover:bg-gray-100'
                   }`}
                 >
+                  <input
+                    type="radio"
+                    name="select-popular-make"
+                    value={brand.name}
+                    checked={formData.brand === brand.name}
+                    onChange={() => {
+                      handleChange('brand', brand.name)
+                      setFormData(prev => ({ ...prev, brand: brand.name, model: '' }))
+                    }}
+                    className="sr-only"
+                  />
                   <BrandLogo name={brand.name} className="h-10 w-auto" />
                   {formData.brand === brand.name && (
                     <div className="absolute -top-2 -right-2 w-6 h-6 bg-primary-500 rounded-full flex items-center justify-center shadow">
                       <Check className="w-4 h-4 text-white" />
                     </div>
                   )}
-                </button>
+                </label>
               ))}
             </div>
           </div>
