@@ -1244,6 +1244,108 @@ const saveCustomModel = (brand, model) => {
           </div>
         )}
 
+        {/* Boost Packages - Show based on user type */}
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-100 p-6 mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            {isSl ? 'Povečajte vidljivost vozila' : 'Boost Your Listing Visibility'}
+          </h3>
+          <p className="text-sm text-gray-600 mb-4">
+            {isSl 
+              ? 'Izberite paket za boljšo vidljivost vašega oglasa na prvi strani.'
+              : 'Choose a package for better visibility on the first page.'
+            }
+          </p>
+          
+          {/* Top Izbira - Special Section */}
+          <div className="bg-white rounded-xl p-4 border-2 border-green-200 mb-4 relative">
+            <div className="absolute -top-3 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+              ⭐ TOP
+            </div>
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="font-semibold text-gray-900">Top izbira</p>
+                <ul className="mt-2 space-y-1 text-sm text-gray-600">
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-green-600" />
+                    {isSl ? 'Objava na prvih straneh' : 'Listing on first pages'}
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-green-600" />
+                    {isSl ? 'Večja vidljivost vozila' : 'Greater vehicle visibility'}
+                  </li>
+                </ul>
+              </div>
+              <div className="text-right">
+                <p className="text-lg font-bold text-green-600">€{isBusiness ? '0.65' : '1.50'}/dan</p>
+                <p className="text-xs text-gray-500">{isSl ? 'min 30/15 dni' : 'min 30/15 days'}</p>
+              </div>
+            </div>
+            <div className="mt-3 pt-3 border-t border-gray-100">
+              <p className="text-xs text-gray-500">
+                {isSl ? 'Skupaj za 30 dni: ' : 'Total for 30 days: '}
+                <span className="font-bold text-gray-700">€{(isBusiness ? 0.65 : 1.50) * (isBusiness ? 30 : 15).toFixed(2)}</span>
+              </p>
+            </div>
+          </div>
+          
+          {/* Akcija and Skok packages in a grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Akcija */}
+            <div className="bg-white rounded-xl p-4 border border-gray-200 relative">
+              <div className="absolute -top-3 left-4 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                🔥 AKCIJA
+              </div>
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="font-semibold text-gray-900">Paket vseh cen</p>
+                  <ul className="mt-2 space-y-1 text-sm text-gray-600">
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-green-600" />
+                      {isSl ? 'Cena s financiranjem' : 'Price with financing'}
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-green-600" />
+                      {isSl ? 'Akcijska cena' : 'Discount price'}
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-green-600" />
+                      {isSl ? 'Znizana cena' : 'Reduced price'}
+                    </li>
+                  </ul>
+                </div>
+                <div className="text-right">
+                  <p className="text-lg font-bold text-orange-600">€{isBusiness ? '0.75' : '1.50'}/dan</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Skok na vrh */}
+            <div className="bg-white rounded-xl p-4 border border-gray-200 relative">
+              <div className="absolute -top-3 left-4 bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                🚀 SKOK
+              </div>
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="font-semibold text-gray-900">Skok na vrh</p>
+                  <ul className="mt-2 space-y-1 text-sm text-gray-600">
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-green-600" />
+                      {isSl ? 'Hitra promocija' : 'Quick promotion'}
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-green-600" />
+                      {isSl ? 'Vidljivost takoj' : 'Instant visibility'}
+                    </li>
+                  </ul>
+                </div>
+                <div className="text-right">
+                  <p className="text-lg font-bold text-blue-600">€{isBusiness ? '0.50' : '1.00'}/dan</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
         <Button type="submit" className="w-full" size="lg">
           {isEditMode ? t('saveChanges') : (canPostCar.allowed ? t('publishCar') : t('buyPackage'))}
         </Button>
