@@ -89,16 +89,23 @@ export function HomePage() {
     return bodyTypes // fallback to all body types
   }
   
-  // Get all body types from all selected brands
+  // Get all body types from all selected brands (or brands with selected models)
   const availableBodyTypes = useMemo(() => {
-    if (selectedBrands.length === 0) return bodyTypes
+    // If models are selected for specific brands, use those brands
+    // Otherwise use selectedBrands
+    const brandsWithModels = Object.keys(selectedModels).filter(brand => 
+      selectedModels[brand] && selectedModels[brand].length > 0
+    )
+    const brandsToUse = brandsWithModels.length > 0 ? brandsWithModels : selectedBrands
+    
+    if (brandsToUse.length === 0) return bodyTypes
     const types = new Set()
-    selectedBrands.forEach(brand => {
+    brandsToUse.forEach(brand => {
       const brandTypes = getBodyTypesForBrand(brand)
       brandTypes.forEach(type => types.add(type))
     })
     return Array.from(types)
-  }, [selectedBrands, brandBodyTypes])
+  }, [selectedBrands, selectedModels, brandBodyTypes])
   
   // Filter brands based on vehicle type
   const filteredBrands = useMemo(() => {
