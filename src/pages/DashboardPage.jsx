@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Plus, Eye, TrendingUp, DollarSign, Car, 
   Settings, CheckCircle, Clock, Edit, Trash2, LogOut, Zap,
-  Crown, Package, Calendar, Timer, X, Send, MessageCircle, CheckCircle as CheckIcon
+  Crown, Package, Calendar, Timer, X, Send, MessageCircle, CheckCircle as CheckIcon,
+  Check
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
@@ -961,13 +962,17 @@ export function DashboardPage() {
                     </div>
                     <ul className="space-y-2">
                       {pkg.features?.map((f, idx) => (
-                        <li key={idx} className={`flex items-center gap-2 text-sm ${f.included ? 'text-gray-700' : 'text-gray-400'}`}>
+                        <li key={idx} className="flex items-center gap-3">
                           {f.included ? (
-                            <CheckCircle className="w-4 h-4 text-green-500" />
+                            <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center">
+                              <Check className="w-3 h-3 text-green-600" />
+                            </div>
                           ) : (
-                            <X className="w-4 h-4 text-gray-300" />
+                            <div className="flex-shrink-0 w-5 h-5 rounded-full bg-red-100 flex items-center justify-center">
+                              <X className="w-3 h-3 text-red-500" />
+                            </div>
                           )}
-                          {f.text}
+                          <span className={f.included ? 'text-gray-700' : 'text-red-500'}>{f.text}</span>
                         </li>
                       ))}
                     </ul>
