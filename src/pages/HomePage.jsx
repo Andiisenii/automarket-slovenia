@@ -31,13 +31,28 @@ export function HomePage() {
         const cities = await getAllCities()
         setAllCities(cities || [])
         
-        // Fetch brand-body-types mapping
+        // Fetch brand-body-types mapping from Supabase REST API
         try {
-          const response = await fetch(`${API_URL}/brands.php?action=body_types`)
+          const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://pajbxchnenouxeaimsdr.supabase.co'
+          const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY || 'sb_publishable_CQVFr7jAHNfQV5DXvxQiZg_h7Cq6MRH'
+          
+          const response = await fetch(`${SUPABASE_URL}/rest/v1/brand_body_types?select=brand_name,body_type`, {
+            headers: {
+              'apikey': SUPABASE_KEY,
+              'Authorization': `Bearer ${SUPABASE_KEY}`
+            }
+          })
           const data = await response.json()
-          if (data && data.brand_body_types) {
-            setBrandBodyTypes(data.brand_body_types)
-          }
+          
+          // Convert to { brand: [bodyTypes] }
+          const mapping = {}
+          data.forEach(row => {
+            if (!mapping[row.brand_name]) {
+              mapping[row.brand_name] = []
+            }
+            mapping[row.brand_name].push(row.body_type)
+          })
+          setBrandBodyTypes(mapping)
         } catch (err) {
           console.warn('Could not fetch brand body types:', err)
         }
