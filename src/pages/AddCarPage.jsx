@@ -9,6 +9,7 @@ import { useLanguage } from '@/lib/LanguageContext'
 import { useCars } from '@/lib/CarContext'
 import { packageDB, carDB } from '@/lib/database'
 import { supabase } from '@/lib/supabase'
+import { BrandLogo } from '@/components/ui/BrandLogo'
 import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, colors, vehicleConditionOptions, vehicleConditionSubOptions, carEquipmentCategories, emissionClasses, vehicleAgeOptions, ownerCountOptions, months, getYears, LUXURY_CAR_THRESHOLD, FALLBACK_BRANDS, FALLBACK_MODELS } from '@/lib/data'
 
 export function AddCarPage() {
@@ -126,19 +127,14 @@ export function AddCarPage() {
   const [modelSuggestions, setModelSuggestions] = useState([])
 
 // Main brands with logos for /add-car
-const MAIN_BRANDS = [
-  { name: 'Volkswagen', emoji: '🪰' },
-  { name: 'BMW', emoji: '🏎️' },
-  { name: 'Mercedes-Benz', emoji: '⭐' },
-  { name: 'Audi', emoji: '④' },
-  { name: 'Opel', emoji: '⑪' },
-  { name: 'Ford', emoji: '🍴' },
+export const MAIN_BRANDS = [
+  { name: 'Volkswagen', id: 25200 },
+  { name: 'BMW', id: 3500 },
+  { name: 'Mercedes-Benz', id: 17200 },
+  { name: 'Audi', id: 1900 },
+  { name: 'Opel', id: 19000 },
+  { name: 'Ford', id: 9000 },
 ]
-
-const getBrandEmoji = (brandName) => {
-  const brand = MAIN_BRANDS.find(b => b.name === brandName)
-  return brand?.emoji || '🚗'
-}
 
 const getGroupedModelsForBrand = (brand, brandModelsData, customModelsData) => {
   const models = brandModelsData[brand] || []
@@ -611,6 +607,37 @@ const saveCustomModel = (brand, model) => {
         </AnimatePresence>
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-6">{t('basicInfo')}</h2>
+          
+          {/* Brand Logo Selection - 6 Popular Brands as boxes */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-3">Priljubljene znamke</label>
+            <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+              {MAIN_BRANDS.map(brand => (
+                <button
+                  key={brand.name}
+                  type="button"
+                  onClick={() => {
+                    handleChange('brand', brand.name)
+                    setFormData(prev => ({ ...prev, brand: brand.name, model: '' }))
+                  }}
+                  className={`relative flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all ${
+                    formData.brand === brand.name
+                      ? 'border-primary-500 bg-primary-50'
+                      : 'border-gray-200 bg-gray-50 hover:border-gray-300 hover:bg-gray-100'
+                  }`}
+                >
+                  <BrandLogo name={brand.name} className="w-10 h-10 mb-1" />
+                  <span className="text-xs font-medium text-gray-700">{brand.name}</span>
+                  {formData.brand === brand.name && (
+                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-primary-500 rounded-full flex items-center justify-center">
+                      <Check className="w-3 h-3 text-white" />
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="relative">
               <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('brand')} *</label>
@@ -624,19 +651,10 @@ const saveCustomModel = (brand, model) => {
                 className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
               >
                 <option value="">Izberi znamko...</option>
-                {MAIN_BRANDS.map(b => (
-                  <option key={b.name} value={b.name}>{b.name}</option>
+                {allBrands.map(b => (
+                  <option key={b} value={b}>{b}</option>
                 ))}
               </select>
-              {/* Brand Logo Display */}
-              {formData.brand && (
-                <div className="mt-2 flex items-center gap-2">
-                  <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                    <span className="text-2xl">{getBrandEmoji(formData.brand)}</span>
-                  </div>
-                  <span className="text-sm font-medium text-gray-700">{formData.brand}</span>
-                </div>
-              )}
             </div>
             <div className="relative">
               <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('model')}</label>
