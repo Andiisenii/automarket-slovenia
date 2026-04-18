@@ -143,20 +143,23 @@ const getGroupedModelsForBrand = (brand, brandModelsData, customModelsData) => {
   
   if (allModels.length === 0) return []
   
-  // Group by series/class prefix (e.g., Golf 1.4 -> Golf, A 180 -> A)
+  // Group by first word (e.g., "Golf 1.4 TSI" -> "Golf", "A 180" -> "A")
   const grouped = {}
   allModels.forEach(model => {
-    const match = model.match(/^([A-Za-z]+(?:\s[A-Za-z]+)?)\s/)
-    const className = match ? match[1] : model.charAt(0)
+    const parts = model.split(' ')
+    const seriesName = parts[0] // First word is the series
     
-    if (!grouped[className]) grouped[className] = []
-    grouped[className].push(model)
+    if (!grouped[seriesName]) grouped[seriesName] = []
+    grouped[seriesName].push(model)
   })
   
-  return Object.entries(grouped).map(([category, models]) => ({
-    category: category,
-    models: models.sort()
-  }))
+  // Sort groups alphabetically and models within each group
+  return Object.entries(grouped)
+    .map(([category, models]) => ({
+      category: category,
+      models: models.sort()
+    }))
+    .sort((a, b) => a.category.localeCompare(b.category))
 }
 
 const getCustomModels = () => { try { return JSON.parse(localStorage.getItem('customCarModels') || '{}') } catch { return {} } }
