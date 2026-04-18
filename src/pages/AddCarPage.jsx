@@ -682,7 +682,20 @@ const saveCustomModel = (brand, model) => {
                 ))}
               </select>
             </div>
-            <Input label={t('yearOfProduction') + ' *'} type="number" placeholder="2024" value={formData.year} onChange={(e) => handleChange('year', parseInt(e.target.value))} error={errors.year} />
+            <div className="relative">
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('yearOfProduction')} *</label>
+              <select
+                value={formData.year || ''}
+                onChange={(e) => handleChange('year', parseInt(e.target.value))}
+                className={"w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm " + (errors.year ? 'border-red-500' : '') }
+              >
+                <option value="">Izberi leto...</option>
+                {getYears(1960, 2026).map(y => (
+                  <option key={y} value={y}>{y}</option>
+                ))}
+              </select>
+              {errors.year && <p className="text-red-500 text-sm mt-1">{errors.year}</p>}
+            </div>
             <div className="relative">
               <Input label={t('price_label').replace('(€)', '') + ' *'} type="number" placeholder="50000" value={formData.price} onChange={(e) => handleChange('price', e.target.value)} error={errors.price} />
               <span className="absolute right-4 top-9 text-gray-500 font-medium">€</span>
@@ -1120,19 +1133,16 @@ const saveCustomModel = (brand, model) => {
           <h2 className="text-lg font-semibold text-gray-900 mb-6">{t('city_label')}</h2>
           <div className="relative">
             <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('city_label')} *</label>
-            <input type="text" placeholder="Type city name..." value={formData.city} onChange={(e) => handleChange('city', e.target.value)} className={"w-full px-4 py-3 bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 " + (errors.city ? 'border-red-500' : 'border-gray-200')} />
-            <AnimatePresence>
-              {citySuggestions.length > 0 && (
-                <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="absolute z-10 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-[200px] overflow-y-auto" >
-                  {citySuggestions.map((city) => (
-                    <button key={city} type="button" onClick={() => selectCity(city)} className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-center justify-between" >
-                      <span>{city}</span>
-                      {formData.city === city && <Check className="w-4 h-4 text-primary-600" />}
-                    </button>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <select
+              value={formData.city || ''}
+              onChange={(e) => handleChange('city', e.target.value)}
+              className={"w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm " + (errors.city ? 'border-red-500' : '') }
+            >
+              <option value="">Izberi mesto...</option>
+              {allCities.map(city => (
+                <option key={city} value={city}>{city}</option>
+              ))}
+            </select>
             {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city}</p>}
           </div>
         </div>
@@ -1210,159 +1220,7 @@ const saveCustomModel = (brand, model) => {
           </div>
         )}
 
-        {/* Package Pricing Preview */}
-        {publishingPackages.length > 0 && (
-          <div className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-2xl border border-orange-100 p-6 mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">{isSl ? 'Izbira paketa' : 'Package Options'}</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {publishingPackages.map((pkg) => {
-                const discountedPrice = pkg.discount_active && pkg.discount_percent > 0 
-                  ? pkg.price * (1 - pkg.discount_percent / 100) 
-                  : pkg.price
-                const hasDiscount = pkg.discount_active && pkg.discount_percent > 0
-                
-                return (
-                  <div key={pkg.id} className="bg-white rounded-xl p-4 border border-gray-200 relative">
-                    {hasDiscount && (
-                      <div className="absolute -top-2 -right-2 bg-red-500 text-white px-2 py-0.5 rounded-full text-xs font-bold shadow">
-                        -{pkg.discount_percent}%
-                      </div>
-                    )}
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="font-semibold text-gray-900">{pkg.name_sl || pkg.name}</p>
-                        <p className="text-sm text-gray-500">{pkg.min_days} {isSl ? 'dni' : 'days'}</p>
-                      </div>
-                      <div className="text-right">
-                        {hasDiscount ? (
-                          <>
-                            <p className="text-lg font-bold text-[#ff6a00]">€{discountedPrice.toFixed(2)}</p>
-                            <p className="text-xs text-gray-400 line-through">€{pkg.price.toFixed(2)}</p>
-                          </>
-                        ) : (
-                          <p className="text-lg font-bold text-[#ff6a00]">€{pkg.price.toFixed(2)}</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-            <p className="text-sm text-gray-500 mt-3">{isSl ? 'Cena velja za izbrano paketo.' : 'Final price depends on selected package.'}</p>
-          </div>
-        )}
-
-        {/* Boost Packages - Show based on user type */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-100 p-6 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            {isSl ? 'Povečajte vidljivost vozila' : 'Boost Your Listing Visibility'}
-          </h3>
-          <p className="text-sm text-gray-600 mb-4">
-            {isSl 
-              ? 'Izberite paket za boljšo vidljivost vašega oglasa na prvi strani.'
-              : 'Choose a package for better visibility on the first page.'
-            }
-          </p>
-          
-          {/* Top Izbira - Special Section */}
-          <div className="bg-white rounded-xl p-4 border-2 border-green-200 mb-4 relative">
-            <div className="absolute -top-3 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-              ⭐ TOP
-            </div>
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="font-semibold text-gray-900">Top izbira</p>
-                <ul className="mt-3 space-y-2 text-sm text-gray-600">
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-green-600" />
-                    <span className="font-medium">Objava na prvih straneh</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-green-600" />
-                    <span className="font-medium">Večja vidljivost vozila</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-green-600" />
-                    <span className="font-medium">Hitrejša prodaja vozila</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-green-600" />
-                    <span className="font-medium">Zlata rumena vidna oznaka</span>
-                  </li>
-                </ul>
-              </div>
-              <div className="text-right">
-                <p className="text-lg font-bold text-green-600">€{isBusiness ? '0.65' : '1.50'}/dan</p>
-                <p className="text-xs text-gray-500">{isSl ? 'min 30/15 dni' : 'min 30/15 days'}</p>
-              </div>
-            </div>
-          </div>
-          
-          {/* Akcija and Skok packages in a grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Akcija */}
-            <div className="bg-white rounded-xl p-4 border border-gray-200 relative">
-              <div className="absolute -top-3 left-4 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                🔥 AKCIJA
-              </div>
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="font-semibold text-gray-900">Paket vseh cen</p>
-                  <ul className="mt-2 space-y-1 text-sm text-gray-600">
-                    <li className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-green-600" />
-                      Akcijska cena
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-green-600" />
-                      Znizana cena
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-green-600" />
-                      Ugodna cena
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check className={isBusiness ? 'w-4 h-4 text-green-600' : 'w-4 h-4 text-gray-300'} />
-                      <span className={isBusiness ? '' : 'text-gray-400'}>Cena s financiranjem</span>
-                      {!isBusiness && <span className="text-xs text-gray-400 ml-1">(samo za avtosalone)</span>}
-                    </li>
-                  </ul>
-                </div>
-                <div className="text-right">
-                  <p className="text-lg font-bold text-orange-600">€{isBusiness ? '0.75' : '0.75'}/dan</p>
-                  <p className="text-xs text-gray-500">min. naročilo 30 dni</p>
-                </div>
-              </div>
-            </div>
-            
-            {/* Skok na vrh */}
-            <div className="bg-white rounded-xl p-4 border border-gray-200 relative">
-              <div className="absolute -top-3 left-4 bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                🚀 SKOK
-              </div>
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="font-semibold text-gray-900">Skok na vrh</p>
-                  <ul className="mt-2 space-y-1 text-sm text-gray-600">
-                    <li className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-green-600" />
-                      {isSl ? 'Hitra promocija' : 'Quick promotion'}
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-green-600" />
-                      {isSl ? 'Vidljivost takoj' : 'Instant visibility'}
-                    </li>
-                  </ul>
-                </div>
-                <div className="text-right">
-                  <p className="text-lg font-bold text-blue-600">€{isBusiness ? '0.50' : '1.00'}/dan</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <Button type="submit" className="w-full" size="lg">
+<Button type="submit" className="w-full" size="lg">
           {isEditMode ? t('saveChanges') : (canPostCar.allowed ? t('publishCar') : t('buyPackage'))}
         </Button>
       </form>
