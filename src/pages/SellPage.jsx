@@ -69,6 +69,7 @@ const BOOST_PRIVATE = [
     color: 'orange',
     features: [
       { text: 'akcijska cena', included: true },
+      { text: 'cena s financiranjem (samo za avtosalone)', included: true },
       { text: 'znizana cena', included: true },
       { text: 'ugodna cena', included: true },
     ]
