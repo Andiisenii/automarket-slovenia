@@ -58,15 +58,16 @@ export function HomePage() {
   const filteredBrands = useMemo(() => {
     if (!allBrands || allBrands.length === 0) return []
     
+    // All brands available for all vehicle types (no filtering)
     const vehicleTypeBrands = {
-      'avto': ['Audi', 'BMW', 'Mercedes-Benz', 'Volkswagen', 'Porsche', 'Opel', 'Toyota', 'Honda', 'Mazda', 'Nissan', 'Lexus', 'Subaru', 'Mitsubishi', 'Suzuki', 'Ford', 'Chevrolet', 'Dodge', 'Jeep', 'Tesla', 'Renault', 'Peugeot', 'Citroen', 'Fiat', 'Alfa Romeo', 'Hyundai', 'Kia', 'Genesis', 'Jaguar', 'Land Rover', 'Mini', 'Volvo', 'Skoda', 'Seat', 'Cupra', 'Dacia', 'Smart', 'Chrysler', 'Cadillac', 'Buick', 'GMC', 'Lincoln', 'Acura', 'Infiniti', 'Maserati', 'Bentley', 'Ferrari', 'Lamborghini', 'Aston Martin', 'Rolls-Royce', 'McLaren', 'Bugatti', 'Pagani', 'Polestar', 'Lucid', 'Rivian', 'DS'],
-      'motor': ['Harley-Davidson', 'Yamaha', 'Honda Motorcycle', 'Kawasaki', 'Suzuki Motorcycle', 'BMW Motorrad', 'Ducati', 'Triumph', 'KTM', 'Piaggio', 'Vespa', 'Motorcycle'],
-      'kamion': ['Ford Trucks', 'Chevrolet Trucks', 'RAM Trucks', 'GMC Trucks', 'Toyota Trucks', 'Nissan Trucks', 'Truck'],
-      'kombi': ['Mercedes-Benz Vans', 'Ford Vans', 'Renault Vans', 'Peugeot Vans', 'Citroen Vans', 'Van'],
-      'traktor': ['Jeep SUV', 'Land Rover SUV', 'Range Rover', 'Toyota SUV', 'Ford SUV', 'Chevrolet SUV', 'SUV']
+      'avto': allBrands,
+      'motor': allBrands,
+      'kamion': allBrands,
+      'kombi': allBrands,
+      'traktor': allBrands
     }
     
-    const allowedBrands = vehicleTypeBrands[vehicleType] || vehicleTypeBrands['avto']
+    const allowedBrands = vehicleTypeBrands[vehicleType] || allBrands
     
     return allBrands.filter(brand => allowedBrands.includes(brand))
   }, [allBrands, vehicleType])
