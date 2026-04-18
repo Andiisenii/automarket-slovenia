@@ -398,7 +398,8 @@ export function DashboardPage() {
   const handleSelectPackage = (planId) => { 
     const plan = SUBSCRIPTION_PLANS.find(p => p.id === planId)
     setSelectedBoost(plan)
-    setPaymentStep('payment') 
+    setPaymentStep('payment')
+    setShowPackageModal(true)
   }
   
   const handleSelectBoost = (boostId) => {
