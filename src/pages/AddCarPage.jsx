@@ -127,13 +127,13 @@ export function AddCarPage() {
   const [modelSuggestions, setModelSuggestions] = useState([])
 
 // Main brands with logos for /add-car
-export const MAIN_BRANDS = [
-  { name: 'Volkswagen', id: 25200 },
-  { name: 'BMW', id: 3500 },
-  { name: 'Mercedes-Benz', id: 17200 },
-  { name: 'Audi', id: 1900 },
-  { name: 'Opel', id: 19000 },
-  { name: 'Ford', id: 9000 },
+const MAIN_BRANDS = [
+  { name: 'Volkswagen' },
+  { name: 'BMW' },
+  { name: 'Mercedes-Benz' },
+  { name: 'Audi' },
+  { name: 'Opel' },
+  { name: 'Ford' },
 ]
 
 const getGroupedModelsForBrand = (brand, brandModelsData, customModelsData) => {
