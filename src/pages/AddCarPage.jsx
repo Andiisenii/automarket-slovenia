@@ -1281,6 +1281,14 @@ const saveCustomModel = (brand, model) => {
                     <Check className="w-4 h-4 text-green-600" />
                     <span className="font-medium">Večja vidljivost vozila</span>
                   </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-green-600" />
+                    <span className="font-medium">Hitrejša prodaja vozila</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-green-600" />
+                    <span className="font-medium">Zlata rumena vidna oznaka</span>
+                  </li>
                 </ul>
               </div>
               <div className="text-right">
@@ -1288,10 +1296,7 @@ const saveCustomModel = (brand, model) => {
                 <p className="text-xs text-gray-500">{isSl ? 'min 30/15 dni' : 'min 30/15 days'}</p>
               </div>
             </div>
-            <div className="mt-3 pt-3 border-t border-gray-100">
-              <p className="text-xs text-gray-500">
-                {isSl ? 'Skupaj za 30 dni: ' : 'Total for 30 days: '}
-                <span className="font-bold text-gray-700">€{(isBusiness ? 0.65 : 1.50) * (isBusiness ? 30 : 15).toFixed(2)}</span>
+          </div>
               </p>
             </div>
           </div>
@@ -1322,16 +1327,16 @@ const saveCustomModel = (brand, model) => {
                       <Check className="w-4 h-4 text-green-600" />
                       Ugodna cena
                     </li>
-                    {isBusiness && (
-                      <li className="flex items-center gap-2">
-                        <Check className="w-4 h-4 text-green-600" />
-                        Cena s financiranjem
-                      </li>
-                    )}
+                    <li className="flex items-center gap-2">
+                      <Check className={isBusiness ? 'w-4 h-4 text-green-600' : 'w-4 h-4 text-gray-300'} />
+                      <span className={isBusiness ? '' : 'text-gray-400'}>Cena s financiranjem</span>
+                      {!isBusiness && <span className="text-xs text-gray-400 ml-1">(samo za avtosalone)</span>}
+                    </li>
                   </ul>
                 </div>
                 <div className="text-right">
-                  <p className="text-lg font-bold text-orange-600">€{isBusiness ? '0.75' : '1.50'}/dan</p>
+                  <p className="text-lg font-bold text-orange-600">€{isBusiness ? '0.75' : '0.75'}/dan</p>
+                  <p className="text-xs text-gray-500">min. naročilo 30 dni</p>
                 </div>
               </div>
             </div>
