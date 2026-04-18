@@ -69,7 +69,8 @@ export function HomePage() {
     
     const allowedBrands = vehicleTypeBrands[vehicleType] || vehicleTypeBrands['avto']
     
-    return allBrands.filter(brand => allowedBrands.includes(brand))
+    // Use vehicle type brands directly, not filtered by API brands
+    return allowedBrands
   }, [allBrands, vehicleType])
   const slovenianCities = allCities.length > 0 ? allCities : [
     'Ljubljana', 'Maribor', 'Celje', 'Kranj', 'Koper', 'Nova Gorica',
