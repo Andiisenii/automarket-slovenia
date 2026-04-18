@@ -581,34 +581,35 @@ export function AddCarPage() {
           <h2 className="text-lg font-semibold text-gray-900 mb-6">{t('basicInfo')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="relative">
-              <Input label={t('brand') + ' *'} placeholder={isSl ? 'Vnesi znamko...' : 'Type brand name...'} value={formData.brand} onChange={(e) => handleChange('brand', e.target.value)} error={errors.brand} />
-              <AnimatePresence>
-                {brandSuggestions.length > 0 && (
-                  <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="absolute z-10 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-[200px] overflow-y-auto" >
-                    {brandSuggestions.map((brand) => (
-                      <button key={brand} type="button" onClick={() => selectBrand(brand)} className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-center justify-between" >
-                        <span>{brand}</span>
-                        {formData.brand === brand && <Check className="w-4 h-4 text-primary-600" />}
-                      </button>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('brand')} *</label>
+              <select
+                value={formData.brand}
+                onChange={(e) => {
+                  handleChange('brand', e.target.value)
+                  setFormData(prev => ({ ...prev, model: '' }))
+                }}
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
+              >
+                <option value="">Izberi znamko...</option>
+                {['Volkswagen', 'BMW', 'Mercedes-Benz', 'Audi', 'Opel', 'Ford'].map(b => (
+                  <option key={b} value={b}>{b}</option>
+                ))}
+                <option value="__more__">-- Več znamk --</option>
+              </select>
             </div>
             <div className="relative">
-              <Input label={t('model')} placeholder={formData.brand ? (isSl ? 'npr. X5' : 'e.g. X5') : (isSl ? 'Najprej izberite znamko' : 'Select brand first')} value={formData.model} onChange={(e) => handleChange('model', e.target.value)} disabled={!formData.brand} />
-              <AnimatePresence>
-                {modelSuggestions.length > 0 && (
-                  <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="absolute z-10 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-[200px] overflow-y-auto" >
-                    {modelSuggestions.map((model) => (
-                      <button key={model} type="button" onClick={() => selectModel(model)} className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-center justify-between" >
-                        <span>{model}</span>
-                        {formData.model === model && <Check className="w-4 h-4 text-primary-600" />}
-                      </button>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('model')}</label>
+              <select
+                value={formData.model}
+                onChange={(e) => setFormData(prev => ({ ...prev, model: e.target.value }))}
+                disabled={!formData.brand}
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm disabled:bg-gray-100"
+              >
+                <option value="">{formData.brand ? (isSl ? 'Izberi model...' : 'Select model...') : (isSl ? 'Najprej izberite znamko' : 'Select brand first')}</option>
+                {formData.brand && getAllModelsForBrand(formData.brand).map(m => (
+                  <option key={m} value={m}>{m}</option>
+                ))}
+              </select>
             </div>
             <Input label={t('yearOfProduction') + ' *'} type="number" placeholder="2024" value={formData.year} onChange={(e) => handleChange('year', parseInt(e.target.value))} error={errors.year} />
             <div className="relative">
@@ -628,22 +629,19 @@ export function AddCarPage() {
                       <p className="text-sm text-gray-500">Moznost obrocnega placevanja za to vozilo</p>
                     </div>
                   </div>
-                  <button type="button" onClick={() => {
-                    if (!hasFinancing) {
-                      // Check if user is business or private, show modal accordingly
-                      if (isBusiness) {
-                        // Business users can use financing directly
+                  {!isBusiness ? (
+                    <span className="text-xs text-gray-400 italic">Samo za avtosalone</span>
+                  ) : (
+                    <button type="button" onClick={() => {
+                      if (!hasFinancing) {
                         setHasFinancing(true)
                       } else {
-                        // Private users need to see the package
-                        setShowFinancingModal(true)
+                        setHasFinancing(false)
                       }
-                    } else {
-                      setHasFinancing(false)
-                    }
-                  }} className={"relative inline-flex h-7 w-12 items-center rounded-full transition-colors " + (hasFinancing ? 'bg-green-500' : 'bg-gray-300')} >
-                    <span className={"inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform " + (hasFinancing ? 'translate-x-6' : 'translate-x-1')} />
-                  </button>
+                    }} className={"relative inline-flex h-7 w-12 items-center rounded-full transition-colors " + (hasFinancing ? 'bg-green-500' : 'bg-gray-300')} >
+                      <span className={"inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform " + (hasFinancing ? 'translate-x-6' : 'translate-x-1')} />
+                    </button>
+                  )}
                 </div>
                 {hasFinancing && (
                   <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="mt-4 pt-4 border-t border-green-200" >
@@ -664,6 +662,7 @@ export function AddCarPage() {
                         </div>
                       </div>
                     </div>
+                    <p className="text-xs text-green-600 mt-2 italic">Cena s financiranjem velja samo za avtosalone.</p>
                   </motion.div>
                 )}
               </div>

@@ -52,7 +52,7 @@ export function HomePage() {
   const [selectedBodyTypes, setSelectedBodyTypes] = useState([])
   
   // Body types
-  const bodyTypes = ['SUV', 'Limuzina', 'Hatchback', 'Coupe', 'Kombi', 'Van', 'Pickup', 'Minivan', 'Kabriolet', 'Roadster', 'Targa', 'Fastback', 'Liftback', 'Sportni coupe']
+  const bodyTypes = ['Traktor', 'Limuzina', 'Hatchback', 'Coupe', 'Kombi', 'Van', 'Pickup', 'Minivan', 'Kabriolet', 'Roadster', 'Targa', 'Fastback', 'Liftback', 'Sportni coupe']
   
   // Filter brands based on vehicle type
   const filteredBrands = useMemo(() => {

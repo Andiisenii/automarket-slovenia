@@ -201,7 +201,7 @@ const translations = {
     requiredFields: 'Prosimo izpolnite vsa obvezna polja',
     maxPhotos: 'Vaša paket dovoljuje največ X fotografij.',
     // Body Types
-    suv: 'SUV',
+    suv: 'Traktor',
     sedan: 'Sedan',
     karavan: 'Karavan',
     hatchback: 'Hatchback',
