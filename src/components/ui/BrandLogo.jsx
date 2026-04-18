@@ -1,24 +1,28 @@
 import { twMerge } from 'tailwind-merge'
 
-// Brand logo data URIs (inline SVGs to ensure they always work)
-const BRAND_LOGOS_DATA = {
-  'Volkswagen': "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23000' stroke='%23fff' stroke-width='4'/%3E%3Ctext x='50' y='58' text-anchor='middle' fill='%23fff' font-family='Arial' font-size='18' font-weight='bold'%3EVW%3C/text%3E%3C/svg%3E",
-  'BMW': "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%230066b1' stroke='%23fff' stroke-width='4'/%3E%3Ctext x='50' y='58' text-anchor='middle' fill='%23fff' font-family='Arial' font-size='16' font-weight='bold'%3EBMW%3C/text%3E%3C/svg%3E",
-  'Mercedes-Benz': "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23000' stroke='%23fff' stroke-width='4'/%3E%3Ctext x='50' y='58' text-anchor='middle' fill='%23fff' font-family='Arial' font-size='14' font-weight='bold'%3EMB%3C/text%3E%3C/svg%3E",
-  'Audi': "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23000' stroke='%23fff' stroke-width='4'/%3E%3Ctext x='50' y='58' text-anchor='middle' fill='%23fff' font-family='Arial' font-size='18' font-weight='bold'%3EAudi%3C/text%3E%3C/svg%3E",
-  'Opel': "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23000' stroke='%23fff' stroke-width='4'/%3E%3Ctext x='50' y='58' text-anchor='middle' fill='%23fff' font-family='Arial' font-size='18' font-weight='bold'%3EOPEL%3C/text%3E%3C/svg%3E",
-  'Ford': "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23000' stroke='%23fff' stroke-width='4'/%3E%3Ctext x='50' y='58' text-anchor='middle' fill='%23fff' font-family='Arial' font-size='18' font-weight='bold'%3EFord%3C/text%3E%3C/svg%3E",
+// Local logo paths (from public/logos folder)
+const BRAND_LOGOS = {
+  'Volkswagen': '/logos/vw.svg',
+  'BMW': '/logos/bmw.svg',
+  'Mercedes-Benz': '/logos/mercedes.svg',
+  'Audi': '/logos/audi.svg',
+  'Opel': '/logos/opel.svg',
+  'Ford': '/logos/ford.svg',
 }
 
 export function BrandLogo({ name, className }) {
-  const logoData = BRAND_LOGOS_DATA[name]
+  const logoPath = BRAND_LOGOS[name]
   
-  if (logoData) {
+  if (logoPath) {
     return (
       <img 
-        src={logoData}
+        src={logoPath}
         alt={name}
         className={twMerge('h-10 w-10 object-contain', className)}
+        onError={(e) => {
+          e.target.style.display = 'none'
+          e.target.parentElement.innerHTML = `<div style="width:40px;height:40px;background:#333;border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:11px;">${name?.substring(0,3).toUpperCase() || 'BR'}</div>`
+        }}
       />
     )
   }
