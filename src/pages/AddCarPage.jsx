@@ -882,8 +882,8 @@ const saveCustomModel = (brand, model) => {
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
               >
                 <option value="">Izberi...</option>
-                {ownerCountOptions.map(count => (
-                  <option key={count} value={count}>{count}</option>
+                {ownerCountOptions.map(cnt => (
+                  <option key={cnt.value} value={cnt.value}>{cnt.label}</option>
                 ))}
               </select>
             </div>
