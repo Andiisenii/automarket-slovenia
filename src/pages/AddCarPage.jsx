@@ -145,16 +145,20 @@ const getGroupedModelsForBrand = (brand, brandModelsData, customModelsData) => {
   const customModels = customModelsData[brand] || []
   const allModels = [...new Set([...models, ...customModels])]
   
-  // Group by first letter or common categories
+  if (allModels.length === 0) return []
+  
+  // Group by series/class prefix (e.g., Golf 1.4 -> Golf, A 180 -> A)
   const grouped = {}
   allModels.forEach(model => {
-    const firstChar = model.charAt(0).toUpperCase()
-    if (!grouped[firstChar]) grouped[firstChar] = []
-    grouped[firstChar].push(model)
+    const match = model.match(/^([A-Za-z]+(?:\s[A-Za-z]+)?)\s/)
+    const className = match ? match[1] : model.charAt(0)
+    
+    if (!grouped[className]) grouped[className] = []
+    grouped[className].push(model)
   })
   
   return Object.entries(grouped).map(([category, models]) => ({
-    category: 'Modeli ' + category,
+    category: category,
     models: models.sort()
   }))
 }

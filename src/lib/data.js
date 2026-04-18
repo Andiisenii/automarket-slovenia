@@ -27,8 +27,82 @@ export const FALLBACK_BRANDS = [
 ]
 
 export const FALLBACK_MODELS = {
-  'Audi': ['A1', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'Q2', 'Q3', 'Q5', 'Q7', 'Q8', 'e-tron', 'e-tron GT', 'TT', 'R8'],
-  'BMW': ['Serija 1', 'Serija 2', 'Serija 3', 'Serija 4', 'Serija 5', 'Serija 6', 'Serija 7', 'Serija 8', 'X1', 'X2', 'X3', 'X4', 'X5', 'X6', 'X7', 'Z4', 'i3', 'i4', 'i7', 'iX', 'iX3'],
+  'Audi': [
+    // A1
+    'A1 1.0 TFSI', 'A1 1.4 TFSI', 'A1 1.8 TFSI', 'A1 2.0 TFSI', 'S1 2.0 TFSI',
+    // A3
+    'A3 1.0 TFSI', 'A3 1.4 TFSI', 'A3 1.5 TFSI', 'A3 1.6 TDI', 'A3 2.0 TDI', 'A3 2.0 TFSI', 'A3 Sportback e-tron', 'S3 2.0 TFSI', 'S3 Sportback', 'RS3 2.5 TFSI',
+    // A4
+    'A4 1.4 TFSI', 'A4 1.8 TFSI', 'A4 2.0 TFSI', 'A4 2.0 TDI', 'A4 3.0 TDI', 'A4 allroad 2.0 TFSI', 'A4 allroad 3.0 TDI', 'S4 3.0 TFSI', 'RS4 2.9 TFSI',
+    // A5
+    'A5 1.4 TFSI', 'A5 2.0 TFSI', 'A5 2.0 TDI', 'A5 3.0 TDI', 'A5 Sportback 1.4 TFSI', 'A5 Sportback 2.0 TFSI', 'A5 Sportback 2.0 TDI', 'S5 3.0 TFSI', 'RS5 2.9 TFSI', 'RS5 Sportback',
+    // A6
+    'A6 1.8 TFSI', 'A6 2.0 TFSI', 'A6 2.0 TDI', 'A6 3.0 TFSI', 'A6 3.0 TDI', 'A6 4.0 TFSI', 'A6 allroad 3.0 TFSI', 'A6 allroad 3.0 TDI', 'A6 L 2.0 TFSI', 'S6 2.9 TFSI', 'RS6 4.0 TFSI',
+    // A7
+    'A7 2.0 TFSI', 'A7 3.0 TFSI', 'A7 3.0 TDI', 'A7 Sportback 2.0 TFSI', 'A7 Sportback 3.0 TFSI', 'S7 2.9 TFSI', 'RS7 4.0 TFSI',
+    // A8
+    'A8 2.0 TFSI', 'A8 3.0 TFSI', 'A8 3.0 TDI', 'A8 4.0 TFSI', 'A8 4.2 TDI', 'A8 L 3.0 TFSI', 'A8 L 4.0 TFSI', 'S8 4.0 TFSI', 'S8 plus',
+    // Q2
+    'Q2 1.0 TFSI', 'Q2 1.4 TFSI', 'Q2 1.6 TDI', 'Q2 2.0 TFSI', 'SQ2 2.0 TFSI',
+    // Q3
+    'Q3 1.4 TFSI', 'Q3 1.5 TFSI', 'Q3 2.0 TFSI', 'Q3 2.0 TDI', 'Q3 RS 2.5 TFSI',
+    // Q5
+    'Q5 2.0 TFSI', 'Q5 2.0 TDI', 'Q5 3.0 TDI', 'Q5 2.0 TFSI e', 'Q5 2.0 TDI e', 'Q5 Sportback 2.0 TFSI', 'SQ5 3.0 TDI',
+    // Q7
+    'Q7 2.0 TFSI', 'Q7 3.0 TFSI', 'Q7 3.0 TDI', 'Q7 4.0 TDI', 'Q7 e-tron 3.0 TDI',
+    // Q8
+    'Q8 3.0 TFSI', 'Q8 3.0 TDI', 'Q8 4.0 TDI', 'Q8 e-tron', 'SQ8 4.0 TFSI', 'RSQ8 4.0 TFSI',
+    // e-tron
+    'e-tron 50', 'e-tron 55', 'e-tron 55 quattro', 'e-tron Sportback 50', 'e-tron Sportback 55', 'e-tron GT', 'e-tron GT quattro', 'RS e-tron GT',
+    // TT
+    'TT 1.8 TFSI', 'TT 2.0 TFSI', 'TT 2.0 TDI', 'TTS 2.0 TFSI', 'TT RS 2.5 TFSI',
+    // R8
+    'R8 4.2 FSI', 'R8 5.2 FSI', 'R8 Spyder 4.2 FSI', 'R8 Spyder 5.2 FSI', 'R8 LMS', 'R8 GT',
+  ],
+  'BMW': [
+    // Serija 1
+    '118i', '120i', '125i', 'M135i', '118d', '120d', '125d', 'M135d',
+    // Serija 2
+    '218i', '220i', '230i', 'M235i', '240i', '218d', '220d', '225d', 'M235d', 'M2 Competition', 'M2 CS',
+    // Serija 3
+    '318i', '320i', '330i', '340i', 'M340i', '318d', '320d', '325d', '330d', '340d', 'M340d', 'M3 Competition', 'M3 CS',
+    // Serija 4
+    '418i', '420i', '430i', '440i', 'M440i', '418d', '420d', '425d', '430d', '440d', 'M440d', 'M4 Competition', 'M4 CS', 'M4 GTS',
+    // Serija 5
+    '518i', '520i', '530i', '540i', 'M550i', '518d', '520d', '525d', '530d', '535d', '540d', 'M550d', 'M5 Competition',
+    // Serija 6
+    '620d', '630i', '640i', '650i', 'M650i', '635d', '640d', 'M6 Gran Coupe',
+    // Serija 7
+    '730i', '735i', '740i', '745i', '750i', '760i', 'M760i', '730d', '735d', '740d', '745d', '750d', 'M750d', '745Le', '745Le xDrive',
+    // Serija 8
+    '830i', '840i', '850i', 'M850i', 'M8 Competition', '830d', '840d', 'M850d',
+    // X1
+    'X1 sDrive18i', 'X1 sDrive20i', 'X1 xDrive20i', 'X1 sDrive18d', 'X1 sDrive20d', 'X1 xDrive20d', 'X1 xDrive25d', 'X1 M35i',
+    // X2
+    'X2 sDrive18i', 'X2 sDrive20i', 'X2 xDrive20i', 'X2 xDrive25i', 'X2 sDrive18d', 'X2 sDrive20d', 'X2 xDrive20d', 'X2 M35i',
+    // X3
+    'X3 xDrive20i', 'X3 xDrive30i', 'X3 xDrive40i', 'X3 M40i', 'X3 sDrive18d', 'X3 sDrive20d', 'X3 xDrive20d', 'X3 xDrive25d', 'X3 xDrive30d', 'X3 xDrive40d', 'X3 M',
+    // X4
+    'X4 xDrive20i', 'X4 xDrive30i', 'X4 xDrive40i', 'X4 M40i', 'X4 xDrive20d', 'X4 xDrive25d', 'X4 xDrive30d', 'X4 xDrive40d', 'X4 M',
+    // X5
+    'X5 xDrive30d', 'X5 xDrive40d', 'X5 xDrive50i', 'X5 M50d', 'X5 M', 'X5 xDrive45e',
+    // X6
+    'X6 xDrive30d', 'X6 xDrive40d', 'X6 xDrive50i', 'X6 M50d', 'X6 M', 'X6 xDrive40e',
+    // X7
+    'X7 xDrive30d', 'X7 xDrive40d', 'X7 xDrive50i', 'X7 M50d', 'X7 M',
+    // Z4
+    'Z4 sDrive20i', 'Z4 sDrive30i', 'Z4 M40i', 'Z4 M40i First Edition', 'Z4 M',
+    // i3
+    'i3s', 'i3 Range Extender',
+    // i4
+    'i4 eDrive35', 'i4 eDrive40', 'i4 xDrive40', 'i4 M50',
+    // i7
+    'i7 xDrive60', 'i7 M70', 'i7 eDrive50',
+    // iX
+    'iX xDrive40', 'iX xDrive50', 'iX xDrive60', 'iX xDrive70', 'iX M60',
+    // iX3
+    'iX3 xDrive30',
+  ],
   'Mercedes-Benz': [
     'A 180', 'A 200', 'A 250 AMG', 'A 350', 'A 45 AMG',
     'B 180', 'B 200', 'B 250 AMG',
@@ -54,11 +128,108 @@ export const FALLBACK_MODELS = {
     'V-Class 200', 'V-Class 220d', 'V-Class 300', 'V-Class 350',
     'Sprinter 314 CDI', 'Sprinter 316 CDI', 'Sprinter 319 CDI', 'Sprinter 516 CDI', 'Sprinter 519 CDI', 'eSprinter'
   ],
-  'Volkswagen': ['Polo', 'Golf', 'Passat', 'Arteon', 'T-Roc', 'T-Cross', 'Tiguan', 'Touareg', 'Teramont', 'Up!', 'Fox', 'Lupo', 'Transporter', 'Multivan', 'Caravelle', 'California', 'ID.3', 'ID.4', 'ID.5', 'ID.Buzz'],
-  'Opel': ['Corsa', 'Astra', 'Insignia', 'Grandland', 'Crossland', 'Mokka', 'Mokka-e', 'Combo', 'Movano', 'Zafira', 'Vivaro', 'Zafira Life'],
+  'Volkswagen': [
+    // Polo series
+    'Polo 1.0', 'Polo 1.2 TSI', 'Polo 1.4 TDI', 'Polo 1.5 TSI', 'Polo 1.6 TDI', 'Polo GTI', 'Polo R-Line',
+    // Golf series
+    'Golf 1.0', 'Golf 1.4 TSI', 'Golf 1.5 TSI', 'Golf 1.6 TDI', 'Golf 2.0 TDI', 'Golf 2.0 TSI', 'Golf GTI', 'Golf GTE', 'Golf R', 'Golf eHybrid', 'Golf Variant 1.4 TSI', 'Golf Variant 1.6 TDI', 'Golf Variant 2.0 TDI', 'Golf Alltrack',
+    // Passat series
+    'Passat 1.4 TSI', 'Passat 1.5 TSI', 'Passat 1.8 TSI', 'Passat 2.0 TSI', 'Passat 2.0 TDI', 'Passat 2.5 V6', 'Passat GTE', 'Passat Variant 1.4 TSI', 'Passat Variant 2.0 TDI', 'Passat Alltrack',
+    // Arteon
+    'Arteon 1.5 TSI', 'Arteon 2.0 TSI', 'Arteon 2.0 TDI', 'Arteon R-Line',
+    // T-Roc
+    'T-Roc 1.0 TSI', 'T-Roc 1.5 TSI', 'T-Roc 2.0 TSI', 'T-Roc Cabriolet', 'T-Roc R',
+    // T-Cross
+    'T-Cross 1.0 TSI', 'T-Cross 1.5 TSI', 'T-Cross 1.6 TDI',
+    // Tiguan
+    'Tiguan 1.4 TSI', 'Tiguan 1.5 TSI', 'Tiguan 2.0 TSI', 'Tiguan 2.0 TDI', 'Tiguan Allspace', 'Tiguan R',
+    // Touareg
+    'Touareg 3.0 V6 TDI', 'Touareg 3.0 V6 TSI', 'Touareg 4.0 V8 TDI', 'Touareg R',
+    // Teramont
+    'Teramont 2.0 TSI', 'Teramont 3.6 V6',
+    // Up!
+    'Up! 1.0', 'Up! Move', 'e-Up!',
+    // Fox
+    'Fox 1.4',
+    // Lupo
+    'Lupo 1.0', 'Lupo GTI',
+    // ID.3
+    'ID.3 Pure', 'ID.3 Business', 'ID.3 Style', 'ID.3 Pro', 'ID.3 Pro S', 'ID.3 Max', 'ID.3 GTX',
+    // ID.4
+    'ID.4 Pure', 'ID.4 Business', 'ID.4 Style', 'ID.4 Pro', 'ID.4 Pro S', 'ID.4 GTX',
+    // ID.5
+    'ID.5 Pure', 'ID.5 Pro', 'ID.5 Pro S', 'ID.5 GTX',
+    // ID.Buzz
+    'ID.Buzz Pure', 'ID.Buzz Life', 'ID.Buzz Cargo', 'ID.Buzz GTX',
+    // Transporter
+    'Transporter T1', 'Transporter T2', 'Transporter T3', 'Transporter T4', 'Transporter T5', 'Transporter T6', 'Transporter T6.1', 'Transporter T7',
+    // Multivan
+    'Multivan 1.4 TSI', 'Multivan 2.0 TDI', 'Multivan 2.0 TSI', 'Multivan eHybrid',
+    // Caravelle
+    'Caravelle 2.0 TDI', 'Caravelle 2.0 TSI', 'Caravelle eHybrid',
+    // California
+    'California 2.0 TDI', 'California 2.0 TSI', 'California Beach', 'California Ocean', 'California Touring',
+  ],
+  'Opel': [
+    // Corsa
+    'Corsa 1.2', 'Corsa 1.4', 'Corsa 1.0 Turbo', 'Corsa 1.4 Turbo', 'Corsa 1.6 Turbo', 'Corsa 1.5 CDI', 'Corsa 1.3 CDTI', 'Corsa-e', 'Corsa GSi', 'Corsa RS',
+    // Astra
+    'Astra 1.2', 'Astra 1.4', 'Astra 1.0 Turbo', 'Astra 1.4 Turbo', 'Astra 1.6 Turbo', 'Astra 1.5 CDTI', 'Astra 1.6 CDTI', 'Astra 2.0 CDTI', 'Astra Sports Tourer', 'Astra GSe', 'Astra RS',
+    // Insignia
+    'Insignia 1.4 Turbo', 'Insignia 1.5 Turbo', 'Insignia 1.6 Turbo', 'Insignia 1.6 CDTI', 'Insignia 2.0 CDTI', 'Insignia 2.0 Turbo', 'Insignia Grand Sport', 'Insignia Sports Tourer', 'Insignia Country Tourer', 'Insignia GSi',
+    // Grandland
+    'Grandland 1.2 Turbo', 'Grandland 1.5 Turbo', 'Grandland 1.6 Hybrid', 'Grandland 2.0 CDTI', 'Grandland X Hybrid',
+    // Crossland
+    'Crossland 1.2', 'Crossland 1.4', 'Crossland 1.2 Turbo', 'Crossland 1.5 CDTI',
+    // Mokka
+    'Mokka 1.2', 'Mokka 1.4', 'Mokka 1.0 Turbo', 'Mokka 1.4 Turbo', 'Mokka 1.6 CDTI', 'Mokka-e', 'Mokka X 1.4 Turbo', 'Mokka X 1.6 CDTI',
+    // Combo
+    'Combo 1.4', 'Combo 1.6 CDTI', 'Combo Life 1.2', 'Combo Life 1.5 CDTI', 'Combo Cargo',
+    // Movano
+    'Movano 2.2 CDTI', 'Movano 2.3 CDTI', 'Movano 3.0 CDTI',
+    // Zafira
+    'Zafira 1.4 Turbo', 'Zafira 1.6 CDTI', 'Zafira 2.0 CDTI', 'Zafira Life', 'Zafira Tourer',
+    // Vivaro
+    'Vivaro 1.6 CDTI', 'Vivaro 2.0 CDTI', 'Vivaro-e', 'Vivaro Life', 'Vivaro Cargo',
+    // Zafira Life
+    'Zafira Life 1.5 CDTI', 'Zafira Life 2.0 CDTI', 'Zafira Life 1.5 BlueHDi',
+  ],
   'Renault': ['Twingo', 'Clio', 'Megane', 'Talisman', 'Laguna', 'Captur', 'Kadjar', 'Koleos', 'Arkana', 'ZOE', 'Megane E-Tech', 'Austral', 'Espace', 'Master', 'Trafic', 'Kangoo'],
   'Peugeot': ['108', '208', '308', '408', '508', '2008', '3008', '5008', 'e-208', 'e-2008', 'e-308', 'Rifter', 'Partner', 'Expert', 'Boxer', '508 PSE', '508 SW'],
-  'Ford': ['Fiesta', 'Focus', 'Mondeo', 'Mustang', 'Puma', 'Kuga', 'Explorer', 'Edge', 'Bronco', 'Bronco Sport', 'Mustang Mach-E', 'Transit', 'Transit Custom', 'Tourneo', 'S-Max', 'Galaxy', 'Ranger', 'F-150', 'Maverick'],
+  'Ford': [
+    // Fiesta
+    'Fiesta 1.0 EcoBoost', 'Fiesta 1.1', 'Fiesta 1.5 TDCi', 'Fiesta ST 1.6 EcoBoost', 'Fiesta ST-Line', 'Fiesta Titanium', 'Fiesta Vignale',
+    // Focus
+    'Focus 1.0 EcoBoost', 'Focus 1.5 EcoBoost', 'Focus 1.5 EcoBlue', 'Focus 2.0 EcoBlue', 'Focus 2.3 EcoBoost ST', 'Focus RS', 'Focus Active', 'Focus ST-Line', 'Focus Titanium', 'Focus Vignale', 'Focus Estate 1.0 EcoBoost', 'Focus Estate 1.5 EcoBlue',
+    // Mondeo
+    'Mondeo 1.0 EcoBoost', 'Mondeo 1.5 EcoBoost', 'Mondeo 1.5 EcoBlue', 'Mondeo 2.0 EcoBlue', 'Mondeo 2.0 HEV', 'Mondeo 2.0 EcoBoost ST-Line', 'Mondeo Vignale',
+    // Mustang
+    'Mustang 2.3 EcoBoost', 'Mustang 5.0 V8', 'Mustang Mach-E', 'Mustang Mach-E GT', 'Mustang Bullitt', 'Mustang Dark Horse', 'Mustang GT Fastback', 'Mustang Convertible',
+    // Puma
+    'Puma 1.0 EcoBoost', 'Puma 1.5 EcoBlue', 'Puma ST 1.5 EcoBoost', 'Puma Titanium', 'Puma ST-Line',
+    // Kuga
+    'Kuga 1.5 EcoBoost', 'Kuga 2.0 EcoBoost', 'Kuga 1.5 EcoBlue', 'Kuga 2.0 EcoBlue', 'Kuga 2.5 HEV', 'Kuga PHEV', 'Kuga ST-Line',
+    // Explorer
+    'Explorer 2.3 EcoBoost', 'Explorer 3.0 V6 EcoBoost', 'Explorer 3.0 V6 Hybrid', 'Explorer ST 3.0 V6 EcoBoost', 'Explorer Platinum',
+    // Edge
+    'Edge 2.0 EcoBoost', 'Edge 2.0 EcoBlue', 'Edge 2.0 TDCi', 'Edge ST 2.7 V6 EcoBoost',
+    // Bronco
+    'Bronco 2.3 EcoBoost', 'Bronco 2.7 V6 EcoBoost', 'Bronco Sport 1.5 EcoBoost', 'Bronco Sport 2.0 EcoBoost', 'Bronco Raptor',
+    // Transit
+    'Transit 2.0 EcoBlue', 'Transit 2.2 TDCi', 'Transit 2.4 TDCi', 'Transit 3.2 TDCi', 'Transit Custom 2.0 EcoBlue', 'Transit Connect 1.5 TDCi', 'Transit Courier 1.5 TDCi', 'Transit Trail', 'Transit ST-Line',
+    // Tourneo
+    'Tourneo Custom 2.0 EcoBlue', 'Tourneo Connect 1.5 EcoBlue', 'Tourneo Courier 1.5 TDCi', 'Tourneo Grand Custom',
+    // S-Max
+    'S-Max 1.5 EcoBoost', 'S-Max 2.0 EcoBoost', 'S-Max 2.0 EcoBlue', 'S-Max 2.5 HEV', 'S-Max ST-Line',
+    // Galaxy
+    'Galaxy 1.5 EcoBoost', 'Galaxy 2.0 EcoBoost', 'Galaxy 2.0 EcoBlue', 'Galaxy 2.5 HEV', 'Galaxy ST-Line',
+    // Ranger
+    'Ranger 2.0 EcoBlue', 'Ranger 2.2 TDCi', 'Ranger 3.2 TDCi', 'Ranger 3.0 V6 Power Stroke', 'Ranger Raptor 2.0 EcoBoost', 'Ranger Raptor 3.0 V6 EcoBoost', 'Ranger Tremor', 'Ranger Wildtrak',
+    // F-150
+    'F-150 XL', 'F-150 XLT', 'F-150 Lariat', 'F-150 Platinum', 'F-150 King Ranch', 'F-150 Raptor', 'F-150 Lightning',
+    // Maverick
+    'Maverick 2.0 EcoBoost', 'Maverick 2.5 Hybrid',
+  ],
   'Toyota': ['Aygo', 'Yaris', 'Corolla', 'Camry', 'Prius', 'C-HR', 'RAV4', 'Highlander', 'Land Cruiser', 'Sequoia', 'Hilux', 'Tacoma', 'Tundra', 'Proace', 'Proace City', 'Sienna', 'GR Supra', 'GR86', 'GR Yaris', 'Mirai', 'bZ4X', 'Urban Cruiser'],
   'Hyundai': ['i10', 'i20', 'i30', 'i40', 'IONIQ', 'Kona', 'Tucson', 'Santa Fe', 'Palisade', 'Bayon', 'Nexo', 'Staria', 'IONIQ 5', 'IONIQ 6', 'Kona Electric'],
   'Kia': ['Picanto', 'Rio', 'Ceed', 'K5', 'Stinger', 'XCeed', 'Niro', 'Sportage', 'Sorento', 'Telluride', 'Soul', 'EV6', 'EV9', 'e-Soul', 'Niro EV', 'Carens', 'Carnival'],
@@ -606,6 +777,20 @@ export const carEquipmentCategories = {
     name: 'Garancija in stanje',
     icon: 'award',
     subcategories: {
+      garancija: {
+        name: 'Garancija',
+        features: [
+          'Vozilo ima garancio',
+          'Vozilo ima jamstvo',
+          'Vozilo ima oldtimer certifikat',
+          'Servisna knjiga',
+          'Poln servis',
+          'Garažirano',
+          'Brezhibno',
+          'Ne kadi',
+          'Prvi lastnik',
+        ]
+      },
       registracija: {
         name: 'Registracija',
         features: [
