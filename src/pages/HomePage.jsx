@@ -474,7 +474,7 @@ export function HomePage() {
                 <select
                   value={priceFrom}
                   onChange={(e) => setPriceFrom(e.target.value)}
-                  className="flex-1 px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer appearance-none"
+                  className="w-1/2 px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer appearance-none"
                 >
                   <option value="">{language === 'sl' ? 'Cena od' : 'Price from'}</option>
                   <option value="100">od 100 EUR</option>
@@ -521,9 +521,9 @@ export function HomePage() {
                 <select
                   value={priceTo}
                   onChange={(e) => setPriceTo(e.target.value)}
-                  className="flex-1 px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer appearance-none"
+                  className="w-1/2 px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer appearance-none"
                 >
-                  <option value="">{language === 'sl' ? 'do' : 'To'}</option>
+                  <option value="">{language === 'sl' ? 'Cena do' : 'Price to'}</option>
                   <option value="100">do 100 EUR</option>
                   <option value="500">do 500 EUR</option>
                   <option value="1000">do 1.000 EUR</option>
@@ -593,9 +593,9 @@ export function HomePage() {
                 <select
                   value={yearFrom}
                   onChange={(e) => setYearFrom(e.target.value)}
-                  className="flex-1 px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer appearance-none"
+                  className="w-1/2 px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer appearance-none"
                 >
-                  <option value="">{language === 'sl' ? 'Letnik od' : 'From'}</option>
+                  <option value="">{language === 'sl' ? 'Letnik od' : 'Year from'}</option>
                   <option value="2026">od 2026</option>
                   <option value="2025">od 2025</option>
                   <option value="2024">od 2024</option>
@@ -634,9 +634,9 @@ export function HomePage() {
                 <select
                   value={yearTo}
                   onChange={(e) => setYearTo(e.target.value)}
-                  className="flex-1 px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer appearance-none"
+                  className="w-1/2 px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer appearance-none"
                 >
-                  <option value="">{language === 'sl' ? 'do' : 'To'}</option>
+                  <option value="">{language === 'sl' ? 'Letnik do' : 'Year to'}</option>
                   <option value="2026">do 2026</option>
                   <option value="2025">do 2025</option>
                   <option value="2024">do 2024</option>
@@ -754,10 +754,10 @@ export function HomePage() {
                 🚐 {language === 'sl' ? 'Kombi' : 'Van'}
               </button>
               <button 
-                onClick={() => setVehicleType('suv')}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors ${vehicleType === 'suv' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
+                onClick={() => setVehicleType('traktor')}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors ${vehicleType === 'traktor' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
               >
-                🚙 SUV {matchingCount > 0 && `(${matchingCount})`}
+                🚜 Traktor {matchingCount > 0 && `(${matchingCount})`}
               </button>
             </div>
           </div>
