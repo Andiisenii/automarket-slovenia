@@ -79,7 +79,7 @@ export function HomePage() {
   const [brandBodyTypes, setBrandBodyTypes] = useState({}) // { brand: [bodyTypes] }
   
   // Body types
-  const bodyTypes = ['Traktor', 'Limuzina', 'Hatchback', 'Coupe', 'Kombi', 'Van', 'Pickup', 'Minivan', 'Kabriolet', 'Roadster', 'Targa', 'Fastback', 'Liftback', 'Sportni coupe']
+  const bodyTypes = ['Traktor', 'Limuzina', 'Hatchback', 'Coupe', 'Kombi', 'Van', 'Pickup', 'Minivan', 'Kabriolet', 'Roadster', 'Targa', 'Fastback', 'Liftback', 'Sportni coupe', 'SUV']
   
   // Get body types for selected brand
   const getBodyTypesForBrand = (brand) => {
