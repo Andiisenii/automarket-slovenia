@@ -611,7 +611,7 @@ const saveCustomModel = (brand, model) => {
           {/* Brand Logo Selection - 6 Popular Brands as boxes */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-3">Priljubljene znamke</label>
-            <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+            <div className="grid grid-cols-6 gap-3">
               {MAIN_BRANDS.map(brand => (
                 <button
                   key={brand.name}
@@ -620,17 +620,16 @@ const saveCustomModel = (brand, model) => {
                     handleChange('brand', brand.name)
                     setFormData(prev => ({ ...prev, brand: brand.name, model: '' }))
                   }}
-                  className={`relative flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all ${
+                  className={`relative flex items-center justify-center p-3 rounded-xl border-2 transition-all min-h-[70px] ${
                     formData.brand === brand.name
                       ? 'border-primary-500 bg-primary-50'
                       : 'border-gray-200 bg-gray-50 hover:border-gray-300 hover:bg-gray-100'
                   }`}
                 >
-                  <BrandLogo name={brand.name} className="w-10 h-10 mb-1" />
-                  <span className="text-xs font-medium text-gray-700">{brand.name}</span>
+                  <BrandLogo name={brand.name} className="h-10 w-auto" />
                   {formData.brand === brand.name && (
-                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-primary-500 rounded-full flex items-center justify-center">
-                      <Check className="w-3 h-3 text-white" />
+                    <div className="absolute -top-2 -right-2 w-6 h-6 bg-primary-500 rounded-full flex items-center justify-center shadow">
+                      <Check className="w-4 h-4 text-white" />
                     </div>
                   )}
                 </button>
