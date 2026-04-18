@@ -69,7 +69,6 @@ const BOOST_PRIVATE = [
     color: 'orange',
     features: [
       { text: 'akcijska cena', included: true },
-      { text: 'cena s financiranjem', included: true },
       { text: 'znizana cena', included: true },
       { text: 'ugodna cena', included: true },
     ]
@@ -82,7 +81,8 @@ const BOOST_PRIVATE = [
     days: 15, 
     color: 'green',
     features: [
-      { text: 'objava na prvih straneh večja vidljivost vozila', included: true },
+      { text: 'objava na prvih straneh', included: true },
+      { text: 'večja vidljivost vozila', included: true },
       { text: 'hitrejša prodaja vozila', included: true },
       { text: 'zlatorumena vidna oznaka', included: true },
     ]
@@ -127,7 +127,8 @@ const BOOST_BUSINESS = [
     days: 30, 
     color: 'green',
     features: [
-      { text: 'objava na prvih straneh večja vidljivost vozila', included: true },
+      { text: 'objava na prvih straneh', included: true },
+      { text: 'večja vidljivost vozila', included: true },
       { text: 'hitrejša prodaja vozila', included: true },
       { text: 'zlatorumena vidna oznaka', included: true },
     ]
