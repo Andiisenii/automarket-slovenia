@@ -117,5 +117,24 @@ switch ($action) {
         
         echo json_encode(['brands' => $brands]);
         break;
+    
+    case 'body_types':
+        // Get brand-body-types mapping
+        $stmt = $pdo->query("SELECT brand_name, body_type FROM brand_body_types ORDER BY brand_name, body_type");
+        $mappings = $stmt->fetchAll();
+        
+        // Convert to { brand: [bodyTypes] }
+        $result = [];
+        foreach ($mappings as $mapping) {
+            $brand = $mapping['brand_name'];
+            $bodyType = $mapping['body_type'];
+            if (!isset($result[$brand])) {
+                $result[$brand] = [];
+            }
+            $result[$brand][] = $bodyType;
+        }
+        
+        echo json_encode(['brand_body_types' => $result]);
+        break;
 }
 ?>

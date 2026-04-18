@@ -30,6 +30,17 @@ export function HomePage() {
         
         const cities = await getAllCities()
         setAllCities(cities || [])
+        
+        // Fetch brand-body-types mapping
+        try {
+          const response = await fetch(`${API_URL}/brands.php?action=body_types`)
+          const data = await response.json()
+          if (data && data.brand_body_types) {
+            setBrandBodyTypes(data.brand_body_types)
+          }
+        } catch (err) {
+          console.warn('Could not fetch brand body types:', err)
+        }
       } catch (error) {
         console.error('Error fetching data:', error)
       }
@@ -50,9 +61,29 @@ export function HomePage() {
   const [selectedCities, setSelectedCities] = useState([])
   const [selectedFuel, setSelectedFuel] = useState([])
   const [selectedBodyTypes, setSelectedBodyTypes] = useState([])
+  const [brandBodyTypes, setBrandBodyTypes] = useState({}) // { brand: [bodyTypes] }
   
   // Body types
   const bodyTypes = ['Traktor', 'Limuzina', 'Hatchback', 'Coupe', 'Kombi', 'Van', 'Pickup', 'Minivan', 'Kabriolet', 'Roadster', 'Targa', 'Fastback', 'Liftback', 'Sportni coupe']
+  
+  // Get body types for selected brand
+  const getBodyTypesForBrand = (brand) => {
+    if (brandBodyTypes[brand]) {
+      return brandBodyTypes[brand]
+    }
+    return bodyTypes // fallback to all body types
+  }
+  
+  // Get all body types from all selected brands
+  const availableBodyTypes = useMemo(() => {
+    if (selectedBrands.length === 0) return bodyTypes
+    const types = new Set()
+    selectedBrands.forEach(brand => {
+      const brandTypes = getBodyTypesForBrand(brand)
+      brandTypes.forEach(type => types.add(type))
+    })
+    return Array.from(types)
+  }, [selectedBrands, brandBodyTypes])
   
   // Filter brands based on vehicle type
   const filteredBrands = useMemo(() => {
@@ -454,7 +485,7 @@ export function HomePage() {
                     }}
                   >
                     <option value="">{language === 'sl' ? 'Karoserijska oblika' : 'Body Type'} ({selectedBodyTypes.length})</option>
-                    {bodyTypes.map(type => (
+                    {availableBodyTypes.map(type => (
                       <option key={type} value={type}>{selectedBodyTypes.includes(type) ? '✓ ' : ''}{type}</option>
                     ))}
                   </select>
