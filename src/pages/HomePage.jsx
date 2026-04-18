@@ -105,16 +105,13 @@ export function HomePage() {
     // Brands and models by vehicle type
     const vehicleTypeBrands = {
       'avto': ['Audi', 'BMW', 'Mercedes-Benz', 'Volkswagen', 'Porsche', 'Opel', 'Toyota', 'Honda', 'Mazda', 'Nissan', 'Lexus', 'Subaru', 'Mitsubishi', 'Suzuki', 'Ford', 'Chevrolet', 'Dodge', 'Jeep', 'Tesla', 'Renault', 'Peugeot', 'Citroen', 'Fiat', 'Alfa Romeo', 'Hyundai', 'Kia', 'Genesis', 'Jaguar', 'Land Rover', 'Mini', 'Volvo', 'Skoda', 'Seat', 'Cupra', 'Dacia', 'Smart', 'Chrysler', 'Cadillac', 'Buick', 'GMC', 'Lincoln', 'Acura', 'Infiniti', 'Maserati', 'Bentley', 'Ferrari', 'Lamborghini', 'Aston Martin', 'Rolls-Royce', 'McLaren', 'Bugatti', 'Pagani', 'Polestar', 'Lucid', 'Rivian', 'DS'],
-      'motor': ['Harley-Davidson', 'Yamaha', 'Kawasaki', 'Suzuki', 'BMW Motorrad', 'Ducati', 'Triumph', 'KTM', 'Piaggio', 'Vespa', 'Honda', 'Indian', 'Victory', 'Benelli', 'CFMoto', 'Royal Enfield', 'Moto Guzzi', 'MV Agusta', 'Beta', 'Gas Gas', 'Sherco', 'Husqvarna', 'Malaguti', 'Sym', 'Keeway', 'Derbi', 'Gilera', 'Aprilia'],
-      'kamion': ['DAF', 'Scania', 'Volvo Trucks', 'MAN', 'Mercedes-Benz Trucks', 'Iveco', 'Renault Trucks', 'Foton', 'Isuzu', 'Kenworth', 'Peterbilt', 'Mack', 'International', 'Freightliner', 'Western Star', 'Hino'],
-      'kombi': ['Mercedes-Benz Sprinter', 'Ford Transit', 'Renault Master', 'Iveco Daily', 'Fiat Ducato', 'Peugeot Boxer', 'Citroen Jumper', 'Volkswagen Transporter', 'Opel Movano', 'Toyota Proace', 'Nissan NV', 'Vauxhall Movano', 'Hyundai Starex', 'Dacia Dokker'],
-      'traktor': ['John Deere', 'Massey Ferguson', 'Case IH', 'New Holland', 'Fendt', 'Kubota', 'Claas', 'Deutz-Fahr', 'Valtra', 'Steyr', 'JCB', 'McCormick', 'Landini', 'Zetor', 'SAME', 'Lamborghini', 'Agrale', 'Belarus', 'MTZ', 'YTO', 'Dongfeng', 'Mahindra', 'Indo Track', 'Farmtrac', 'Force Motors', 'Preeti', 'TAFE', 'Eicher', 'Sonalika']
+      'motor': ['Harley-Davidson', 'Yamaha', 'Kawasaki', 'BMW Motorrad', 'Ducati', 'Triumph', 'KTM', 'Piaggio', 'Vespa', 'Indian', 'Benelli', 'CFMoto', 'Royal Enfield', 'Moto Guzzi', 'MV Agusta', 'Beta', 'Gas Gas', 'Husqvarna', 'Sym', 'Keeway', 'Aprilia'],
+      'kamion': ['DAF', 'Scania', 'Volvo Trucks', 'MAN', 'Mercedes-Benz Trucks', 'Iveco', 'Renault Trucks', 'Foton', 'Isuzu', 'Kenworth', 'Peterbilt', 'Mack', 'International', 'Freightliner'],
+      'kombi': ['Mercedes-Benz Sprinter', 'Ford Transit', 'Renault Master', 'Iveco Daily', 'Fiat Ducato', 'Peugeot Boxer', 'Citroen Jumper', 'Volkswagen Transporter', 'Opel Movano', 'Toyota Proace', 'Nissan NV'],
+      'traktor': ['John Deere', 'Massey Ferguson', 'Case IH', 'New Holland', 'Fendt', 'Kubota', 'Claas', 'Deutz-Fahr', 'Valtra', 'Steyr', 'JCB', 'McCormick', 'Landini', 'Zetor', 'SAME', 'Belarus', 'MTZ', 'YTO', 'Dongfeng', 'Mahindra', 'TAFE', 'Eicher', 'Sonalika', 'Farmtrac', 'Agrale']
     }
     
-    const allowedBrands = vehicleTypeBrands[vehicleType] || vehicleTypeBrands['avto']
-    
-    // Use vehicle type brands directly, not filtered by API brands
-    return allowedBrands
+    return vehicleTypeBrands[vehicleType] || vehicleTypeBrands['avto']
   }, [allBrands, vehicleType])
   const slovenianCities = allCities.length > 0 ? allCities : [
     'Ljubljana', 'Maribor', 'Celje', 'Kranj', 'Koper', 'Nova Gorica',
@@ -858,6 +855,7 @@ export function HomePage() {
 }
 
 export default HomePage
+
 
 
 
