@@ -1034,38 +1034,8 @@ const saveCustomModel = (brand, model) => {
             >
               {carEquipmentCategories[openFeaturesCategory] && (
                 <>
-                  {/* Special handling for Sedeži in vrata - dropdown selects */}
-                  {openFeaturesCategory === 'sedeži_in_vrata' && (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {Object.entries(carEquipmentCategories[openFeaturesCategory].subcategories || {}).map(([subKey, subCategory]) => (
-                        <div key={subKey}>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">{subCategory.name}</label>
-                          <select
-                            value={formData.featureIds.find(f => subCategory.features.includes(f)) || ''}
-                            onChange={(e) => {
-                              const newValue = e.target.value
-                              setFormData(prev => ({
-                                ...prev,
-                                featureIds: [
-                                  ...prev.featureIds.filter(f => !subCategory.features.includes(f)),
-                                  ...(newValue ? [newValue] : [])
-                                ]
-                              }))
-                            }}
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
-                          >
-                            <option value="">Izberi...</option>
-                            {subCategory.features.map(f => (
-                              <option key={f} value={f}>{f}</option>
-                            ))}
-                          </select>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  
-                  {/* Regular checkboxes for other categories */}
-                  {openFeaturesCategory !== 'sedeži_in_vrata' && Object.entries(carEquipmentCategories[openFeaturesCategory].subcategories || {}).map(([subKey, subCategory]) => (
+                  {/* Regular checkboxes for all categories */}
+                  {Object.entries(carEquipmentCategories[openFeaturesCategory].subcategories || {}).map(([subKey, subCategory]) => (
                     <div key={subKey} className="mb-4">
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="text-sm font-semibold text-gray-700">{subCategory.name}</h3>
