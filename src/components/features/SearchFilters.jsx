@@ -312,16 +312,16 @@ export function SearchFilters({ onSearch, onClear }) {
       </div>
       
       {/* Filter Dropdowns */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3" ref={dropdownRef}>
+      <div className="flex flex-wrap gap-2" ref={dropdownRef}>
         
-        {/* Vehicle Category with icons */}
-        <div className="relative" ref={openDropdown === 'vehicleCategory' ? dropdownRef : null}>
+        {/* Vehicle Category */}
+        <div className="relative min-w-[160px]" ref={openDropdown === 'vehicleCategory' ? dropdownRef : null}>
           <button
             onClick={() => toggleDropdown('vehicleCategory')}
             className={`w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-left flex items-center justify-between hover:bg-gray-50 transition-colors text-sm ${filters.vehicleCategory ? 'text-gray-700' : 'text-gray-400'}`}
           >
             <span className="flex items-center gap-2 truncate">
-              <span className="w-5 h-5 flex items-center justify-center">
+              <span className="w-5 h-5 flex items-center justify-center text-base">
                 {filters.vehicleCategory === 'avto' && '🚗'}
                 {filters.vehicleCategory === 'moto' && '🏍️'}
                 {filters.vehicleCategory === 'kamion' && '🚚'}
@@ -341,7 +341,7 @@ export function SearchFilters({ onSearch, onClear }) {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="absolute z-20 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-[300px] overflow-y-auto"
+                className="absolute z-30 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-[300px] overflow-y-auto"
               >
                 {filters.vehicleCategory && (
                   <button
@@ -365,7 +365,7 @@ export function SearchFilters({ onSearch, onClear }) {
                     }}
                     className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 transition-colors flex items-center gap-2 ${filters.vehicleCategory === cat.value ? 'bg-primary-50 text-primary-700 font-medium' : ''}`}
                   >
-                    <span className="w-5 h-5 flex items-center justify-center">
+                    <span className="w-5 h-5 flex items-center justify-center text-base">
                       {cat.value === 'avto' && '🚗'}
                       {cat.value === 'moto' && '🏍️'}
                       {cat.value === 'kamion' && '🚚'}
@@ -382,13 +382,13 @@ export function SearchFilters({ onSearch, onClear }) {
           </AnimatePresence>
         </div>
         
-        {/* Vehicle SubCategory - only show if main category has options */}
+        {/* Vehicle SubCategory */}
         {filters.vehicleCategory && vehicleSubCategories[filters.vehicleCategory]?.options?.length > 0 && (
-          <div className="relative">
+          <div className="relative min-w-[200px]">
             <select
               value={filters.vehicleSubCategory || ''}
               onChange={(e) => handleChange('vehicleSubCategory', e.target.value)}
-              className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm appearance-none"
+              className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm appearance-none bg-no-repeat bg-[right_0.5rem_center]"
             >
               <option value="">Podkategorija</option>
               {vehicleSubCategories[filters.vehicleCategory].options.map(opt => (
@@ -399,22 +399,64 @@ export function SearchFilters({ onSearch, onClear }) {
         )}
         
         {/* City */}
-        <FilterDropdown label="City" name="city" value={filters.city} options={cityOptions} />
+        <div className="relative min-w-[120px]">
+          <select
+            value={filters.city || ''}
+            onChange={(e) => handleChange('city', e.target.value)}
+            className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm appearance-none bg-no-repeat bg-[right_0.5rem_center]"
+          >
+            <option value="">Mesto</option>
+            {cityOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+          </select>
+        </div>
         
         {/* Brand */}
-        <FilterDropdown label="Brand" name="brand" value={filters.brand} options={allBrands} />
-        
-        {/* Model - Shows only when brand is selected */}
-        <ModelFilter />
+        <div className="relative min-w-[120px]">
+          <select
+            value={filters.brand || ''}
+            onChange={(e) => handleChange('brand', e.target.value)}
+            className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm appearance-none bg-no-repeat bg-[right_0.5rem_center]"
+          >
+            <option value="">Znamka</option>
+            {allBrands.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+          </select>
+        </div>
         
         {/* Fuel Type */}
-        <FilterDropdown label="Fuel" name="fuelType" value={filters.fuelType} options={fuelTypes} />
+        <div className="relative min-w-[100px]">
+          <select
+            value={filters.fuelType || ''}
+            onChange={(e) => handleChange('fuelType', e.target.value)}
+            className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm appearance-none bg-no-repeat bg-[right_0.5rem_center]"
+          >
+            <option value="">Gorivo</option>
+            {fuelTypes.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+          </select>
+        </div>
         
         {/* Transmission */}
-        <FilterDropdown label="Transmission" name="transmission" value={filters.transmission} options={transmissions} />
+        <div className="relative min-w-[100px]">
+          <select
+            value={filters.transmission || ''}
+            onChange={(e) => handleChange('transmission', e.target.value)}
+            className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm appearance-none bg-no-repeat bg-[right_0.5rem_center]"
+          >
+            <option value="">Menjalnik</option>
+            {transmissions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+          </select>
+        </div>
         
         {/* Body Type */}
-        <FilterDropdown label="Body" name="bodyType" value={filters.bodyType} options={bodyTypes} />
+        <div className="relative min-w-[100px]">
+          <select
+            value={filters.bodyType || ''}
+            onChange={(e) => handleChange('bodyType', e.target.value)}
+            className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm appearance-none bg-no-repeat bg-[right_0.5rem_center]"
+          >
+            <option value="">Tip</option>
+            {bodyTypes.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+          </select>
+        </div>
       </div>
       
       {/* Price and Year Range with DROPDOWNS */}
