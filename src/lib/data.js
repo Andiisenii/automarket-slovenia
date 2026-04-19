@@ -221,7 +221,21 @@ export const vehicleCategories = [
 
 // Vehicle subcategories based on type
 export const vehicleSubCategories = {
-  'avto': { label: 'Podkategorija avtomobila', options: [] },
+  'avto': {
+    label: 'Podkategorija',
+    options: [
+      'Limuzina',
+      'Karavan',
+      'SUV',
+      'Coupe',
+      'Kabriolet',
+      'Hatchback',
+      'Pickup',
+      'Minivan',
+      'Van',
+      'Kombi',
+    ]
+  },
   'moto': {
     label: 'Izberite podrubriko',
     options: [
