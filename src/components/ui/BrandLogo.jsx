@@ -10,16 +10,21 @@ const BRAND_LOGOS = {
   'Ford': '/logos/ford.svg',
 }
 
-export function BrandLogo({ name, className }) {
+export function BrandLogo({ name, className, showLabel = false }) {
   const logoPath = BRAND_LOGOS[name]
   
   if (logoPath) {
     return (
-      <img 
-        src={logoPath}
-        alt={name}
-        className={twMerge('h-10 w-auto object-contain', className)}
-      />
+      <div className={twMerge('flex flex-col items-center gap-1', className)}>
+        <img 
+          src={logoPath}
+          alt={name}
+          className="h-12 w-auto object-contain"
+        />
+        {showLabel && (
+          <span className="text-xs text-gray-600 font-medium">{name}</span>
+        )}
+      </div>
     )
   }
   
