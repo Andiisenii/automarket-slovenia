@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, X, ChevronDown, Check, Plus } from 'lucide-react'
+import { Search, X, ChevronDown, Check, Plus, Car, Bike, Truck, Van } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
-import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes } from '@/lib/data'
+import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, vehicleCategories, vehicleSubCategories } from '@/lib/data'
 import { useCars } from '@/lib/CarContext'
 import { useLanguage } from '@/lib/LanguageContext'
 
@@ -60,6 +60,8 @@ export function SearchFilters({ onSearch, onClear }) {
   
   const [filters, setFilters] = useState({
     search: searchParams.get('q') || '',
+    vehicleCategory: searchParams.get('vehicleCategory') || '',
+    vehicleSubCategory: searchParams.get('vehicleSubCategory') || '',
     brand: initialBrand,
     models: initialModels,
     city: initialCity,
@@ -105,6 +107,20 @@ export function SearchFilters({ onSearch, onClear }) {
         searchParams.set('q', value)
       } else {
         searchParams.delete('q')
+      }
+    } else if (key === 'vehicleCategory') {
+      if (value) {
+        searchParams.set('vehicleCategory', value)
+      } else {
+        searchParams.delete('vehicleCategory')
+      }
+      // Clear subcategory when main category changes
+      searchParams.delete('vehicleSubCategory')
+    } else if (key === 'vehicleSubCategory') {
+      if (value) {
+        searchParams.set('vehicleSubCategory', value)
+      } else {
+        searchParams.delete('vehicleSubCategory')
       }
     } else if (key === 'brand') {
       if (value) {
@@ -296,7 +312,88 @@ export function SearchFilters({ onSearch, onClear }) {
       </div>
       
       {/* Filter Dropdowns */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3" ref={dropdownRef}>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3" ref={dropdownRef}>
+        
+        {/* Vehicle Category with icons */}
+        <div className="relative" ref={openDropdown === 'vehicleCategory' ? dropdownRef : null}>
+          <button
+            onClick={() => toggleDropdown('vehicleCategory')}
+            className={`w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-left flex items-center justify-between hover:bg-gray-50 transition-colors text-sm ${filters.vehicleCategory ? 'text-gray-700' : 'text-gray-400'}`}
+          >
+            <span className="flex items-center gap-2 truncate">
+              {filters.vehicleCategory === 'avto' && '🚗'}
+              {filters.vehicleCategory === 'moto' && '🏍️'}
+              {filters.vehicleCategory === 'kamion' && '🚚'}
+              {filters.vehicleCategory === 'kombi' && '🚐'}
+              {filters.vehicleCategory === 'traktor' && '🚜'}
+              {filters.vehicleCategory === 'avtodom' && '🏠'}
+              {filters.vehicleCategory
+                ? vehicleCategories.find(c => c.value === filters.vehicleCategory)?.label
+                : 'Vrsta vozila'}
+            </span>
+            <ChevronDown className={`w-4 h-4 ml-2 flex-shrink-0 transition-transform ${openDropdown === 'vehicleCategory' ? 'rotate-180' : ''}`} />
+          </button>
+          <AnimatePresence>
+            {openDropdown === 'vehicleCategory' && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="absolute z-20 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-[300px] overflow-y-auto"
+              >
+                {filters.vehicleCategory && (
+                  <button
+                    onClick={() => {
+                      handleChange('vehicleCategory', '')
+                      handleChange('vehicleSubCategory', '')
+                      setOpenDropdown(null)
+                    }}
+                    className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 transition-colors flex items-center gap-2 text-gray-500 border-b border-gray-100"
+                  >
+                    <X className="w-4 h-4" /> Ponastavi
+                  </button>
+                )}
+                {vehicleCategories.map(cat => (
+                  <button
+                    key={cat.value}
+                    onClick={() => {
+                      handleChange('vehicleCategory', cat.value)
+                      handleChange('vehicleSubCategory', '')
+                      setOpenDropdown(null)
+                    }}
+                    className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 transition-colors flex items-center gap-2 ${filters.vehicleCategory === cat.value ? 'bg-primary-50 text-primary-700 font-medium' : ''}`}
+                  >
+                    {cat.value === 'avto' && '🚗'}
+                    {cat.value === 'moto' && '🏍️'}
+                    {cat.value === 'kamion' && '🚚'}
+                    {cat.value === 'kombi' && '🚐'}
+                    {cat.value === 'traktor' && '🚜'}
+                    {cat.value === 'avtodom' && '🏠'}
+                    {cat.label}
+                    {filters.vehicleCategory === cat.value && <Check className="w-4 h-4 ml-auto" />}
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+        
+        {/* Vehicle SubCategory - only show if main category has options */}
+        {filters.vehicleCategory && vehicleSubCategories[filters.vehicleCategory]?.options?.length > 0 && (
+          <div className="relative">
+            <select
+              value={filters.vehicleSubCategory || ''}
+              onChange={(e) => handleChange('vehicleSubCategory', e.target.value)}
+              className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm appearance-none"
+            >
+              <option value="">Podkategorija</option>
+              {vehicleSubCategories[filters.vehicleCategory].options.map(opt => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
+          </div>
+        )}
+        
         {/* City */}
         <FilterDropdown label="City" name="city" value={filters.city} options={cityOptions} />
         
