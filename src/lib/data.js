@@ -209,6 +209,14 @@ export const slovenianCities = [
   'Vodice', 'Vožec', 'Zagorje ob Savi', 'Zavrč', 'Zreče', 'Železniki'
 ]
 
+// Vehicle type categories
+export const vehicleCategories = [
+  { value: 'avto', label: 'Avto', icon: 'Car' },
+  { value: 'kamion', label: 'Kamion', icon: 'Truck' },
+  { value: 'kombi', label: 'Kombi', icon: 'Van' },
+  { value: 'moto', label: 'Motor', icon: 'Bike' },
+]
+
 // Brands and default models - empty, data from Supabase
 export const brands = []
 export const defaultModels = {}

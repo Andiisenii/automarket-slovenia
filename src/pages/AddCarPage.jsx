@@ -10,7 +10,7 @@ import { useCars } from '@/lib/CarContext'
 import { packageDB, carDB } from '@/lib/database'
 import { supabase } from '@/lib/supabase'
 import { BrandLogo } from '@/components/ui/BrandLogo'
-import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, colors, vehicleConditionOptions, vehicleConditionSubOptions, carEquipmentCategories, DEFAULT_AUTO_SELECT_FEATURES, emissionClasses, vehicleAgeOptions, ownerCountOptions, months, getYears, LUXURY_CAR_THRESHOLD, FALLBACK_BRANDS, FALLBACK_MODELS } from '@/lib/data'
+import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, colors, vehicleConditionOptions, vehicleConditionSubOptions, carEquipmentCategories, DEFAULT_AUTO_SELECT_FEATURES, vehicleCategories, emissionClasses, vehicleAgeOptions, ownerCountOptions, months, getYears, LUXURY_CAR_THRESHOLD, FALLBACK_BRANDS, FALLBACK_MODELS } from '@/lib/data'
 
 export function AddCarPage() {
   const navigate = useNavigate()
@@ -27,7 +27,7 @@ export function AddCarPage() {
   const [publishingPackages, setPublishingPackages] = useState([])
   
   const [formData, setFormData] = useState({
-    brand: '', model: '', year: new Date().getFullYear(),
+    vehicleCategory: 'avto', brand: '', model: '', year: new Date().getFullYear(),
     price: '', mileage: '', fuelType: '', transmission: '', bodyType: '',
     engine: '', horsepower: '', color: '', city: '', description: '',
     vehicleCondition: '', vehicleConditionSub: [], featureIds: DEFAULT_AUTO_SELECT_FEATURES,
@@ -610,6 +610,36 @@ const saveCustomModel = (brand, model) => {
         </AnimatePresence>
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-6">{t('basicInfo')}</h2>
+          
+          {/* Vehicle Category Selection */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-3">Vrsta vozila</label>
+            <div className="grid grid-cols-4 gap-3">
+              {vehicleCategories.map(cat => (
+                <label
+                  key={cat.value}
+                  className={`relative flex flex-col items-center p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                    formData.vehicleCategory === cat.value
+                      ? 'border-primary-500 bg-primary-50'
+                      : 'border-gray-200 bg-gray-50 hover:border-gray-300 hover:bg-gray-100'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="vehicleCategory"
+                    value={cat.value}
+                    checked={formData.vehicleCategory === cat.value}
+                    onChange={() => {
+                      setFormData(prev => ({ ...prev, vehicleCategory: cat.value, brand: '', model: '' }))
+                    }}
+                    className="sr-only"
+                  />
+                  <Car className={`w-8 h-8 mb-2 ${formData.vehicleCategory === cat.value ? 'text-primary-600' : 'text-gray-400'}`} />
+                  <span className={`text-sm font-medium ${formData.vehicleCategory === cat.value ? 'text-primary-700' : 'text-gray-600'}`}>{cat.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
           
           {/* Brand Logo Selection - mobile.de style */}
           <div className="mb-6">
