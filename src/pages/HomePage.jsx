@@ -4,7 +4,7 @@ import { CarCard } from '@/components/features/CarCard'
 import { useCars } from '@/lib/CarContext'
 import { useLanguage } from '@/lib/LanguageContext'
 import { useFavorites } from '@/lib/FavoritesContext'
-import { getAllBrands, getModelsForBrand, getAllCities, vehicleCategories, vehicleSubCategories } from '@/lib/data'
+import { getAllBrands, getModelsForBrand, getAllCities } from '@/lib/data'
 
 export function HomePage() {
   const { cars } = useCars()
@@ -65,8 +65,7 @@ export function HomePage() {
   
   // State for search
   const [searchText, setSearchText] = useState('')
-  const [vehicleCategory, setVehicleCategory] = useState('')
-  const [vehicleSubCategory, setVehicleSubCategory] = useState('')
+  const [vehicleType, setVehicleType] = useState('avto')
   const [selectedBrands, setSelectedBrands] = useState([])
   const [selectedModels, setSelectedModels] = useState({}) // { brand: [models] }
   const [priceFrom, setPriceFrom] = useState('')
@@ -111,7 +110,7 @@ export function HomePage() {
   // Filter brands based on vehicle type
   const filteredBrands = useMemo(() => {
     // Brands and models by vehicle type
-    const vehicleCategoryBrands = {
+    const vehicleTypeBrands = {
       'avto': ['Audi', 'BMW', 'Mercedes-Benz', 'Volkswagen', 'Porsche', 'Opel', 'Toyota', 'Honda', 'Mazda', 'Nissan', 'Lexus', 'Subaru', 'Mitsubishi', 'Suzuki', 'Ford', 'Chevrolet', 'Dodge', 'Jeep', 'Tesla', 'Renault', 'Peugeot', 'Citroen', 'Fiat', 'Alfa Romeo', 'Hyundai', 'Kia', 'Genesis', 'Jaguar', 'Land Rover', 'Mini', 'Volvo', 'Skoda', 'Seat', 'Cupra', 'Dacia', 'Smart', 'Chrysler', 'Cadillac', 'Buick', 'GMC', 'Lincoln', 'Acura', 'Infiniti', 'Maserati', 'Bentley', 'Ferrari', 'Lamborghini', 'Aston Martin', 'Rolls-Royce', 'McLaren', 'Bugatti', 'Pagani', 'Polestar', 'Lucid', 'Rivian', 'DS'],
       'motor': ['Harley-Davidson', 'Yamaha', 'Kawasaki', 'BMW Motorrad', 'Ducati', 'Triumph', 'KTM', 'Piaggio', 'Vespa', 'Indian', 'Benelli', 'CFMoto', 'Royal Enfield', 'Moto Guzzi', 'MV Agusta', 'Beta', 'Gas Gas', 'Husqvarna', 'Sym', 'Keeway', 'Aprilia'],
       'kamion': ['DAF', 'Scania', 'Volvo Trucks', 'MAN', 'Mercedes-Benz Trucks', 'Iveco', 'Renault Trucks', 'Foton', 'Isuzu', 'Kenworth', 'Peterbilt', 'Mack', 'International', 'Freightliner'],
@@ -119,8 +118,8 @@ export function HomePage() {
       'traktor': ['John Deere', 'Massey Ferguson', 'Case IH', 'New Holland', 'Fendt', 'Kubota', 'Claas', 'Deutz-Fahr', 'Valtra', 'Steyr', 'JCB', 'McCormick', 'Landini', 'Zetor', 'SAME', 'Belarus', 'MTZ', 'YTO', 'Dongfeng', 'Mahindra', 'TAFE', 'Eicher', 'Sonalika', 'Farmtrac', 'Agrale']
     }
     
-    return vehicleCategoryBrands[vehicleCategory] || vehicleCategoryBrands['avto']
-  }, [allBrands, vehicleCategory])
+    return vehicleTypeBrands[vehicleType] || vehicleTypeBrands['avto']
+  }, [allBrands, vehicleType])
   const slovenianCities = allCities.length > 0 ? allCities : [
     'Ljubljana', 'Maribor', 'Celje', 'Kranj', 'Koper', 'Nova Gorica',
     'Krško', 'Novo Mesto', 'Ptuj', 'Trbovlje', 'Kamnik', 'Jesenice', 'Žalec',
@@ -170,7 +169,7 @@ export function HomePage() {
     if (yearTo) params.set('yearTo', yearTo)
     if (selectedCities.length) params.set('cities', selectedCities.join(','))
     if (selectedFuel.length) params.set('fuel', selectedFuel.join(','))
-    if (vehicleCategory) params.set('type', vehicleCategory)
+    if (vehicleType) params.set('type', vehicleType)
     
     navigate(`/cars?${params.toString()}`)
   }
@@ -403,8 +402,6 @@ export function HomePage() {
                 <button 
                   onClick={() => {
                     setSearchText('')
-                    setVehicleCategory('')
-                    setVehicleSubCategory('')
                     setSelectedBrands([])
                     setSelectedModels({})
                     setPriceFrom('')
@@ -432,50 +429,6 @@ export function HomePage() {
             
             {/* Filters Grid - Simplified */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-[15px] mb-0">
-              {/* Vrsta vozila - Category Selection */}
-              <div className="flex flex-wrap gap-2 p-3 bg-gray-50 rounded-[14px]">
-                {vehicleCategories.map(cat => (
-                  <button
-                    key={cat.value}
-                    onClick={() => {
-                      setVehicleCategory(cat.value === vehicleCategory ? '' : cat.value)
-                      setVehicleSubCategory('')
-                    }}
-                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ${
-                      vehicleCategory === cat.value
-                        ? 'bg-[#ff6a00] text-white'
-                        : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
-                    }`}
-                  >
-                    <span className="text-base">
-                      {cat.value === 'avto' && '🚗'}
-                      {cat.value === 'moto' && '🏍️'}
-                      {cat.value === 'kamion' && '🚚'}
-                      {cat.value === 'kombi' && '🚐'}
-                      {cat.value === 'traktor' && '🚜'}
-                      {cat.value === 'avtodom' && <img src="/logos/avtodom.png" alt="AvtoDom" className="w-4 h-4 object-contain inline" />}
-                    </span>
-                    <span>{cat.label}</span>
-                  </button>
-                ))}
-              </div>
-              
-              {/* Podkategorija - Shows only when category has subcategories */}
-              {vehicleCategory && vehicleSubCategories[vehicleCategory]?.options?.length > 0 && (
-                <div className="relative col-span-full">
-                  <select
-                    className="w-full px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer appearance-none bg-no-repeat bg-[right_0.5rem_center]"
-                    value={vehicleSubCategory || ''}
-                    onChange={(e) => setVehicleSubCategory(e.target.value)}
-                  >
-                    <option value="">Izberite podrubriko...</option>
-                    {vehicleSubCategories[vehicleCategory].options.map(opt => (
-                      <option key={opt} value={opt}>{opt}</option>
-                    ))}
-                  </select>
-                </div>
-              )}
-              
               {/* Znamka (Brand) - Multi Select */}
               <div className="relative">
                 <select 
@@ -827,32 +780,32 @@ export function HomePage() {
             {/* Vehicle Types */}
             <div className="flex flex-wrap gap-2 md:gap-5 mt-5">
               <button 
-                onClick={() => setvehicleCategory('avto')}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors ${vehicleCategory === 'avto' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
+                onClick={() => setVehicleType('avto')}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors ${vehicleType === 'avto' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
               >
                 🚗 {language === 'sl' ? 'Avto' : 'Car'}
               </button>
               <button 
-                onClick={() => setvehicleCategory('motor')}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors ${vehicleCategory === 'motor' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
+                onClick={() => setVehicleType('motor')}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors ${vehicleType === 'motor' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
               >
                 🏍 {language === 'sl' ? 'Motor' : 'Motorcycle'}
               </button>
               <button 
-                onClick={() => setvehicleCategory('kamion')}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors ${vehicleCategory === 'kamion' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
+                onClick={() => setVehicleType('kamion')}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors ${vehicleType === 'kamion' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
               >
                 🚚 {language === 'sl' ? 'Kamion' : 'Truck'}
               </button>
               <button 
-                onClick={() => setvehicleCategory('kombi')}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors ${vehicleCategory === 'kombi' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
+                onClick={() => setVehicleType('kombi')}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors ${vehicleType === 'kombi' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
               >
                 🚐 {language === 'sl' ? 'Kombi' : 'Van'}
               </button>
               <button 
-                onClick={() => setvehicleCategory('traktor')}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors ${vehicleCategory === 'traktor' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
+                onClick={() => setVehicleType('traktor')}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors ${vehicleType === 'traktor' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
               >
                 🚜 Traktor {matchingCount > 0 && `(${matchingCount})`}
               </button>
