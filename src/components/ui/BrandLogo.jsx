@@ -2,12 +2,12 @@ import { twMerge } from 'tailwind-merge'
 
 // Local logo paths (from public/logos folder)
 const BRAND_LOGOS = {
-  'Volkswagen': '/logos/vw.svg',
-  'BMW': '/logos/bmw.svg',
-  'Mercedes-Benz': '/logos/mercedes.svg',
-  'Audi': '/logos/audi.svg',
-  'Opel': '/logos/opel.svg',
-  'Ford': '/logos/ford.svg',
+  'Volkswagen': '/logos/vw.jpg',
+  'BMW': '/logos/bmw.png',
+  'Mercedes-Benz': '/logos/mercedes.png',
+  'Audi': '/logos/audi.png',
+  'Opel': '/logos/opel.png',
+  'Ford': '/logos/ford.png',
 }
 
 export function BrandLogo({ name, className, showLabel = false }) {
