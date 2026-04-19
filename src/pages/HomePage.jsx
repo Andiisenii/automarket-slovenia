@@ -4,7 +4,7 @@ import { CarCard } from '@/components/features/CarCard'
 import { useCars } from '@/lib/CarContext'
 import { useLanguage } from '@/lib/LanguageContext'
 import { useFavorites } from '@/lib/FavoritesContext'
-import { getAllBrands, getModelsForBrand, getAllCities } from '@/lib/data'
+import { getAllBrands, getModelsForBrand, getAllCities, vehicleCategories, vehicleSubCategories } from '@/lib/data'
 
 export function HomePage() {
   const { cars } = useCars()
@@ -65,7 +65,8 @@ export function HomePage() {
   
   // State for search
   const [searchText, setSearchText] = useState('')
-  const [vehicleType, setVehicleType] = useState('avto')
+  const [vehicleCategory, setVehicleCategory] = useState('')
+  const [vehicleSubCategory, setVehicleSubCategory] = useState('')
   const [selectedBrands, setSelectedBrands] = useState([])
   const [selectedModels, setSelectedModels] = useState({}) // { brand: [models] }
   const [priceFrom, setPriceFrom] = useState('')
@@ -402,6 +403,8 @@ export function HomePage() {
                 <button 
                   onClick={() => {
                     setSearchText('')
+                    setVehicleCategory('')
+                    setVehicleSubCategory('')
                     setSelectedBrands([])
                     setSelectedModels({})
                     setPriceFrom('')
@@ -429,6 +432,50 @@ export function HomePage() {
             
             {/* Filters Grid - Simplified */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-[15px] mb-0">
+              {/* Vrsta vozila - Category Selection */}
+              <div className="flex flex-wrap gap-2 p-3 bg-gray-50 rounded-[14px]">
+                {vehicleCategories.map(cat => (
+                  <button
+                    key={cat.value}
+                    onClick={() => {
+                      setVehicleCategory(cat.value === vehicleCategory ? '' : cat.value)
+                      setVehicleSubCategory('')
+                    }}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ${
+                      vehicleCategory === cat.value
+                        ? 'bg-[#ff6a00] text-white'
+                        : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+                    }`}
+                  >
+                    <span className="text-base">
+                      {cat.value === 'avto' && '🚗'}
+                      {cat.value === 'moto' && '🏍️'}
+                      {cat.value === 'kamion' && '🚚'}
+                      {cat.value === 'kombi' && '🚐'}
+                      {cat.value === 'traktor' && '🚜'}
+                      {cat.value === 'avtodom' && <img src="/logos/avtodom.png" alt="AvtoDom" className="w-4 h-4 object-contain inline" />}
+                    </span>
+                    <span>{cat.label}</span>
+                  </button>
+                ))}
+              </div>
+              
+              {/* Podkategorija - Shows only when category has subcategories */}
+              {vehicleCategory && vehicleSubCategories[vehicleCategory]?.options?.length > 0 && (
+                <div className="relative col-span-full">
+                  <select
+                    className="w-full px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer appearance-none bg-no-repeat bg-[right_0.5rem_center]"
+                    value={vehicleSubCategory || ''}
+                    onChange={(e) => setVehicleSubCategory(e.target.value)}
+                  >
+                    <option value="">Izberite podrubriko...</option>
+                    {vehicleSubCategories[vehicleCategory].options.map(opt => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              
               {/* Znamka (Brand) - Multi Select */}
               <div className="relative">
                 <select 
