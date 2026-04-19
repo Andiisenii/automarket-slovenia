@@ -321,12 +321,14 @@ export function SearchFilters({ onSearch, onClear }) {
             className={`w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-left flex items-center justify-between hover:bg-gray-50 transition-colors text-sm ${filters.vehicleCategory ? 'text-gray-700' : 'text-gray-400'}`}
           >
             <span className="flex items-center gap-2 truncate">
-              {filters.vehicleCategory === 'avto' && '🚗'}
-              {filters.vehicleCategory === 'moto' && '🏍️'}
-              {filters.vehicleCategory === 'kamion' && '🚚'}
-              {filters.vehicleCategory === 'kombi' && '🚐'}
-              {filters.vehicleCategory === 'traktor' && '🚜'}
-              {filters.vehicleCategory === 'avtodom' && '🏠'}
+              <span className="w-5 h-5 flex items-center justify-center">
+                {filters.vehicleCategory === 'avto' && '🚗'}
+                {filters.vehicleCategory === 'moto' && '🏍️'}
+                {filters.vehicleCategory === 'kamion' && '🚚'}
+                {filters.vehicleCategory === 'kombi' && '🚐'}
+                {filters.vehicleCategory === 'traktor' && '🚜'}
+                {filters.vehicleCategory === 'avtodom' && <img src="/logos/avtodom.png" alt="AvtoDom" className="w-5 h-5 object-contain" />}
+              </span>
               {filters.vehicleCategory
                 ? vehicleCategories.find(c => c.value === filters.vehicleCategory)?.label
                 : 'Vrsta vozila'}
@@ -363,12 +365,14 @@ export function SearchFilters({ onSearch, onClear }) {
                     }}
                     className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 transition-colors flex items-center gap-2 ${filters.vehicleCategory === cat.value ? 'bg-primary-50 text-primary-700 font-medium' : ''}`}
                   >
-                    {cat.value === 'avto' && '🚗'}
-                    {cat.value === 'moto' && '🏍️'}
-                    {cat.value === 'kamion' && '🚚'}
-                    {cat.value === 'kombi' && '🚐'}
-                    {cat.value === 'traktor' && '🚜'}
-                    {cat.value === 'avtodom' && '🏠'}
+                    <span className="w-5 h-5 flex items-center justify-center">
+                      {cat.value === 'avto' && '🚗'}
+                      {cat.value === 'moto' && '🏍️'}
+                      {cat.value === 'kamion' && '🚚'}
+                      {cat.value === 'kombi' && '🚐'}
+                      {cat.value === 'traktor' && '🚜'}
+                      {cat.value === 'avtodom' && <img src="/logos/avtodom.png" alt="AvtoDom" className="w-5 h-5 object-contain" />}
+                    </span>
                     {cat.label}
                     {filters.vehicleCategory === cat.value && <Check className="w-4 h-4 ml-auto" />}
                   </button>
