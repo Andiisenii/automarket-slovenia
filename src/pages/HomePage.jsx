@@ -814,12 +814,12 @@ export function HomePage() {
                 onClick={() => { setVehicleType('avtodom'); setVehicleSubCategory('') }}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors ${vehicleType === 'avtodom' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
               >
-                <img src="/logos/avtodom.png" alt="AvtoDom" className="w-5 h-5 object-contain inline" /> AvtoDom
+                AvtoDom
               </button>
             </div>
             
-            {/* Subcategory - compact inline */}
-            {vehicleType && vehicleSubCategories[vehicleType]?.options?.length > 0 && (
+            {/* Subcategory - only shows when BOTH category AND subcategory are selected */}
+            {vehicleType && vehicleSubCategory && vehicleSubCategories[vehicleType]?.options?.length > 0 && (
               <div className="mt-3 flex items-center gap-3">
                 <span className="text-sm text-gray-600">Podkategorija:</span>
                 <select
