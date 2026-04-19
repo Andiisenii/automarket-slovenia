@@ -208,160 +208,94 @@ export const brands = []
 export const defaultModels = {}
 
 // Car equipment categories - with proper structure for AddCarPage
-const carEquipmentData = {
-  'varnost': {
-    name: 'Varnost',
-    icon: 'Shield',
-    subcategories: {
-      'zracni_blazini': {
-        name: 'Zračne blazine',
-        features: ['Airbag spredaj', 'Airbag nazaj', 'Airbag stransko', 'Airbag za kolena', 'Zračne zavese']
-      },
-      'varnostni_sistemi': {
-        name: 'Varnostni sistemi',
-        features: ['ABS', 'ESP', 'ASR', 'Tempomat', 'Opozorilnik razdalje', 'Senzor za mrtvi kot', 'Aktivno zaviranje']
-      },
-      'prislusitvena': {
-        name: 'Prislusitvena',
-        features: ['Alarm', 'Vsodilnik za sledenje', 'Zaklepanje volana', 'Immobilizer']
-      }
-    }
-  },
-  'udobje': {
-    name: 'Udobje',
-    icon: 'Settings',
-    subcategories: {
-      'klimatska_naprava': {
-        name: 'Klimatska naprava',
-        features: ['Klima', 'Avtomatska klima', 'Dvo cone klima', 'Cetiri cone klima']
-      },
-      'ogrevanje_hlajenje': {
-        name: 'Ogrevanje in hlajenje',
-        features: ['Greteks', 'Sedeži z ogrevanjem', 'Sedeži s prezračevanjem', 'Ogrevano vetrobransko steklo', 'Ogrevana ogledala']
-      },
-      'elektricni_pomiki': {
-        name: 'Električni pomiki',
-        features: ['Električni pomik sedežev', 'Električno odpiranje prtljagenika', 'Električna vrtljiva ogledala', 'Šiborna okna']
-      },
-      'ostalo_udobje': {
-        name: 'Ostalo',
-        features: ['Centralno zaklepanje', 'SMEMA', 'Tempomat', 'Pomoč pri parkiranju', 'Parkirni senzorji', 'Kamere za parkiranje', 'Električna ročna zavora']
-      }
-    }
-  },
-  'multimedija': {
-    name: 'Multimedija',
-    icon: 'Wifi',
-    subcategories: {
-      'avdio_sistemi': {
-        name: 'Avdio sistemi',
-        features: ['Radio', 'DAB+', 'USB', 'Bluetooth', 'Plošča za telefon']
-      },
-      'povezljivost': {
-        name: 'Povezljivost',
-        features: ['Navigacija', 'Android Auto', 'Apple CarPlay', 'Wi-Fi hotspot', 'Prikažovalnik na vetrobranu']
-      },
-      'ostalo_multimedija': {
-        name: 'Ostalo',
-        features: ['Paket za telefon', 'Prikažovalnik', 'Glasovno upravljanje', 'Dnevne LED zaslon']
-      }
-    }
-  },
-  'sedeži_in_vrata': {
-    name: 'Sedeži in vrata',
-    icon: 'Star',
-    subcategories: {
-      'sedeži': {
-        name: 'Sedeži',
-        features: ['Usnjeni sedeži', 'Tekturni sedeži', 'Električni sedeži', 'Vzvratni asisten', 'Masazni sedeži', 'Sedež za otroke - ISOFIX']
-      },
-      'notranjost': {
-        name: 'Notranjost',
-        features: ['Športni volan', 'Volan z ogrevanjem', 'Električno nastavljiv volan', 'Multifunkcionalen volan', 'Tapecirana notranjost']
-      },
-      'vrata_okna': {
-        name: 'Vrata in okna',
-        features: ['Panoramska streha', 'Pomična streha', 'Senčniki za okna', 'Roleta za prtljag']
-      }
-    }
-  },
-  'podvozje': {
-    name: 'Podvozje',
-    icon: 'Settings',
-    subcategories: {
-      'vzmetenje': {
-        name: 'Vzmetenje',
-        features: ['Športno vzmetenje', 'Zračno vzmetenje', 'Prilagodljivo vzmetenje', 'AVD']
-      },
-      'zavore': {
-        name: 'Zavore',
-        features: ['Karbonske zavore', 'Športne zavore', 'Električna ročna zavora']
-      },
-      'kolesa': {
-        name: 'Kolesa',
-        features: ['Aluminijasta platišča', 'Prestavna ročica', 'Kolesa za rezervo']
-      },
-      'ostalo_podvozje': {
-        name: 'Ostalo',
-        features: ['4x4 pogon', 'Haldex', 'Blokada diferenciala', 'Pnevmatko os', 'Tovorniško podvozje']
-      }
-    }
-  },
-  'zunanjost': {
-    name: 'Zunanjost',
-    icon: 'Sun',
-    subcategories: {
-      'svetila': {
-        name: 'Svetila',
-        features: ['LED žarometi', 'Xenon žarometi', 'Prilagodljivi žarometi', 'LED dnevne luči', 'Žarometi za meglo', 'Matrični LED žarometi']
-      },
-      'karoserija': {
-        name: 'Karoserija',
-        features: ['Armeriran zadnji spojler', 'Sprednji spojler', 'Podvozje za šport', 'Privlačna sidra', 'Rack za kolesa']
-      },
-      'ostevanje': {
-        name: 'Ostevanj',
-        features: ['Zaščita za prah', 'Zaščita za vremenske vplive', 'Zaščita za UV žarke', 'Zaščita za otroke']
-      },
-      'ostalo_zunanjost': {
-        name: 'Ostalo',
-        features: ['Pralnik za žaromete', 'Ogrevano vetrobransko steklo', 'Žerjav za rezervo', 'Tovorniški prostor']
-      }
-    }
-  },
-  'info_multimedia': {
-    name: 'Info multimedija',
-    icon: 'Wifi',
-    subcategories: {
-      'prikazovalniki': {
-        name: 'Prikazovalniki',
-        features: ['Digitalna instrumentna plošča', 'Barvni zaslon', 'Na dotik zaslon', 'Prikažovalnik na vetrobranu']
-      },
-      'povezljivost_infor': {
-        name: 'Povezljivost',
-        features: ['Navigacijski sistem', 'Android Auto', 'Apple CarPlay', 'Bluetooth', 'Wi-Fi']
-      },
-      'ostalo_info': {
-        name: 'Ostalo',
-        features: ['DAB+ radio', 'Paket za telefon', 'Prikažovalnik hitrosti', 'Glasovno upravljanje']
-      }
-    }
-  },
+const carEquipmentCategories = {
   'notranjost': {
     name: 'Notranjost',
     icon: 'Car',
     subcategories: {
-      'sedeži_notr': {
-        name: 'Sedeži',
-        features: ['Usnjeni sedeži', 'Tekturni sedeži', 'Športni sedeži', 'Električni sedeži']
-      },
-      'prtljazni_prostor': {
-        name: 'Prtljažni prostor',
-        features: ['Dvojno dno prtljaznika', 'Deljiva klop', 'Ročna vrata prtljaznika', 'Električna vrata prtljaznika']
-      },
-      'ostalo_notranjost': {
-        name: 'Ostalo',
-        features: ['Ambiente osvetlitev', 'Prilagodljiva osvetlitev', 'Električna vlečna kljuka', 'Tovorniški prostor']
+      'udobje_notr': {
+        name: 'Udobje',
+        features: [
+          'Virtualni Cockpit',
+          'Ambientna osvetlitev notranjosti',
+          'Leseni dodatki notranjosti',
+          'ALU dodatki notranjosti',
+          'Karbonski dodatki notranjosti',
+          'Krom dodatki notranjosti',
+          'Paket za kadilce',
+          'Sportni sedezi',
+          'Komfortni sedezi',
+          'Ortopedski sedezi',
+          '12V vticnica',
+          'Klimatska naprava - rocna',
+          'Sedeži: nastavitev po visini',
+          'Sedeži: el. nastavitev',
+          'Sedeži: paket Memory',
+          'Sedeži: gretje spreda',
+          'Sedeži: gretje zadaj',
+          'Sedeži: hlajenje / ventilacija',
+          'Sedeži: masazna funkcija',
+          'Sredinski naslon za roko med sedezi',
+          'Hladilni predal',
+          'Avtomatska klimatska naprava / digitalna',
+          'Klimatska naprava - 2 conska',
+          'Klimatska naprava - 3 conska',
+          'Klimatska naprava - 4 conska',
+          'Gretje mirujocega vozila (Webasto)',
+          'Tonirana stekla',
+          'Elektricni pomik prednjih stekel',
+          'Elektricni pomik prednjih in zadnjih stekel',
+          'El. nastavijiva zunanja ogledala',
+          'Ogrevanje zunanjih ogledal',
+          'El. zlozijiva zunanja ogledala',
+          'Centralno zaklepanje',
+          'Centralno zaklepanje z daljinskim',
+          'Soft-Close sistem zapiranja',
+          'Sencni rolo za zadnje steklo',
+          'Keyless Go',
+          'Start-Stop sistem',
+          'Elektricni paket',
+          'Nastavijiv volan po visini',
+          'Nastavijiv volan po globini',
+          'Servo volan',
+          'Volanski obroc oblecen v usnje',
+          'Multifunkcijski volan',
+          'Sportni volan',
+          'Ogrevan volanski obroc',
+          'Obvolanski prestavni rocici',
+          'Tempomat',
+          'Aktivni tempomat (Adaptive Cruise Control)',
+          'El. parkima zavora',
+          'El. zapiranje prtljaznika',
+          'Ogrevano vetrobransko steklo'
+        ]
+      }
+    }
+  },
+  'info_multimedia': {
+    name: 'Info-Multimedia',
+    icon: 'Wifi',
+    subcategories: {
+      'avdio': {
+        name: 'Avdio',
+        features: [
+          'Avtoradio',
+          'Avtoradio / CD',
+          'Hi-Fi ozvocenje',
+          'CD izmenjevalnik / streznik',
+          'MP3 predvajalnik',
+          'DVD predvajalnik',
+          'Trdi disk za shranjevanje podatkov',
+          'USB prikljucek (iPod, HD...)',
+          'TV sprejemnik / tuner',
+          'Bluetooth vmesnik',
+          'Apple CarPlay',
+          'Android Auto',
+          'Digitalni radio DAB',
+          'Navigacija',
+          'Navigacija + TV',
+          'Touch screen'
+        ]
       }
     }
   },
@@ -369,17 +303,209 @@ const carEquipmentData = {
     name: 'Uporabnost',
     icon: 'Settings',
     subcategories: {
-      'udobje_upor': {
-        name: 'Udobje',
-        features: ['Avdio sistem', 'Kamera za vzvratno vožnjo', 'Parkirni senzorji', 'Električni pomik']
+      'prtljaznik': {
+        name: 'Prtljažnik in klop',
+        features: [
+          'Deljiva zad.klop 1/2 - 1/2',
+          'Deljiva zad.klop 1/3 - 2/3',
+          'Deljiva zad.klop 1/3-1/3-1/3',
+          'Isofix sistem za pritrditev sedeza',
+          'Integrirani otroški sedez',
+          'Vreca za smuci',
+          'Mrezasta pregrada tovornega prostora',
+          'Rolo prijaznega prostora',
+          'Navodila za uporabo v SLO jeziku',
+          'Dvojno dno prtljaznika',
+          'Strešne sani'
+        ]
       },
-      'varnost_upor': {
-        name: 'Varnost',
-        features: ['Active Guard', 'Driving Assistant', 'Parking Assistant', 'Rear View Camera']
+      'komunikacija': {
+        name: 'Komunikacija in asistenti',
+        features: [
+          'Predpriprava za mobilni telefon',
+          'Avtatelefon',
+          'Potovalni racunalnik',
+          'Komunikacijski paket',
+          'Pomoc pri speljevanju v klanec',
+          'Sistem za aktivno pomoc pri parkiranju',
+          'Parkimi senzorji PDC',
+          'Pomoc pri parkiranju: kamera',
+          'Pomoc pri parkiranju: prednji senzorji',
+          'Pomoc pri parkiranju: zadnji senzorji',
+          'Pomoc pri parkiranju: pogled 360 stopinj',
+          'Vzratna kamera',
+          'Bone stopnice',
+          'Vlecna kijuka',
+          'Vozilo priagojeno invalidu'
+        ]
+      }
+    }
+  },
+  'sedeži_in_vrata': {
+    name: 'Sedeži in vrata',
+    icon: 'Star',
+    subcategories: {
+      'stevilka_sedežev': {
+        name: 'Število sedežev',
+        features: [
+          'Sedežev: 2',
+          'Sedežev: 4',
+          'Sedežev: 5',
+          'Sedežev: 5+2',
+          'Sedežev: 7',
+          'Sedežev: 8',
+          'Bus 30+'
+        ]
       },
-      'ostalo_upor': {
-        name: 'Ostalo',
-        features: ['Komfort pristop', 'Keyless Go', 'Pnevmatsko vzmetenje', 'Protiblokirni sistem']
+      'material_sedežev': {
+        name: 'Material sedežev',
+        features: [
+          'Usnjeni sedeži',
+          'Delno usnjeni sedeži',
+          'Alcantara sedeži'
+        ]
+      },
+      'sklopiva_klop': {
+        name: 'Sklopiva klop',
+        features: [
+          'Sklopiva klop 60/40',
+          'Sklopiva klop 40/20/40'
+        ]
+      },
+      'obloge_vrat': {
+        name: 'Obloge vrat',
+        features: [
+          'Obloga vrat - les',
+          'Obloga vrat - aluminij',
+          'Obloga vrat - karbon',
+          'Obloga vrat - krom'
+        ]
+      },
+      'stevilka_vrat': {
+        name: 'Število vrat',
+        features: [
+          'Vrat: 2',
+          'Vrat: 3',
+          'Vrat: 4',
+          'Vrat: 5'
+        ]
+      },
+      'platišča': {
+        name: 'Platišča',
+        features: ['Platisca (ALU)']
+      }
+    }
+  },
+  'podvozje': {
+    name: 'Podvozje',
+    icon: 'Settings',
+    subcategories: {
+      'zavorni_sistem': {
+        name: 'Zavorni sistem',
+        features: [
+          'Zavorni sistem (ABS)',
+          'Pomoc pri zaviranju (BAS / DBC / EBV)',
+          'Samodejna zapora diferenciala (ASD / EDS)'
+        ]
+      },
+      'stabilnost': {
+        name: 'Stabilnost',
+        features: [
+          'Elektronski program stabilnosti (ESP / DSC)',
+          'Elektronski nadzor Blaiseilnikov (EDC)',
+          'Regulacija nivoja podvozja (ADS)',
+          'Stirikolesni volan (4WS / 4CONTROL)',
+          'Regulacija zdrsa pogonskih koles (ASR / DTC)',
+          'Elektronski sistem za bolisi opnijem koles ETS'
+        ]
+      },
+      'vrsta_podvozja': {
+        name: 'Vrsta podvozja',
+        features: [
+          'Športno podvozje',
+          'Aktivno vzmetenje (ABC - Active Body Control)',
+          'Zracno vzmetenje',
+          'Štirikolesni pogon (4x4 / 4WD / Quattro)'
+        ]
+      }
+    }
+  },
+  'varnost': {
+    name: 'Varnost',
+    icon: 'Shield',
+    subcategories: {
+      'število_airbagov': {
+        name: 'Število airbagov',
+        features: [
+          'Airbag - voznik',
+          'Airbag - sopotnik',
+          'Airbag - stranski (vratni)',
+          'Airbag - zavesni',
+          'Airbag - kolenski'
+        ]
+      },
+      'žarometi_in_luci': {
+        name: 'Žarometi in luči',
+        features: [
+          'Nadzor zracnega tlaka v pnevmatikah (RDK)',
+          'Xenonski zarometi',
+          'Bi-xenonski zarometi',
+          'Samodejno upravljanje dolgih luzi',
+          'LED zarometi',
+          'Prednje (dnevne) LED luci',
+          'Zadnje LED luci',
+          'Meglenke',
+          'Adaptive light / dinamicno prilagodijivi zarometi',
+          '3. zavorna luc',
+          'Naprava za pranie zarometov'
+        ]
+      },
+      'varnostni_asistenti': {
+        name: 'Varnostni asistenti',
+        features: [
+          'Head-Up display',
+          'Sistem za ohranjanje voznega pasu',
+          'Sistem za opozarjanje na mrtvi kot',
+          'Sistem za prepoznavo prometnih znakov',
+          'Senzor za dez',
+          'Sistem za samodejno zaviranje v sili',
+          'Opozorilnik spremembe voznega pasu',
+          'Opozorilnik varnostne razdalje'
+        ]
+      },
+      'zaščita': {
+        name: 'Zaščita',
+        features: [
+          'Alarmna naprava',
+          'Blokada motorja',
+          'Kodno varovan vzign motorja'
+        ]
+      },
+      'pnevmatike': {
+        name: 'Pnevmatike',
+        features: [
+          'Rezervno kolo normalne dimenzije',
+          'Run-Flat pnevmatike'
+        ]
+      }
+    }
+  },
+  'zunanjost': {
+    name: 'Zunanjost',
+    icon: 'Sun',
+    subcategories: {
+      'zunanjost_splošno': {
+        name: 'Zunanjost',
+        features: [
+          'Roofracks - Strešne sani',
+          'Towbar - Vlecna kljuka',
+          'Zasenčena stekla',
+          'Privacy stekla',
+          'Karbon paket zunanj',
+          'Športni izpuh',
+          'Automatski žarometi',
+          'Označevalne luci LED'
+        ]
       }
     }
   },
@@ -389,18 +515,28 @@ const carEquipmentData = {
     subcategories: {
       'garancija': {
         name: 'Garancija',
-        features: ['Brez garancije', '1 leto', '2 leti', '3 leta', '5 let', 'Podaljšana garancija']
+        features: [
+          'Vozilo ima garancio',
+          'Vozilo ima jamstvo',
+          'Vozilo ima oldtimer certifikat',
+          'Servisna knjiga',
+          'Poln servis',
+          'Garažirano',
+          'Brezhibno',
+          'Ne kadi',
+          'Prvi lastnik'
+        ]
       },
-      'stanje_vozila': {
-        name: 'Stanje vozila',
-        features: ['Novo vozilo', 'Rabljeno vozilo', 'Vozilo z garancijo', 'Leasing vozilo']
-      },
-      'prevoz': {
-        name: 'Prevoz',
-        features: ['Možnost prevoza', 'Možnost dostave', 'Možnost zamenjave']
+      'registracija': {
+        name: 'Registracija',
+        features: [
+          'Vozilo je registrirano',
+          'Vozilo je tecnicno pregledano',
+          'Tehnicni pregled velja do'
+        ]
       }
     }
   }
 }
 
-export { carEquipmentData as carEquipmentCategories }
+export { carEquipmentCategories }
