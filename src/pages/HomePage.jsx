@@ -4,7 +4,7 @@ import { CarCard } from '@/components/features/CarCard'
 import { useCars } from '@/lib/CarContext'
 import { useLanguage } from '@/lib/LanguageContext'
 import { useFavorites } from '@/lib/FavoritesContext'
-import { getAllBrands, getModelsForBrand, getAllCities } from '@/lib/data'
+import { getAllBrands, getModelsForBrand, getAllCities, vehicleSubCategories } from '@/lib/data'
 
 export function HomePage() {
   const { cars } = useCars()
@@ -66,6 +66,7 @@ export function HomePage() {
   // State for search
   const [searchText, setSearchText] = useState('')
   const [vehicleType, setVehicleType] = useState('avto')
+  const [vehicleSubCategory, setVehicleSubCategory] = useState('')
   const [selectedBrands, setSelectedBrands] = useState([])
   const [selectedModels, setSelectedModels] = useState({}) // { brand: [models] }
   const [priceFrom, setPriceFrom] = useState('')
@@ -780,36 +781,58 @@ export function HomePage() {
             {/* Vehicle Types */}
             <div className="flex flex-wrap gap-2 md:gap-5 mt-5">
               <button 
-                onClick={() => setVehicleType('avto')}
+                onClick={() => { setVehicleType('avto'); setVehicleSubCategory('') }}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors ${vehicleType === 'avto' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
               >
                 🚗 {language === 'sl' ? 'Avto' : 'Car'}
               </button>
               <button 
-                onClick={() => setVehicleType('motor')}
+                onClick={() => { setVehicleType('motor'); setVehicleSubCategory('') }}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors ${vehicleType === 'motor' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
               >
                 🏍 {language === 'sl' ? 'Motor' : 'Motorcycle'}
               </button>
               <button 
-                onClick={() => setVehicleType('kamion')}
+                onClick={() => { setVehicleType('kamion'); setVehicleSubCategory('') }}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors ${vehicleType === 'kamion' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
               >
                 🚚 {language === 'sl' ? 'Kamion' : 'Truck'}
               </button>
               <button 
-                onClick={() => setVehicleType('kombi')}
+                onClick={() => { setVehicleType('kombi'); setVehicleSubCategory('') }}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors ${vehicleType === 'kombi' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
               >
                 🚐 {language === 'sl' ? 'Kombi' : 'Van'}
               </button>
               <button 
-                onClick={() => setVehicleType('traktor')}
+                onClick={() => { setVehicleType('traktor'); setVehicleSubCategory('') }}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors ${vehicleType === 'traktor' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
               >
-                🚜 Traktor {matchingCount > 0 && `(${matchingCount})`}
+                🚜 {language === 'sl' ? 'Traktor' : 'Tractor'} {matchingCount > 0 && `(${matchingCount})`}
+              </button>
+              <button 
+                onClick={() => { setVehicleType('avtodom'); setVehicleSubCategory('') }}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors ${vehicleType === 'avtodom' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
+              >
+                🏠 AvtoDom
               </button>
             </div>
+            
+            {/* Subcategory dropdown - shows when category has subcategories */}
+            {vehicleType && vehicleSubCategories[vehicleType]?.options?.length > 0 && (
+              <div className="mt-3">
+                <select
+                  className="w-full max-w-md px-3 py-2.5 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer appearance-none bg-no-repeat bg-[right_0.5rem_center]"
+                  value={vehicleSubCategory || ''}
+                  onChange={(e) => setVehicleSubCategory(e.target.value)}
+                >
+                  <option value="">Izberite podrubriko...</option>
+                  {vehicleSubCategories[vehicleType].options.map(opt => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
         </div>
       </section>
