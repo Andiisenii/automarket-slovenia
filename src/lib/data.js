@@ -212,10 +212,76 @@ export const slovenianCities = [
 // Vehicle type categories
 export const vehicleCategories = [
   { value: 'avto', label: 'Avto', icon: 'Car' },
+  { value: 'moto', label: 'Motor', icon: 'Bike' },
   { value: 'kamion', label: 'Kamion', icon: 'Truck' },
   { value: 'kombi', label: 'Kombi', icon: 'Van' },
-  { value: 'moto', label: 'Motor', icon: 'Bike' },
+  { value: 'traktor', label: 'Traktor', icon: 'Tractor' },
+  { value: 'avtodom', label: 'AvtoDom', icon: 'Home' },
 ]
+
+// Vehicle subcategories based on type
+export const vehicleSubCategories = {
+  'avto': { label: 'Podkategorija avtomobila', options: [] },
+  'moto': {
+    label: 'Izberite podrubriko',
+    options: [
+      'Motorno kolo',
+      'Skuter, Maxi-scooter, 3-4 kolesni scooter',
+      'Moped, kolo z motorjem',
+      '4-kolesnik, ATV, UTV, 3-kolesnik',
+      'Minimoto',
+      'Oldtimer',
+      'Go-kart',
+      'Motorne sani',
+      'E-skiro',
+      'E-kolo',
+      'E-moto',
+    ]
+  },
+  'kamion': {
+    label: 'Izberite podrubriko',
+    options: [
+      'Dostavna vozila',
+      'Tovorna vozila',
+      'Avtobusi',
+      'Tovorne prikolice',
+      'UTV vozila',
+    ]
+  },
+  'kombi': {
+    label: 'Izberite podrubriko',
+    options: [
+      'Dostavna vozila',
+      'Tovorna vozila',
+      'Avtobusi',
+      'Tovorne prikolice',
+      'UTV vozila',
+    ]
+  },
+  'traktor': {
+    label: 'Izberite podrubriko',
+    options: [
+      'Gradbena mehanizacija',
+      'Kmetijska mehanizacija',
+      'Viličarji',
+      'Gozdarska mehanizacija',
+      'Komunalna mehanizacija',
+    ]
+  },
+  'avtodom': {
+    label: 'Izberite podrubriko',
+    options: [
+      'Avtodom',
+      'Počitniška prikolica',
+      'Mobilna hišica',
+      'Snemljivi bivalnik',
+      'Šotorska prikolica',
+      'Navtika',
+      'E-kolo',
+      'E-skiro',
+    ]
+  },
+}
 
 // Brands and default models - empty, data from Supabase
 export const brands = []
