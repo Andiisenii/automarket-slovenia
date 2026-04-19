@@ -814,19 +814,20 @@ export function HomePage() {
                 onClick={() => { setVehicleType('avtodom'); setVehicleSubCategory('') }}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors ${vehicleType === 'avtodom' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
               >
-                🏠 AvtoDom
+                <img src="/logos/avtodom.png" alt="AvtoDom" className="w-5 h-5 object-contain inline" /> AvtoDom
               </button>
             </div>
             
-            {/* Subcategory dropdown - shows when category has subcategories */}
+            {/* Subcategory - compact inline */}
             {vehicleType && vehicleSubCategories[vehicleType]?.options?.length > 0 && (
-              <div className="mt-3">
+              <div className="mt-3 flex items-center gap-3">
+                <span className="text-sm text-gray-600">Podkategorija:</span>
                 <select
-                  className="w-full max-w-md px-3 py-2.5 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer appearance-none bg-no-repeat bg-[right_0.5rem_center]"
+                  className="px-3 py-2 rounded-[10px] border border-gray-300 bg-white text-gray-700 cursor-pointer text-sm appearance-none bg-no-repeat bg-[right_0.5rem_center] pr-8"
                   value={vehicleSubCategory || ''}
                   onChange={(e) => setVehicleSubCategory(e.target.value)}
                 >
-                  <option value="">Izberite podrubriko...</option>
+                  <option value="">- Izberi -</option>
                   {vehicleSubCategories[vehicleType].options.map(opt => (
                     <option key={opt} value={opt}>{opt}</option>
                   ))}
