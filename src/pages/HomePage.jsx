@@ -111,7 +111,7 @@ export function HomePage() {
   // Filter brands based on vehicle type
   const filteredBrands = useMemo(() => {
     // Brands and models by vehicle type
-    const vehicleTypeBrands = {
+    const vehicleCategoryBrands = {
       'avto': ['Audi', 'BMW', 'Mercedes-Benz', 'Volkswagen', 'Porsche', 'Opel', 'Toyota', 'Honda', 'Mazda', 'Nissan', 'Lexus', 'Subaru', 'Mitsubishi', 'Suzuki', 'Ford', 'Chevrolet', 'Dodge', 'Jeep', 'Tesla', 'Renault', 'Peugeot', 'Citroen', 'Fiat', 'Alfa Romeo', 'Hyundai', 'Kia', 'Genesis', 'Jaguar', 'Land Rover', 'Mini', 'Volvo', 'Skoda', 'Seat', 'Cupra', 'Dacia', 'Smart', 'Chrysler', 'Cadillac', 'Buick', 'GMC', 'Lincoln', 'Acura', 'Infiniti', 'Maserati', 'Bentley', 'Ferrari', 'Lamborghini', 'Aston Martin', 'Rolls-Royce', 'McLaren', 'Bugatti', 'Pagani', 'Polestar', 'Lucid', 'Rivian', 'DS'],
       'motor': ['Harley-Davidson', 'Yamaha', 'Kawasaki', 'BMW Motorrad', 'Ducati', 'Triumph', 'KTM', 'Piaggio', 'Vespa', 'Indian', 'Benelli', 'CFMoto', 'Royal Enfield', 'Moto Guzzi', 'MV Agusta', 'Beta', 'Gas Gas', 'Husqvarna', 'Sym', 'Keeway', 'Aprilia'],
       'kamion': ['DAF', 'Scania', 'Volvo Trucks', 'MAN', 'Mercedes-Benz Trucks', 'Iveco', 'Renault Trucks', 'Foton', 'Isuzu', 'Kenworth', 'Peterbilt', 'Mack', 'International', 'Freightliner'],
@@ -119,8 +119,8 @@ export function HomePage() {
       'traktor': ['John Deere', 'Massey Ferguson', 'Case IH', 'New Holland', 'Fendt', 'Kubota', 'Claas', 'Deutz-Fahr', 'Valtra', 'Steyr', 'JCB', 'McCormick', 'Landini', 'Zetor', 'SAME', 'Belarus', 'MTZ', 'YTO', 'Dongfeng', 'Mahindra', 'TAFE', 'Eicher', 'Sonalika', 'Farmtrac', 'Agrale']
     }
     
-    return vehicleTypeBrands[vehicleType] || vehicleTypeBrands['avto']
-  }, [allBrands, vehicleType])
+    return vehicleCategoryBrands[vehicleCategory] || vehicleCategoryBrands['avto']
+  }, [allBrands, vehicleCategory])
   const slovenianCities = allCities.length > 0 ? allCities : [
     'Ljubljana', 'Maribor', 'Celje', 'Kranj', 'Koper', 'Nova Gorica',
     'Krško', 'Novo Mesto', 'Ptuj', 'Trbovlje', 'Kamnik', 'Jesenice', 'Žalec',
@@ -170,7 +170,7 @@ export function HomePage() {
     if (yearTo) params.set('yearTo', yearTo)
     if (selectedCities.length) params.set('cities', selectedCities.join(','))
     if (selectedFuel.length) params.set('fuel', selectedFuel.join(','))
-    if (vehicleType) params.set('type', vehicleType)
+    if (vehicleCategory) params.set('type', vehicleCategory)
     
     navigate(`/cars?${params.toString()}`)
   }
@@ -827,32 +827,32 @@ export function HomePage() {
             {/* Vehicle Types */}
             <div className="flex flex-wrap gap-2 md:gap-5 mt-5">
               <button 
-                onClick={() => setVehicleType('avto')}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors ${vehicleType === 'avto' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
+                onClick={() => setvehicleCategory('avto')}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors ${vehicleCategory === 'avto' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
               >
                 🚗 {language === 'sl' ? 'Avto' : 'Car'}
               </button>
               <button 
-                onClick={() => setVehicleType('motor')}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors ${vehicleType === 'motor' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
+                onClick={() => setvehicleCategory('motor')}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors ${vehicleCategory === 'motor' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
               >
                 🏍 {language === 'sl' ? 'Motor' : 'Motorcycle'}
               </button>
               <button 
-                onClick={() => setVehicleType('kamion')}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors ${vehicleType === 'kamion' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
+                onClick={() => setvehicleCategory('kamion')}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors ${vehicleCategory === 'kamion' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
               >
                 🚚 {language === 'sl' ? 'Kamion' : 'Truck'}
               </button>
               <button 
-                onClick={() => setVehicleType('kombi')}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors ${vehicleType === 'kombi' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
+                onClick={() => setvehicleCategory('kombi')}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors ${vehicleCategory === 'kombi' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
               >
                 🚐 {language === 'sl' ? 'Kombi' : 'Van'}
               </button>
               <button 
-                onClick={() => setVehicleType('traktor')}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors ${vehicleType === 'traktor' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
+                onClick={() => setvehicleCategory('traktor')}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors ${vehicleCategory === 'traktor' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
               >
                 🚜 Traktor {matchingCount > 0 && `(${matchingCount})`}
               </button>
