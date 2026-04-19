@@ -88,11 +88,14 @@ export const getAllCities = async () => {
 // Fuel types
 export const fuelTypes = ['Bencin', 'Dizel', 'Hybrid', 'Električni', 'Plin (LPG)']
 
+
 // Transmissions
 export const transmissions = ['Avtomatski', 'Ročni', 'Polavtomatski']
 
+
 // Body types
 export const bodyTypes = ['Traktor', 'Limuzina', 'Hatchback', 'Coupe', 'Kombi', 'Van', 'Pickup', 'Minivan', 'Kabriolet', 'Roadster', 'Targa', 'Fastback', 'Liftback', 'Sportni coupe', 'SUV']
+
 
 // Door counts
 export const doorCounts = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30+']
@@ -145,6 +148,7 @@ export const registracijaOptions = [
   { value: 'potekla_registracija', label: 'Potekla registracija' },
 ]
 
+
 // Vehicle age options
 export const vehicleAgeOptions = [
   { value: '0-1', label: '0-1 leto' },
@@ -155,6 +159,7 @@ export const vehicleAgeOptions = [
   { value: '8-10', label: '8-10 let' },
   { value: '10+', label: '10+ let' },
 ]
+
 
 // Owner count options
 export const ownerCountOptions = [
@@ -183,6 +188,7 @@ export const getYears = (startYear = 1990, endYear = 2026) => {
 export const FALLBACK_BRANDS = []
 export const FALLBACK_MODELS = {}
 
+
 // Luxury car threshold and fee
 export const LUXURY_CAR_THRESHOLD = 50000
 export const LUXURY_FEE = 5
@@ -207,13 +213,14 @@ export const slovenianCities = [
 export const brands = []
 export const defaultModels = {}
 
+
 // Car equipment categories - with proper structure for AddCarPage
 const carEquipmentCategories = {
   'notranjost': {
     name: 'Notranjost',
     icon: 'Car',
     subcategories: {
-      'udobje_notr': {
+      'udobje': {
         name: 'Udobje',
         features: [
           'Virtualni Cockpit',
@@ -276,13 +283,13 @@ const carEquipmentCategories = {
     name: 'Info-Multimedia',
     icon: 'Wifi',
     subcategories: {
-      'avdio': {
-        name: 'Avdio',
+      'avdio_in_povezovanje': {
+        name: 'Avtoradio in povezovanje',
         features: [
           'Avtoradio',
           'Avtoradio / CD',
           'Hi-Fi ozvocenje',
-          'CD izmenjevalnik / streznik',
+          'CD izmenjevalnik / strežnik',
           'MP3 predvajalnik',
           'DVD predvajalnik',
           'Trdi disk za shranjevanje podatkov',
@@ -303,8 +310,8 @@ const carEquipmentCategories = {
     name: 'Uporabnost',
     icon: 'Settings',
     subcategories: {
-      'prtljaznik': {
-        name: 'Prtljažnik in klop',
+      'uporabnost_vse': {
+        name: 'Uporabnost',
         features: [
           'Deljiva zad.klop 1/2 - 1/2',
           'Deljiva zad.klop 1/3 - 2/3',
@@ -316,12 +323,7 @@ const carEquipmentCategories = {
           'Rolo prijaznega prostora',
           'Navodila za uporabo v SLO jeziku',
           'Dvojno dno prtljaznika',
-          'Strešne sani'
-        ]
-      },
-      'komunikacija': {
-        name: 'Komunikacija in asistenti',
-        features: [
+          'Strešne sani',
           'Predpriprava za mobilni telefon',
           'Avtatelefon',
           'Potovalni racunalnik',
@@ -345,8 +347,8 @@ const carEquipmentCategories = {
     name: 'Sedeži in vrata',
     icon: 'Star',
     subcategories: {
-      'stevilka_sedežev': {
-        name: 'Število sedežev',
+      'sedeži': {
+        name: 'Sedeži',
         features: [
           'Sedežev: 2',
           'Sedežev: 4',
@@ -354,20 +356,10 @@ const carEquipmentCategories = {
           'Sedežev: 5+2',
           'Sedežev: 7',
           'Sedežev: 8',
-          'Bus 30+'
-        ]
-      },
-      'material_sedežev': {
-        name: 'Material sedežev',
-        features: [
+          'Bus 30+',
           'Usnjeni sedeži',
           'Delno usnjeni sedeži',
-          'Alcantara sedeži'
-        ]
-      },
-      'sklopiva_klop': {
-        name: 'Sklopiva klop',
-        features: [
+          'Alcantara sedeži',
           'Sklopiva klop 60/40',
           'Sklopiva klop 40/20/40'
         ]
@@ -381,7 +373,7 @@ const carEquipmentCategories = {
           'Obloga vrat - krom'
         ]
       },
-      'stevilka_vrat': {
+      'število_vrat': {
         name: 'Število vrat',
         features: [
           'Vrat: 2',
@@ -389,10 +381,6 @@ const carEquipmentCategories = {
           'Vrat: 4',
           'Vrat: 5'
         ]
-      },
-      'platišča': {
-        name: 'Platišča',
-        features: ['Platisca (ALU)']
       }
     }
   },
@@ -400,6 +388,10 @@ const carEquipmentCategories = {
     name: 'Podvozje',
     icon: 'Settings',
     subcategories: {
+      'platišča': {
+        name: 'Platišča',
+        features: ['Platisca (ALU)']
+      },
       'zavorni_sistem': {
         name: 'Zavorni sistem',
         features: [
@@ -494,7 +486,7 @@ const carEquipmentCategories = {
     name: 'Zunanjost',
     icon: 'Sun',
     subcategories: {
-      'zunanjost_splošno': {
+      'zunanjost_vse': {
         name: 'Zunanjost',
         features: [
           'Roofracks - Strešne sani',
@@ -531,12 +523,28 @@ const carEquipmentCategories = {
         name: 'Registracija',
         features: [
           'Vozilo je registrirano',
-          'Vozilo je tecnicno pregledano',
-          'Tehnicni pregled velja do'
+          'Vozilo je tecnicno pregledano'
         ]
       }
     }
   }
 }
+
+// Default auto-selected features (standard on most cars)
+export const DEFAULT_AUTO_SELECT_FEATURES = [
+  // Varnost - basic safety that comes with every car
+  'Zavorni sistem (ABS)',
+  'Elektronski program stabilnosti (ESP / DSC)',
+  'Airbag - voznik',
+  'Airbag - sopotnik',
+  // Notranjost - common features
+  'Centralno zaklepanje',
+  'Centralno zaklepanje z daljinskim',
+  'Elektricni pomik prednjih stekel',
+  'Servo volan',
+  'Tempomat',
+  // Podvozje
+  'Regulacija zdrsa pogonskih koles (ASR / DTC)',
+]
 
 export { carEquipmentCategories }

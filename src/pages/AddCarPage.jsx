@@ -10,7 +10,7 @@ import { useCars } from '@/lib/CarContext'
 import { packageDB, carDB } from '@/lib/database'
 import { supabase } from '@/lib/supabase'
 import { BrandLogo } from '@/components/ui/BrandLogo'
-import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, colors, vehicleConditionOptions, vehicleConditionSubOptions, carEquipmentCategories, emissionClasses, vehicleAgeOptions, ownerCountOptions, months, getYears, LUXURY_CAR_THRESHOLD, FALLBACK_BRANDS, FALLBACK_MODELS } from '@/lib/data'
+import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, colors, vehicleConditionOptions, vehicleConditionSubOptions, carEquipmentCategories, DEFAULT_AUTO_SELECT_FEATURES, emissionClasses, vehicleAgeOptions, ownerCountOptions, months, getYears, LUXURY_CAR_THRESHOLD, FALLBACK_BRANDS, FALLBACK_MODELS } from '@/lib/data'
 
 export function AddCarPage() {
   const navigate = useNavigate()
@@ -30,7 +30,7 @@ export function AddCarPage() {
     brand: '', model: '', year: new Date().getFullYear(),
     price: '', mileage: '', fuelType: '', transmission: '', bodyType: '',
     engine: '', horsepower: '', color: '', city: '', description: '',
-    vehicleCondition: '', vehicleConditionSub: [], featureIds: [],
+    vehicleCondition: '', vehicleConditionSub: [], featureIds: DEFAULT_AUTO_SELECT_FEATURES,
     // Fuel consumption
     fuelConsumption: '', emissionClass: '', co2Emissions: '', autoPublishFuelData: false,
     // Vehicle age & ownership
@@ -39,7 +39,7 @@ export function AddCarPage() {
     firstRegMonth: '', firstRegYear: '', technicalValidUntil: '', ownerCount: '',
   })
 
-  const [openFeaturesCategory, setOpenFeaturesCategory] = useState('safety')
+  const [openFeaturesCategory, setOpenFeaturesCategory] = useState('notranjost')
 
   const [hasFinancing, setHasFinancing] = useState(false)
   const [showFinancingModal, setShowFinancingModal] = useState(false)
