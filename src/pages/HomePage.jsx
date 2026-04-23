@@ -779,42 +779,42 @@ export function HomePage() {
             </div>
             
             {/* Vehicle Types */}
-            <div className="flex flex-nowrap overflow-x-auto gap-2 md:gap-3 mt-5 pb-2">
+            <div className="flex flex-wrap justify-center gap-2 mt-5">
               <button 
                 onClick={() => { setVehicleType('avto'); setVehicleSubCategory('') }}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors whitespace-nowrap ${vehicleType === 'avto' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
+                className={`flex items-center gap-1 px-3 py-2 text-sm rounded-[10px] cursor-pointer transition-colors ${vehicleType === 'avto' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
               >
                 🚗 {language === 'sl' ? 'Avto' : 'Car'}
               </button>
               <button 
                 onClick={() => { setVehicleType('motor'); setVehicleSubCategory('') }}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors whitespace-nowrap ${vehicleType === 'motor' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
+                className={`flex items-center gap-1 px-3 py-2 text-sm rounded-[10px] cursor-pointer transition-colors ${vehicleType === 'motor' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
               >
-                🏍 {language === 'sl' ? 'Motor' : 'Motorcycle'}
+                🏍 {language === 'sl' ? 'Motor' : 'Moto'}
               </button>
               <button 
                 onClick={() => { setVehicleType('kamion'); setVehicleSubCategory('') }}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors whitespace-nowrap ${vehicleType === 'kamion' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
+                className={`flex items-center gap-1 px-3 py-2 text-sm rounded-[10px] cursor-pointer transition-colors ${vehicleType === 'kamion' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
               >
                 🚚 {language === 'sl' ? 'Kamion' : 'Truck'}
               </button>
               <button 
                 onClick={() => { setVehicleType('kombi'); setVehicleSubCategory('') }}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors whitespace-nowrap ${vehicleType === 'kombi' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
+                className={`flex items-center gap-1 px-3 py-2 text-sm rounded-[10px] cursor-pointer transition-colors ${vehicleType === 'kombi' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
               >
                 🚐 {language === 'sl' ? 'Kombi' : 'Van'}
               </button>
               <button 
                 onClick={() => { setVehicleType('traktor'); setVehicleSubCategory('') }}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors whitespace-nowrap ${vehicleType === 'traktor' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
+                className={`flex items-center gap-1 px-3 py-2 text-sm rounded-[10px] cursor-pointer transition-colors ${vehicleType === 'traktor' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
               >
-                🚜 {language === 'sl' ? 'Traktor' : 'Tractor'} {matchingCount > 0 && `(${matchingCount})`}
+                🚜 {language === 'sl' ? 'Traktor' : 'Tractor'}
               </button>
               <button 
                 onClick={() => { setVehicleType('avtodom'); setVehicleSubCategory('') }}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors whitespace-nowrap ${vehicleType === 'avtodom' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
+                className={`flex items-center gap-1 px-3 py-2 text-sm rounded-[10px] cursor-pointer transition-colors ${vehicleType === 'avtodom' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
               >
-                🚐 {language === 'sl' ? 'AvtoDom' : 'Motorhome'}
+                🚐 AvtoDom
               </button>
             </div>
             
