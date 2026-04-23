@@ -12,30 +12,30 @@ export function HomePage() {
   const { favorites } = useFavorites()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  
+
   // Check if URL has type=new (new cars with year >= 2024, mileage <= 30000)
   const urlType = searchParams.get('type')
   const isNewCarsFilter = urlType === 'new'
-  
+
   // Get dynamic brands from API (async)
   const [allBrands, setAllBrands] = useState([])
   const [allCities, setAllCities] = useState([])
-  
+
   useEffect(() => {
     // Fetch brands and cities from API
     const fetchData = async () => {
       try {
         const brands = await getAllBrands()
         setAllBrands(brands || [])
-        
+
         const cities = await getAllCities()
         setAllCities(cities || [])
-        
+
         // Fetch brand-body-types mapping from Supabase REST API
         try {
           const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://pajbxchnenouxeaimsdr.supabase.co'
           const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY || 'sb_publishable_CQVFr7jAHNfQV5DXvxQiZg_h7Cq6MRH'
-          
+
           const response = await fetch(`${SUPABASE_URL}/rest/v1/brand_body_types?select=brand_name,body_type`, {
             headers: {
               'apikey': SUPABASE_KEY,
@@ -43,7 +43,7 @@ export function HomePage() {
             }
           })
           const data = await response.json()
-          
+
           // Convert to { brand: [bodyTypes] }
           const mapping = {}
           data.forEach(row => {
@@ -62,7 +62,7 @@ export function HomePage() {
     }
     fetchData()
   }, [])
-  
+
   // State for search
   const [searchText, setSearchText] = useState('')
   const [vehicleType, setVehicleType] = useState('avto')
@@ -78,11 +78,18 @@ export function HomePage() {
   const [selectedFuel, setSelectedFuel] = useState([])
   const [selectedBodyTypes, setSelectedBodyTypes] = useState([])
   const [brandBodyTypes, setBrandBodyTypes] = useState({}) // { brand: [bodyTypes] }
-  
+
   // Body types
   const bodyTypes = ['Traktor', 'Limuzina', 'Hatchback', 'Coupe', 'Kombi', 'Van', 'Pickup', 'Minivan', 'Kabriolet', 'Roadster', 'Targa', 'Fastback', 'Liftback', 'Sportni coupe', 'SUV']
-  const motorBodyTypes = ['Sport', 'Chopper', 'Tourer', 'Naked bike', 'Enduro', 'Supermoto', 'Trial', 'Cross']
-  
+
+  // Moto body types by subcategory
+  const motoBodyTypesBySubcategory = {
+    'Motorno kolo': ['Sport', 'Chopper', 'Tourer', 'Naked bike', 'Enduro', 'Supermoto', 'Trial', 'Cross'],
+    'Skuter, Maxi-scooter, 3-4 kolesni scooter': ['Scooter', 'Maxi Scooter', '3-4 kolesni scooter'],
+    'Moped, kolo z motorjem': ['Moped', 'Kolo z motorjem'],
+    '4-kolesnik, ATV, UTV, 3-kolesnik': ['ATV', 'UTV', '3-kolesnik'],
+  }
+
   // Get body types for selected brand
   const getBodyTypesForBrand = (brand) => {
     if (brandBodyTypes[brand]) {
@@ -90,21 +97,29 @@ export function HomePage() {
     }
     return bodyTypes // fallback to all body types
   }
-  
+
   // Get all body types from all selected brands (or brands with selected models)
   const availableBodyTypes = useMemo(() => {
-    // If vehicle type is motor, return motor body types
-    if (vehicleType === 'moto') {
-      return motorBodyTypes
+    // If vehicle type is motor and subcategory is selected, return body types for that subcategory
+    if (vehicleType === 'moto' && vehicleSubCategory) {
+      if (motoBodyTypesBySubcategory[vehicleSubCategory]) {
+        return motoBodyTypesBySubcategory[vehicleSubCategory]
+      }
+      return [] // No body types for this subcategory
     }
-    
+
+    // If vehicle type is motor (no subcategory yet), return empty
+    if (vehicleType === 'moto') {
+      return []
+    }
+
     // If models are selected for specific brands, use those brands
     // Otherwise use selectedBrands
-    const brandsWithModels = Object.keys(selectedModels).filter(brand => 
+    const brandsWithModels = Object.keys(selectedModels).filter(brand =>
       selectedModels[brand] && selectedModels[brand].length > 0
     )
     const brandsToUse = brandsWithModels.length > 0 ? brandsWithModels : selectedBrands
-    
+
     if (brandsToUse.length === 0) return bodyTypes
     const types = new Set()
     brandsToUse.forEach(brand => {
@@ -112,8 +127,8 @@ export function HomePage() {
       brandTypes.forEach(type => types.add(type))
     })
     return Array.from(types)
-  }, [selectedBrands, selectedModels, brandBodyTypes, vehicleType])
-  
+  }, [selectedBrands, selectedModels, brandBodyTypes, vehicleType, vehicleSubCategory])
+
   // Filter brands based on vehicle type
   const filteredBrands = useMemo(() => {
     // Brands and models by vehicle type
@@ -124,7 +139,7 @@ export function HomePage() {
       'kombi': ['Mercedes-Benz Sprinter', 'Ford Transit', 'Renault Master', 'Iveco Daily', 'Fiat Ducato', 'Peugeot Boxer', 'Citroen Jumper', 'Volkswagen Transporter', 'Opel Movano', 'Toyota Proace', 'Nissan NV'],
       'traktor': ['John Deere', 'Massey Ferguson', 'Case IH', 'New Holland', 'Fendt', 'Kubota', 'Claas', 'Deutz-Fahr', 'Valtra', 'Steyr', 'JCB', 'McCormick', 'Landini', 'Zetor', 'SAME', 'Belarus', 'MTZ', 'YTO', 'Dongfeng', 'Mahindra', 'TAFE', 'Eicher', 'Sonalika', 'Farmtrac', 'Agrale']
     }
-    
+
     return vehicleTypeBrands[vehicleType] || vehicleTypeBrands['avto']
   }, [allBrands, vehicleType])
   const slovenianCities = allCities.length > 0 ? allCities : [
@@ -141,23 +156,23 @@ export function HomePage() {
     'Trebnje', 'Tržič', 'Turnišče', 'Velenje', 'Vinica', 'Vipava', 'Vitanje',
     'Vodice', 'Vožec', 'Zagorje ob Savi', 'Zavrč', 'Zreče', 'Železniki'
   ]
-  
+
   // Fuel types
   const fuelTypes = ['Bencin', 'Dizel', 'Hybrid', 'Električni', 'Plin (LPG)']
-  
+
   // Year options (2025 to 2100)
   const yearOptions = Array.from({ length: 37 }, (_, i) => 1990 + i)
-  
+
   // Price options (simplified: 0 to 1M+)
   const priceOptions = [
     '', '0', '100', '1000', '10000', '100000', '1000000'
   ]
-  
+
   // Mileage options (simplified: 0 to 1M+)
   const mileageOptions = [
     '', '0', '100', '1000', '10000', '100000', '1000000'
   ]
-  
+
   // Handle search
   const handleSearch = () => {
     const params = new URLSearchParams()
@@ -177,13 +192,13 @@ export function HomePage() {
     if (selectedCities.length) params.set('cities', selectedCities.join(','))
     if (selectedFuel.length) params.set('fuel', selectedFuel.join(','))
     if (vehicleType) params.set('type', vehicleType)
-    
+
     navigate(`/cars?${params.toString()}`)
   }
-  
+
   // Toggle brand selection
   const toggleBrand = (brand) => {
-    setSelectedBrands(prev => 
+    setSelectedBrands(prev =>
       prev.includes(brand) ? prev.filter(b => b !== brand) : [...prev, brand]
     )
     // Clear models when brand is removed
@@ -195,7 +210,7 @@ export function HomePage() {
       })
     }
   }
-  
+
   // Toggle model selection for a specific brand
   const toggleModel = (brand, model) => {
     setSelectedModels(prev => {
@@ -206,10 +221,10 @@ export function HomePage() {
       return { ...prev, [brand]: newBrandModels }
     })
   }
-  
+
   // State for models (loaded when brand is selected)
   const [brandModels, setBrandModels] = useState({})
-  
+
   // Fetch models when a brand is selected
   useEffect(() => {
     const fetchModels = async () => {
@@ -224,71 +239,71 @@ export function HomePage() {
       fetchModels()
     }
   }, [selectedBrands])
-  
+
   // Get available models for a brand
   const getBrandModels = (brand) => {
     return brandModels[brand] || []
   }
-  
+
   // Toggle city selection
   const toggleCity = (city) => {
-    setSelectedCities(prev => 
+    setSelectedCities(prev =>
       prev.includes(city) ? prev.filter(c => c !== city) : [...prev, city]
     )
   }
-  
+
   // Toggle fuel selection
   const toggleFuel = (fuel) => {
-    setSelectedFuel(prev => 
+    setSelectedFuel(prev =>
       prev.includes(fuel) ? prev.filter(f => f !== fuel) : [...prev, fuel]
     )
   }
-  
+
   // Toggle body type selection
   const toggleBodyType = (type) => {
-    setSelectedBodyTypes(prev => 
+    setSelectedBodyTypes(prev =>
       prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]
     )
   }
-  
+
   // Get promoted cars first, then regular cars (filtered by year/mileage for new cars)
   const getDisplayedCars = () => {
     if (cars.length === 0) return []
-    
+
     // Apply year filter for new cars
     let filteredCars = cars
     if (isNewCarsFilter) {
-      filteredCars = cars.filter(car => 
-        car.year && car.year >= 2024 && 
+      filteredCars = cars.filter(car =>
+        car.year && car.year >= 2024 &&
         car.mileage && parseInt(car.mileage) <= 30000
       )
     }
-    
+
     // Separate promoted and regular cars
     const promotedCars = filteredCars.filter(car => car.promoted)
     const regularCars = filteredCars.filter(car => !car.promoted)
-    
+
     // Return promoted first (max 8), then regular
     return [...promotedCars.slice(0, 8), ...regularCars.slice(0, 8)]
   }
-  
+
   const displayedCars = getDisplayedCars()
   const promotedCars = displayedCars.filter(car => car.promoted)
   const regularCars = displayedCars.filter(car => !car.promoted)
-  
+
   // Get count of matching cars based on current filters
   const getMatchingCarCount = () => {
     if (cars.length === 0) return 0
-    
+
     let result = [...cars]
-    
+
     // Filter by brand
     if (selectedBrands.length > 0) {
-      result = result.filter(car => 
+      result = result.filter(car =>
         selectedBrands.includes(car.brand)
       )
     }
-    
+
     // Filter by model
     if (Object.keys(selectedModels).length > 0) {
       result = result.filter(car => {
@@ -297,28 +312,28 @@ export function HomePage() {
         return brandModels.some(m => carModel?.includes(m.toLowerCase()))
       })
     }
-    
+
     // Filter by fuel
     if (selectedFuel.length > 0) {
-      result = result.filter(car => 
+      result = result.filter(car =>
         selectedFuel.includes(car.fuelType)
       )
     }
-    
+
     // Filter by city
     if (selectedCities.length > 0) {
-      result = result.filter(car => 
+      result = result.filter(car =>
         selectedCities.includes(car.location)
       )
     }
-    
+
     // Filter by body type
     if (selectedBodyTypes.length > 0) {
-      result = result.filter(car => 
+      result = result.filter(car =>
         selectedBodyTypes.includes(car.bodyType)
       )
     }
-    
+
     // Filter by price (od - do)
     if (priceFrom || priceTo) {
       result = result.filter(car => {
@@ -333,18 +348,18 @@ export function HomePage() {
         return true
       })
     }
-    
+
     // Filter by mileage
     if (mileageTo) {
-      result = result.filter(car => 
+      result = result.filter(car =>
         car.mileage && parseInt(car.mileage) <= parseInt(mileageTo)
       )
     }
-    
+
     // Filter by year (od - do) - for new cars filter: year >= 2026, otherwise year range
     if (isNewCarsFilter) {
       // New cars: year >= 2026
-      result = result.filter(car => 
+      result = result.filter(car =>
         car.year && car.year >= 2026
       )
     } else if (yearFrom || yearTo) {
@@ -360,23 +375,23 @@ export function HomePage() {
         return true
       })
     }
-    
+
     return result.length
   }
-  
+
   const matchingCount = getMatchingCarCount()
-  
+
   return (
     <div className="min-h-screen bg-[#f5f6f8]">
       {/* ===== HERO ===== */}
-      <section 
+      <section
         className="min-h-[60vh] md:min-h-screen bg-cover bg-center relative flex justify-center text-center text-white pb-[60px] md:pb-[100px]"
         style={{
           backgroundImage: "url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=2000')",
         }}
       >
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-[#f5f6f8]"></div>
-        
+
         <div className="relative z-10 w-full max-w-[800px] px-4 sm:px-6 pt-[80px] md:pt-[120px]">
           {isNewCarsFilter ? (
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[52px] font-bold mb-6 md:mb-10">
@@ -387,7 +402,7 @@ export function HomePage() {
               {language === 'sl' ? 'Milijoni vozil. Na enem mestu.' : 'Millions of Vehicles. In One Place.'}
             </h1>
           )}
-          
+
           {/* ===== SEARCH BOX ===== */}
           <div className="bg-white p-6 rounded-[20px] shadow-[0_25px_50px_rgba(0,0,0,0.15)]">
             {/* Search Top */}
@@ -399,14 +414,14 @@ export function HomePage() {
                 onChange={(e) => setSearchText(e.target.value)}
                 className="flex-1 min-w-[200px] px-4 py-[15px] rounded-[14px] border border-gray-300 text-gray-900 text-base"
               />
-              <button 
+              <button
                 onClick={handleSearch}
                 className="bg-[#ff6a00] border-none text-white px-8 py-[15px] rounded-[14px] font-semibold cursor-pointer hover:bg-[#ff7f2a] transition-colors"
               >
                 {language === 'sl' ? 'Poišči' : 'Search'}
               </button>
               {(selectedBrands.length > 0 || selectedModels || selectedFuel.length > 0 || selectedCities.length > 0 || selectedBodyTypes.length > 0 || priceFrom || priceTo || mileageTo || yearFrom || yearTo) && (
-                <button 
+                <button
                   onClick={() => {
                     setSearchText('')
                     setSelectedBrands([])
@@ -426,19 +441,19 @@ export function HomePage() {
                 </button>
               )}
             </div>
-            
+
             {/* Matching Cars Count - only show when filters are selected */}
             {(selectedBrands.length > 0 || Object.keys(selectedModels).length > 0 || selectedFuel.length > 0 || selectedCities.length > 0 || selectedBodyTypes.length > 0 || priceFrom || priceTo || mileageTo || yearFrom || yearTo || searchText) && matchingCount > 0 && (
               <div className="text-center mt-3 text-sm text-green-600 font-medium">
                 {matchingCount} {language === 'sl' ? 'makina jan gjithsej' : 'vehicles total'}
               </div>
             )}
-            
+
             {/* Filters Grid - Simplified */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-[15px] mb-0">
               {/* Znamka (Brand) - Multi Select */}
               <div className="relative">
-                <select 
+                <select
                   className="w-full px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer appearance-none"
                   onChange={(e) => {
                     if (e.target.value) toggleBrand(e.target.value)
@@ -460,11 +475,11 @@ export function HomePage() {
                   </div>
                 )}
               </div>
-              
+
               {/* Model - Shows only when brand is selected */}
               {selectedBrands.length > 0 && (
                 <div className="relative">
-                  <select 
+                  <select
                     className="w-full px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer appearance-none"
                     onChange={(e) => {
                       if (e.target.value) {
@@ -486,7 +501,7 @@ export function HomePage() {
                   </select>
                   {Object.entries(selectedModels).some(([_, models]) => models.length > 0) && (
                     <div className="mt-2 flex flex-wrap gap-1">
-                      {Object.entries(selectedModels).map(([brand, models]) => 
+                      {Object.entries(selectedModels).map(([brand, models]) =>
                         models.map(model => (
                           <span key={`${brand}-${model}`} className="text-xs bg-blue-500 text-white px-2 py-1 rounded-full flex items-center gap-1">
                             {model}
@@ -498,11 +513,11 @@ export function HomePage() {
                   )}
                 </div>
               )}
-              
+
               {/* Body Type - Shows when brand is selected OR when vehicle type is motor */}
-              {(selectedBrands.length > 0 || vehicleType === 'moto') && (
+              {((selectedBrands.length > 0 && vehicleType !== 'moto') || (vehicleType === 'moto' && vehicleSubCategory && motoBodyTypesBySubcategory[vehicleSubCategory])) && (
                 <div className="relative">
-                  <select 
+                  <select
                     className="w-full px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer appearance-none"
                     onChange={(e) => {
                       if (e.target.value) toggleBodyType(e.target.value)
@@ -525,7 +540,7 @@ export function HomePage() {
                   )}
                 </div>
               )}
-              
+
               {/* Cena (Price) - "od - do" DROPDOWN */}
               <div className="flex gap-1 items-center">
                 <select
@@ -624,7 +639,7 @@ export function HomePage() {
                   <option value="200000">do 200.000 EUR</option>
                 </select>
               </div>
-              
+
               {/* Kilometri (Mileage) - Only "do" DROPDOWN */}
               <select
                 value={mileageTo}
@@ -644,7 +659,7 @@ export function HomePage() {
                 <option value="200000">do 200.000 km</option>
                 <option value="250000">do 250.000 km</option>
               </select>
-              
+
               {/* Letnik (Year) - "od - do" DROPDOWN */}
               <div className="flex gap-1 items-center">
                 <select
@@ -729,10 +744,10 @@ export function HomePage() {
                   <option value="1960">do 1960</option>
                 </select>
               </div>
-              
+
               {/* Lokacija (City) - Multi Select */}
               <div className="relative">
-                <select 
+                <select
                   className="w-full px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer appearance-none"
                   onChange={(e) => {
                     if (e.target.value) toggleCity(e.target.value)
@@ -757,10 +772,10 @@ export function HomePage() {
                   </div>
                 )}
               </div>
-              
+
               {/* Gorivo (Fuel) - Multi Select */}
               <div className="relative">
-                <select 
+                <select
                   className="w-full px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer appearance-none"
                   onChange={(e) => {
                     if (e.target.value) toggleFuel(e.target.value)
@@ -783,47 +798,47 @@ export function HomePage() {
                 )}
               </div>
             </div>
-            
+
             {/* Vehicle Types */}
             <div className="flex flex-wrap justify-center gap-2 mt-5">
-              <button 
+              <button
                 onClick={() => { setVehicleType('avto'); setVehicleSubCategory('') }}
                 className={`flex items-center gap-1 px-3 py-2 text-sm rounded-[10px] cursor-pointer transition-colors ${vehicleType === 'avto' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
               >
                 🚗 {language === 'sl' ? 'Avto' : 'Car'}
               </button>
-              <button 
+              <button
                 onClick={() => { setVehicleType('moto'); setVehicleSubCategory('') }}
                 className={`flex items-center gap-1 px-3 py-2 text-sm rounded-[10px] cursor-pointer transition-colors ${vehicleType === 'moto' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
               >
                 🏍 {language === 'sl' ? 'Motor' : 'Moto'}
               </button>
-              <button 
+              <button
                 onClick={() => { setVehicleType('kamion'); setVehicleSubCategory('') }}
                 className={`flex items-center gap-1 px-3 py-2 text-sm rounded-[10px] cursor-pointer transition-colors ${vehicleType === 'kamion' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
               >
                 🚚 {language === 'sl' ? 'Kamion' : 'Truck'}
               </button>
-              <button 
+              <button
                 onClick={() => { setVehicleType('kombi'); setVehicleSubCategory('') }}
                 className={`flex items-center gap-1 px-3 py-2 text-sm rounded-[10px] cursor-pointer transition-colors ${vehicleType === 'kombi' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
               >
                 🚐 {language === 'sl' ? 'Kombi' : 'Van'}
               </button>
-              <button 
+              <button
                 onClick={() => { setVehicleType('traktor'); setVehicleSubCategory('') }}
                 className={`flex items-center gap-1 px-3 py-2 text-sm rounded-[10px] cursor-pointer transition-colors ${vehicleType === 'traktor' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
               >
                 🚜 {language === 'sl' ? 'Traktor' : 'Tractor'}
               </button>
-              <button 
+              <button
                 onClick={() => { setVehicleType('avtodom'); setVehicleSubCategory('') }}
                 className={`flex items-center gap-1 px-3 py-2 text-sm rounded-[10px] cursor-pointer transition-colors ${vehicleType === 'avtodom' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
               >
                 🚐 AvtoDom
               </button>
             </div>
-            
+
             {/* Subcategory - shows when vehicle type is 'moto' */}
             {vehicleType === 'moto' && vehicleSubCategories['moto']?.options?.length > 0 && (
               <div className="mt-3 flex items-center gap-3">
@@ -843,10 +858,10 @@ export function HomePage() {
           </div>
         </div>
       </section>
-      
+
       {/* ===== SECTION ===== */}
       <section className="px-4 sm:px-6 lg:px-[60px] py-12 md:py-20 -mt-20 relative z-20">
-        
+
         {/* Promoted Cars Section */}
         {promotedCars.length > 0 && (
           <div className="mb-10">
@@ -858,7 +873,7 @@ export function HomePage() {
                 {language === 'sl' ? 'Vidi vse →' : 'View all →'}
               </Link>
             </div>
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-[25px]">
               {promotedCars.slice(0, 4).map((car, index) => (
                 <CarCard key={car.id || index} car={car} index={index} featured />
@@ -866,7 +881,7 @@ export function HomePage() {
             </div>
           </div>
         )}
-        
+
         {/* Regular Cars Section */}
         {regularCars.length > 0 && (
           <div>
@@ -878,7 +893,7 @@ export function HomePage() {
                 {language === 'sl' ? 'Vidi več ponudb →' : 'View more →'}
               </Link>
             </div>
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-[25px]">
               {regularCars.slice(0, 4).map((car, index) => (
                 <CarCard key={car.id || index} car={car} index={index} featured />
