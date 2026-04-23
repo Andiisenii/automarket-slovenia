@@ -82,6 +82,7 @@ export function HomePage() {
   // Body types
   const bodyTypes = ['Traktor', 'Limuzina', 'Hatchback', 'Coupe', 'Kombi', 'Van', 'Pickup', 'Minivan', 'Kabriolet', 'Roadster', 'Targa', 'Fastback', 'Liftback', 'Sportni coupe', 'SUV']
   const motorBodyTypes = ['Sport', 'Enduro', 'Chopper', 'Tourer', 'Naked Bike', 'Supermoto', 'Trial', 'Cross', 'Custom', 'Motorno kolo s prikolico', 'Oldtimer', 'Tekmovalno']
+  const motorSubcategories = ['Motorna kolesa', 'Skuterji, Maxi-scooterji, 3-4 kolesni scooterji', 'Mopedi, Kolesa z motorjem', '4-kolesniki, ATV, UTV, 3-kolesniki', 'Minimoto', 'Oldtimer', 'Go kart', 'Motorne sani', 'e-kolo']
   
   // Get body types for selected brand
   const getBodyTypesForBrand = (brand) => {
@@ -94,7 +95,7 @@ export function HomePage() {
   // Get all body types from all selected brands (or brands with selected models)
   const availableBodyTypes = useMemo(() => {
     // If vehicle type is motor, return motor body types
-    if (vehicleType === 'motor') {
+    if (vehicleType === 'moto') {
       return motorBodyTypes
     }
     
@@ -500,7 +501,7 @@ export function HomePage() {
               )}
               
               {/* Body Type - Shows when brand is selected OR when vehicle type is motor */}
-              {(selectedBrands.length > 0 || vehicleType === 'motor') && (
+              {(selectedBrands.length > 0 || vehicleType === 'moto') && (
                 <div className="relative">
                   <select 
                     className="w-full px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer appearance-none"
@@ -793,8 +794,8 @@ export function HomePage() {
                 🚗 {language === 'sl' ? 'Avto' : 'Car'}
               </button>
               <button 
-                onClick={() => { setVehicleType('motor'); setVehicleSubCategory('') }}
-                className={`flex items-center gap-1 px-3 py-2 text-sm rounded-[10px] cursor-pointer transition-colors ${vehicleType === 'motor' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
+                onClick={() => { setVehicleType('moto'); setVehicleSubCategory('') }}
+                className={`flex items-center gap-1 px-3 py-2 text-sm rounded-[10px] cursor-pointer transition-colors ${vehicleType === 'moto' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
               >
                 🏍 {language === 'sl' ? 'Motor' : 'Moto'}
               </button>

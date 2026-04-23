@@ -239,17 +239,15 @@ export const vehicleSubCategories = {
   'moto': {
     label: 'Izberite podrubriko',
     options: [
-      'Motorno kolo',
-      'Skuter, Maxi-scooter, 3-4 kolesni scooter',
-      'Moped, kolo z motorjem',
-      '4-kolesnik, ATV, UTV, 3-kolesnik',
+      'Motorna kolesa',
+      'Skuterji, Maxi-scooterji, 3-4 kolesni scooterji',
+      'Mopedi, Kolesa z motorjem',
+      '4-kolesniki, ATV, UTV, 3-kolesniki',
       'Minimoto',
       'Oldtimer',
-      'Go-kart',
+      'Go kart',
       'Motorne sani',
-      'E-skiro',
-      'E-kolo',
-      'E-moto',
+      'e-kolo',
     ]
   },
   'kamion': {
