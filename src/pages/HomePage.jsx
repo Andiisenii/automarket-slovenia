@@ -839,8 +839,8 @@ export function HomePage() {
               </button>
             </div>
 
-            {/* Subcategory - shows when vehicle type is 'moto' */}
-            {vehicleType === 'moto' && vehicleSubCategories['moto']?.options?.length > 0 && (
+            {/* Subcategory - shows when vehicle type has subcategories */}
+            {vehicleType && vehicleSubCategories[vehicleType]?.options?.length > 0 && (
               <div className="mt-3 flex items-center gap-3">
                 <span className="text-sm text-gray-600">Podkategorija:</span>
                 <select
