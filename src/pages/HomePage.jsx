@@ -81,6 +81,7 @@ export function HomePage() {
   
   // Body types
   const bodyTypes = ['Traktor', 'Limuzina', 'Hatchback', 'Coupe', 'Kombi', 'Van', 'Pickup', 'Minivan', 'Kabriolet', 'Roadster', 'Targa', 'Fastback', 'Liftback', 'Sportni coupe', 'SUV']
+  const motorBodyTypes = ['Sport', 'Enduro', 'Chopper', 'Tourer', 'Naked Bike', 'Supermoto', 'Trial', 'Cross', 'Custom', 'Motorno kolo s prikolico', 'Oldtimer', 'Tekmovalno']
   
   // Get body types for selected brand
   const getBodyTypesForBrand = (brand) => {
@@ -92,6 +93,11 @@ export function HomePage() {
   
   // Get all body types from all selected brands (or brands with selected models)
   const availableBodyTypes = useMemo(() => {
+    // If vehicle type is motor, return motor body types
+    if (vehicleType === 'motor') {
+      return motorBodyTypes
+    }
+    
     // If models are selected for specific brands, use those brands
     // Otherwise use selectedBrands
     const brandsWithModels = Object.keys(selectedModels).filter(brand => 
@@ -106,7 +112,7 @@ export function HomePage() {
       brandTypes.forEach(type => types.add(type))
     })
     return Array.from(types)
-  }, [selectedBrands, selectedModels, brandBodyTypes])
+  }, [selectedBrands, selectedModels, brandBodyTypes, vehicleType])
   
   // Filter brands based on vehicle type
   const filteredBrands = useMemo(() => {
@@ -493,8 +499,8 @@ export function HomePage() {
                 </div>
               )}
               
-              {/* Body Type - Shows only when brand is selected */}
-              {selectedBrands.length > 0 && (
+              {/* Body Type - Shows when brand is selected OR when vehicle type is motor */}
+              {(selectedBrands.length > 0 || vehicleType === 'motor') && (
                 <div className="relative">
                   <select 
                     className="w-full px-3 py-3 rounded-[14px] border border-gray-300 bg-white text-gray-700 cursor-pointer appearance-none"
