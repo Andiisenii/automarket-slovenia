@@ -779,7 +779,7 @@ export function HomePage() {
             </div>
             
             {/* Vehicle Types */}
-            <div className="flex flex-wrap gap-2 md:gap-3 mt-5">
+            <div className="flex flex-nowrap overflow-x-auto gap-2 md:gap-3 mt-5 pb-2">
               <button 
                 onClick={() => { setVehicleType('avto'); setVehicleSubCategory('') }}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-[14px] cursor-pointer transition-colors whitespace-nowrap ${vehicleType === 'avto' ? 'bg-[#ff6a00] text-white' : 'bg-[#f3f4f6] text-gray-700'}`}
