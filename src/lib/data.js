@@ -272,6 +272,29 @@ export const vehicleSubCategories = {
       'UTV vozila',
     ]
   },
+  'traktor': {
+    label: 'Izberite podrubriko',
+    options: [
+      'Gradbena mehanizacija',
+      'Kmetijska mehanizacija',
+      'Viličarji',
+      'Gozdarska mehanizacija',
+      'Komunalna mehanizacija',
+    ]
+  },
+  'avtodom': {
+    label: 'Izberite podrubriko',
+    options: [
+      'Avtodom',
+      'Počitniška prikolica',
+      'Mobilna hišica',
+      'Snemljivi bivalnik',
+      'Šotorska prikolica',
+      'Navtika',
+      'E-kolo',
+      'E-skiro',
+    ]
+  },
 }
 
 // Subcategory mapping: main subcategory key -> detailed options
