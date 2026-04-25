@@ -430,15 +430,32 @@ export const subCategoryDetails = {
       'komisionirni',
     ]
   },
-  // Traktor - Gozdarska mehanizacija
-  'Gozdarska mehanizacija': {
-    label: 'Vrsta gozdarske mehanizacije',
-    options: [] // No detailed subcategory yet
+  'Avtodom': {
+    label: 'Vrsta avtodoma',
+    options: [
+      'Alkoven',
+      'Polintegriran',
+      'Integriran',
+      'Crossover',
+      'Kombi / Van',
+      'ni pomembno',
+    ]
   },
-  // Traktor - Komunalna mehanizacija
-  'Komunalna mehanizacija': {
-    label: 'Vrsta komunalne mehanizacije',
-    options: [] // No detailed subcategory yet
+  'Počitniška prikolica': {
+    label: 'Vrsta počitniške prikolice',
+    options: [] // No subcategories
+  },
+  'Mobilna hišica': {
+    label: 'Vrsta mobilne hišice',
+    options: [] // No subcategories
+  },
+  'Snemljivi bivalnik': {
+    label: 'Vrsta snemljivega bivalnika',
+    options: [] // No subcategories
+  },
+  'Šotorska prikolica': {
+    label: 'Vrsta šotorske prikolice',
+    options: [] // No subcategories
   },
   // For Kombi and Kamion - Tovorne prikolice subcategory
   'Tovorne prikolice': {
