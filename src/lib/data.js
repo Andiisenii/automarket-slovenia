@@ -324,15 +324,98 @@ export const subCategoryDetails = {
   // For Kombi and Kamion - Avtobusi subcategory
   'Avtobusi': {
     label: 'Vrsta avtobusa',
+    options: [] // No detailed subcategory - just show label
+  },
+  // For Kombi and Kamion - UTV vozila subcategory
+  'UTV vozila': {
+    label: 'Vrsta UTV vozila',
+    options: [] // No detailed subcategory
+  },
+  // Traktor - Gradbena mehanizacija
+  'Gradbena mehanizacija': {
+    label: 'Vrsta gradbene mehanizacije',
     options: [
-      'Avtobus',
-      'Mini avtobus',
-      'Skupinski avtobus',
-      'Medkrajevni avtobus',
-      'Čarterski avtobus',
-      'Šolski avtobus',
-      'Turistični avtobus',
+      'ni pomembno',
+      'bager / goseničar',
+      'bager / na kolesih',
+      'buldožer',
+      'demper',
+      'drobilec',
+      'dvigalo',
+      'dvižna ploščad',
+      'freza',
+      'greder',
+      'kladivo',
+      'kombinirka / rovokopač',
+      'kompresor / agregat',
+      'mehanizacija za kamnolom',
+      'mini bager',
+      'nakladalec',
+      'robot',
+      'valjar',
+      'ostala mehanizacija',
     ]
+  },
+  // Traktor - Kmetijska mehanizacija
+  'Kmetijska mehanizacija': {
+    label: 'Vrsta kmetijske mehanizacije',
+    options: [
+      'ni pomembno',
+      'balirka',
+      'brana',
+      'cisterna za prevoz',
+      'česalnik',
+      'dognojevalec',
+      'freza',
+      'izkopalnik / okopalnik',
+      'kmetijski kombajn',
+      'kosilnica',
+      'mešalnica krmil',
+      'motokultivator',
+      'mulčar',
+      'nakladalec',
+      'obračalnik',
+      'odjemalec silaže',
+      'ovijalka za bale',
+      'plug',
+      'predsetvenik',
+      'sadilna tehnika',
+      'samonakladalka',
+      'sejalnica',
+      'škropilnica',
+      'šrotar',
+      'traktor',
+      'traktorska prikolica',
+      'traktorski plato',
+      'trosilec',
+      'zgrabljalnik',
+      'vrtni traktor',
+      'ostala mehanizacija',
+    ]
+  },
+  // Traktor - Viličarji
+  'Viličarji': {
+    label: 'Vrsta viličarja',
+    options: [
+      'ni pomembno',
+      'čelni',
+      'paletni',
+      'bočni',
+      'regalni',
+      'ročni',
+      'teleskopski',
+      'komisionirni',
+    ]
+  },
+  // Traktor - Gozdarska mehanizacija
+  'Gozdarska mehanizacija': {
+    label: 'Vrsta gozdarske mehanizacije',
+    options: [] // No detailed subcategory yet
+  },
+  // Traktor - Komunalna mehanizacija
+  'Komunalna mehanizacija': {
+    label: 'Vrsta komunalne mehanizacije',
+    options: [] // No detailed subcategory yet
   },
   // For Kombi and Kamion - Tovorne prikolice subcategory
   'Tovorne prikolice': {
