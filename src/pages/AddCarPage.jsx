@@ -10,7 +10,7 @@ import { useCars } from '@/lib/CarContext'
 import { packageDB, carDB } from '@/lib/database'
 import { supabase } from '@/lib/supabase'
 import { BrandLogo } from '@/components/ui/BrandLogo'
-import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, colors, vehicleConditionOptions, vehicleConditionSubOptions, carEquipmentCategories, DEFAULT_AUTO_SELECT_FEATURES, vehicleCategories, vehicleSubCategories, emissionClasses, vehicleAgeOptions, ownerCountOptions, months, getYears, LUXURY_CAR_THRESHOLD, FALLBACK_BRANDS, FALLBACK_MODELS } from '@/lib/data'
+import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, colors, vehicleConditionOptions, vehicleConditionSubOptions, carEquipmentCategories, DEFAULT_AUTO_SELECT_FEATURES, vehicleCategories, vehicleSubCategories, subCategoryDetails, emissionClasses, vehicleAgeOptions, ownerCountOptions, months, getYears, LUXURY_CAR_THRESHOLD, FALLBACK_BRANDS, FALLBACK_MODELS } from '@/lib/data'
 
 export function AddCarPage() {
   const navigate = useNavigate()
@@ -27,7 +27,7 @@ export function AddCarPage() {
   const [publishingPackages, setPublishingPackages] = useState([])
   
   const [formData, setFormData] = useState({
-    vehicleCategory: 'avto', vehicleSubCategory: '', brand: '', model: '', year: new Date().getFullYear(),
+    vehicleCategory: 'avto', vehicleSubCategory: '', vehicleSubCategoryDetail: '', brand: '', model: '', year: new Date().getFullYear(),
     price: '', mileage: '', fuelType: '', transmission: '', bodyType: '',
     engine: '', horsepower: '', color: '', city: '', description: '',
     vehicleCondition: '', vehicleConditionSub: [], featureIds: DEFAULT_AUTO_SELECT_FEATURES,
@@ -654,6 +654,25 @@ const saveCustomModel = (brand, model) => {
               >
                 <option value="">Izberi...</option>
                 {vehicleSubCategories[formData.vehicleCategory].options.map(opt => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
+            </div>
+          )}
+          
+          {/* Vehicle SubCategory Detail Selection - 3rd level */}
+          {formData.vehicleSubCategory && subCategoryDetails[formData.vehicleSubCategory]?.options?.length > 0 && (
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                {subCategoryDetails[formData.vehicleSubCategory].label}
+              </label>
+              <select
+                value={formData.vehicleSubCategoryDetail || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, vehicleSubCategoryDetail: e.target.value }))}
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
+              >
+                <option value="">Izberi...</option>
+                {subCategoryDetails[formData.vehicleSubCategory].options.map(opt => (
                   <option key={opt} value={opt}>{opt}</option>
                 ))}
               </select>

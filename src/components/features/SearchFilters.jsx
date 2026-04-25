@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, X, ChevronDown, Check, Plus, Car, Bike, Truck, Van } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
-import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, vehicleCategories, vehicleSubCategories } from '@/lib/data'
+import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, vehicleCategories, vehicleSubCategories, subCategoryDetails } from '@/lib/data'
 import { useCars } from '@/lib/CarContext'
 import { useLanguage } from '@/lib/LanguageContext'
 
@@ -62,6 +62,7 @@ export function SearchFilters({ onSearch, onClear }) {
     search: searchParams.get('q') || '',
     vehicleCategory: searchParams.get('vehicleCategory') || '',
     vehicleSubCategory: searchParams.get('vehicleSubCategory') || '',
+    vehicleSubCategoryDetail: searchParams.get('vehicleSubCategoryDetail') || '',
     brand: initialBrand,
     models: initialModels,
     city: initialCity,
@@ -121,6 +122,14 @@ export function SearchFilters({ onSearch, onClear }) {
         searchParams.set('vehicleSubCategory', value)
       } else {
         searchParams.delete('vehicleSubCategory')
+      }
+      // Clear detail subcategory when subcategory changes
+      searchParams.delete('vehicleSubCategoryDetail')
+    } else if (key === 'vehicleSubCategoryDetail') {
+      if (value) {
+        searchParams.set('vehicleSubCategoryDetail', value)
+      } else {
+        searchParams.delete('vehicleSubCategoryDetail')
       }
     } else if (key === 'brand') {
       if (value) {
@@ -387,11 +396,30 @@ export function SearchFilters({ onSearch, onClear }) {
           <div className="relative min-w-[200px]">
             <select
               value={filters.vehicleSubCategory || ''}
-              onChange={(e) => handleChange('vehicleSubCategory', e.target.value)}
+              onChange={(e) => {
+                handleChange('vehicleSubCategory', e.target.value)
+                handleChange('vehicleSubCategoryDetail', '')
+              }}
               className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm appearance-none bg-no-repeat bg-[right_0.5rem_center]"
             >
               <option value="">Podkategorija</option>
               {vehicleSubCategories[filters.vehicleCategory].options.map(opt => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
+          </div>
+        )}
+        
+        {/* Vehicle SubCategory Detail - 3rd level dropdown */}
+        {filters.vehicleSubCategory && subCategoryDetails[filters.vehicleSubCategory]?.options?.length > 0 && (
+          <div className="relative min-w-[200px]">
+            <select
+              value={filters.vehicleSubCategoryDetail || ''}
+              onChange={(e) => handleChange('vehicleSubCategoryDetail', e.target.value)}
+              className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm appearance-none bg-no-repeat bg-[right_0.5rem_center]"
+            >
+              <option value="">{subCategoryDetails[filters.vehicleSubCategory].label}</option>
+              {subCategoryDetails[filters.vehicleSubCategory].options.map(opt => (
                 <option key={opt} value={opt}>{opt}</option>
               ))}
             </select>

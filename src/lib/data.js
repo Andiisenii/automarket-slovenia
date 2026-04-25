@@ -272,6 +272,109 @@ export const vehicleSubCategories = {
       'UTV vozila',
     ]
   },
+}
+
+// Subcategory mapping: main subcategory key -> detailed options
+// Used when user selects a subcategory like "Dostavna vozila" and needs more specific options
+export const subCategoryDetails = {
+  // For Kombi and Kamion - Dostavna vozila subcategory
+  'Dostavna vozila': {
+    label: 'Vrsta dostavnega vozila',
+    options: [
+      'Furgon',
+      'Kombi',
+      'Kamionet',
+      'Šasija s kabino',
+      'Šasija z nadgradnjo',
+      'Pick up',
+    ]
+  },
+  // For Kombi and Kamion - Tovorna vozila subcategory
+  'Tovorna vozila': {
+    label: 'Vrsta tovornega vozila',
+    options: [
+      'Avtovleka',
+      'Avtotransporter',
+      'Furgon',
+      'Gasilsko vozilo',
+      'Gozdarsko vozilo',
+      'Komunalno vozilo',
+      'Kontejnerski tovornjak',
+      'Kiper',
+      'Mešalnik betona',
+      'S cisterno',
+      'S hladilnikom',
+      'S kesonom',
+      'S platojem',
+      'S ponjavo',
+      'S prekucnikom',
+      'Smetarsko vozilo',
+      'Storitveni',
+      'Tovornjak-šasija',
+      'Vlačilec',
+      'Z dvižno ploščadjo',
+      'Z mobilnim vrtalnikom',
+      'Z žerjavom',
+      'Za hlode',
+      'Za prevoz živine',
+      'Za razsuti tovor',
+      'Zabojnik',
+    ]
+  },
+  // For Kombi and Kamion - Avtobusi subcategory
+  'Avtobusi': {
+    label: 'Vrsta avtobusa',
+    options: [
+      'Avtobus',
+      'Mini avtobus',
+      'Skupinski avtobus',
+      'Medkrajevni avtobus',
+      'Čarterski avtobus',
+      'Šolski avtobus',
+      'Turistični avtobus',
+    ]
+  },
+  // For Kombi and Kamion - Tovorne prikolice subcategory
+  'Tovorne prikolice': {
+    label: 'Vrsta tovorne prikolice',
+    options: [
+      'ni pomembno',
+      'Betonski mešalnik',
+      'Cisterna',
+      'Delovni oder',
+      'Hladilnik',
+      'Keson',
+      'Keson + ponjava',
+      'Kontejnerska prikolica',
+      'Nizki priklopnik',
+      'Platforma',
+      'Podvozje',
+      'Prekucnik',
+      'Prodajna prikolica',
+      'Silos',
+      'Tandemska prikolica',
+      'Traktorska prikolica',
+      'Transporter dolgega materiala',
+      'Walking floor',
+      'za transport stekla',
+      'za čolne',
+      'za konje',
+      'za prevoz lesa',
+      'za prevoz pijač',
+      'za prevoz vozil',
+      'za prevoz živine',
+      'Ostale prikolice',
+    ]
+  },
+  // For Kombi and Kamion - UTV vozila subcategory
+  'UTV vozila': {
+    label: 'Vrsta UTV vozila',
+    options: [
+      'ATV',
+      'UTV',
+      '3-kolesnik',
+    ]
+  },
   'traktor': {
     label: 'Izberite podrubriko',
     options: [

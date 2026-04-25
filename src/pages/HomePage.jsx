@@ -4,7 +4,7 @@ import { CarCard } from '@/components/features/CarCard'
 import { useCars } from '@/lib/CarContext'
 import { useLanguage } from '@/lib/LanguageContext'
 import { useFavorites } from '@/lib/FavoritesContext'
-import { getAllBrands, getModelsForBrand, getAllCities, vehicleSubCategories } from '@/lib/data'
+import { getAllBrands, getModelsForBrand, getAllCities, vehicleSubCategories, subCategoryDetails } from '@/lib/data'
 
 export function HomePage() {
   const { cars } = useCars()
@@ -67,6 +67,7 @@ export function HomePage() {
   const [searchText, setSearchText] = useState('')
   const [vehicleType, setVehicleType] = useState('avto')
   const [vehicleSubCategory, setVehicleSubCategory] = useState('')
+  const [vehicleSubCategoryDetail, setVehicleSubCategoryDetail] = useState('')
   const [selectedBrands, setSelectedBrands] = useState([])
   const [selectedModels, setSelectedModels] = useState({}) // { brand: [models] }
   const [priceFrom, setPriceFrom] = useState('')
@@ -192,6 +193,8 @@ export function HomePage() {
     if (selectedCities.length) params.set('cities', selectedCities.join(','))
     if (selectedFuel.length) params.set('fuel', selectedFuel.join(','))
     if (vehicleType) params.set('type', vehicleType)
+    if (vehicleSubCategory) params.set('subcategory', vehicleSubCategory)
+    if (vehicleSubCategoryDetail) params.set('subcategoryDetail', vehicleSubCategoryDetail)
 
     navigate(`/cars?${params.toString()}`)
   }
@@ -846,13 +849,30 @@ export function HomePage() {
                 <select
                   className="px-3 py-2 rounded-[10px] border border-gray-300 bg-white text-gray-700 cursor-pointer text-sm appearance-none bg-no-repeat bg-[right_0.5rem_center] pr-8"
                   value={vehicleSubCategory || ''}
-                  onChange={(e) => setVehicleSubCategory(e.target.value)}
+                  onChange={(e) => { setVehicleSubCategory(e.target.value); setVehicleSubCategoryDetail('') }}
                 >
                   <option value="">- Izberi -</option>
                   {vehicleSubCategories[vehicleType].options.map(opt => (
                     <option key={opt} value={opt}>{opt}</option>
                   ))}
                 </select>
+                
+                {/* Subcategory Detail - 3rd level dropdown */}
+                {vehicleSubCategory && subCategoryDetails[vehicleSubCategory]?.options?.length > 0 && (
+                  <>
+                    <span className="text-sm text-gray-600">Vrsta:</span>
+                    <select
+                      className="px-3 py-2 rounded-[10px] border border-gray-300 bg-white text-gray-700 cursor-pointer text-sm appearance-none bg-no-repeat bg-[right_0.5rem_center] pr-8"
+                      value={vehicleSubCategoryDetail || ''}
+                      onChange={(e) => setVehicleSubCategoryDetail(e.target.value)}
+                    >
+                      <option value="">- {subCategoryDetails[vehicleSubCategory].label} -</option>
+                      {subCategoryDetails[vehicleSubCategory].options.map(opt => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+                  </>
+                )}
               </div>
             )}
           </div>
