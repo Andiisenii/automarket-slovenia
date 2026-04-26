@@ -39,6 +39,11 @@ export function AddCarPage() {
     firstRegMonth: '', firstRegYear: '', technicalValidUntil: '', ownerCount: '',
     // Motor specific technical characteristics
     engineCapacity: '', enginePowerKw: '', cylinderCount: '', engineStroke: '', diffLock: '', startType: '',
+    // Kamion specific fields
+    airbagCountKamion: '', nosilnost: '', tovorniProstor: '',
+    zadnjaVrata: [], stranskaVrata: [],
+    barvaOblazinjenja: '', oblazinjenje: '', strehaVozila: [],
+    vin: '',
   })
 
   const [openFeaturesCategory, setOpenFeaturesCategory] = useState('notranjost')
@@ -246,6 +251,11 @@ const saveCustomModel = (brand, model) => {
         firstRegMonth: editCar.firstRegMonth || '', firstRegYear: editCar.firstRegYear || '', technicalValidUntil: editCar.technicalValidUntil || '', ownerCount: editCar.ownerCount || '',
         // Motor specific
         engineCapacity: editCar.engineCapacity || '', enginePowerKw: editCar.enginePowerKw || '', cylinderCount: editCar.cylinderCount || '', engineStroke: editCar.engineStroke || '', diffLock: editCar.diffLock || '', startType: editCar.startType || '',
+        // Kamion specific
+        airbagCountKamion: editCar.airbagCountKamion || '', nosilnost: editCar.nosilnost || '', tovorniProstor: editCar.tovorniProstor || '',
+        zadnjaVrata: editCar.zadnjaVrata || [], stranskaVrata: editCar.stranskaVrata || [],
+        barvaOblazinjenja: editCar.barvaOblazinjenja || '', oblazinjenje: editCar.oblazinjenje || '', strehaVozila: editCar.strehaVozila || [],
+        vin: editCar.vin || '',
       })
       setImages(editCar.images || [])
       if (editCar.hasFinancing) {
@@ -997,6 +1007,187 @@ const saveCustomModel = (brand, model) => {
                   <option value="Kick (nožen)">Kick (nožen)</option>
                   <option value="Električni in kick">Električni in kick</option>
                 </select>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Dodatni podatki za Kamion */}
+        {formData.vehicleCategory === 'kamion' && (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Dodatni podatki za dostavno vozilo</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Število airbagov</label>
+                <select
+                  value={formData.airbagCountKamion || ''}
+                  onChange={(e) => handleChange('airbagCountKamion', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
+                >
+                  <option value="">Izberi...</option>
+                  {[0,1,2,3,4,5,6,7,8].map(n => (
+                    <option key={n} value={n}>{n}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Nosilnost (kg)</label>
+                <input
+                  type="number"
+                  placeholder="npr. 1000"
+                  value={formData.nosilnost || ''}
+                  onChange={(e) => handleChange('nosilnost', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Tovorni prostor (m³)</label>
+                <input
+                  type="number"
+                  step="0.1"
+                  placeholder="npr. 8.5"
+                  value={formData.tovorniProstor || ''}
+                  onChange={(e) => handleChange('tovorniProstor', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">VIN / štev. šasije</label>
+                <input
+                  type="text"
+                  placeholder="npr. WVZZZ123456789012"
+                  value={formData.vin || ''}
+                  onChange={(e) => handleChange('vin', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Barva oblazinjenja</label>
+                <select
+                  value={formData.barvaOblazinjenja || ''}
+                  onChange={(e) => handleChange('barvaOblazinjenja', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
+                >
+                  <option value="">Izberi...</option>
+                  <option value="črna">Črna</option>
+                  <option value="siva">Siva</option>
+                  <option value="bež">Bež</option>
+                  <option value="rjava">Rjava</option>
+                  <option value="modra">Modra</option>
+                  <option value="rdeča">Rdeča</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Oblazinjenje</label>
+                <select
+                  value={formData.oblazinjenje || ''}
+                  onChange={(e) => handleChange('oblazinjenje', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
+                >
+                  <option value="">Izberi...</option>
+                  <option value="blago">Blago</option>
+                  <option value="usnje">Usnje</option>
+                  <option value="delno_usnje">Delno usnje</option>
+                  <option value="alcantara">Alcantara</option>
+                  <option value="tkanina">Tkanina</option>
+                  <option value="velur">Velur</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Zadnja vrata - multi-checkbox */}
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Zadnja vrata</label>
+              <div className="flex flex-wrap gap-3">
+                {['Dvižna zadnja vrata', 'Dvokrilna zadnja vrata', 'Zastekljena zadnja vrata'].map(opt => (
+                  <label key={opt} className={`flex items-center gap-2 px-4 py-2 rounded-xl border cursor-pointer transition-all text-sm ${
+                    formData.zadnjaVrata.includes(opt)
+                      ? 'border-orange-500 bg-orange-50 text-orange-700'
+                      : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                  }`}>
+                    <input
+                      type="checkbox"
+                      checked={formData.zadnjaVrata.includes(opt)}
+                      onChange={(e) => {
+                        const newVals = e.target.checked
+                          ? [...formData.zadnjaVrata, opt]
+                          : formData.zadnjaVrata.filter(v => v !== opt)
+                        handleChange('zadnjaVrata', newVals)
+                      }}
+                      className="sr-only"
+                    />
+                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                      formData.zadnjaVrata.includes(opt) ? 'border-orange-500 bg-orange-500' : 'border-gray-300'
+                    }`}>
+                      {formData.zadnjaVrata.includes(opt) && <Check className="w-3 h-3 text-white" />}
+                    </div>
+                    {opt}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Stranska vrata - multi-checkbox */}
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Stranska vrata</label>
+              <div className="flex flex-wrap gap-3">
+                {['Drsna LEVO', 'Drsna DESNO', 'DVOJNA drsna (levo in desno)'].map(opt => (
+                  <label key={opt} className={`flex items-center gap-2 px-4 py-2 rounded-xl border cursor-pointer transition-all text-sm ${
+                    formData.stranskaVrata.includes(opt)
+                      ? 'border-orange-500 bg-orange-50 text-orange-700'
+                      : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                  }`}>
+                    <input
+                      type="checkbox"
+                      checked={formData.stranskaVrata.includes(opt)}
+                      onChange={(e) => {
+                        const newVals = e.target.checked
+                          ? [...formData.stranskaVrata, opt]
+                          : formData.stranskaVrata.filter(v => v !== opt)
+                        handleChange('stranskaVrata', newVals)
+                      }}
+                      className="sr-only"
+                    />
+                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                      formData.stranskaVrata.includes(opt) ? 'border-orange-500 bg-orange-500' : 'border-gray-300'
+                    }`}>
+                      {formData.stranskaVrata.includes(opt) && <Check className="w-3 h-3 text-white" />}
+                    </div>
+                    {opt}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Streha vozila - multi-checkbox */}
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Streha vozila</label>
+              <div className="flex flex-wrap gap-3">
+                {['El. pomik', 'Povišana', 'Nizka'].map(opt => (
+                  <label key={opt} className={`flex items-center gap-2 px-4 py-2 rounded-xl border cursor-pointer transition-all text-sm ${
+                    formData.strehaVozila.includes(opt)
+                      ? 'border-orange-500 bg-orange-50 text-orange-700'
+                      : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                  }`}>
+                    <input
+                      type="checkbox"
+                      checked={formData.strehaVozila.includes(opt)}
+                      onChange={(e) => {
+                        const newVals = e.target.checked
+                          ? [...formData.strehaVozila, opt]
+                          : formData.strehaVozila.filter(v => v !== opt)
+                        handleChange('strehaVozila', newVals)
+                      }}
+                      className="sr-only"
+                    />
+                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                      formData.strehaVozila.includes(opt) ? 'border-orange-500 bg-orange-500' : 'border-gray-300'
+                    }`}>
+                      {formData.strehaVozila.includes(opt) && <Check className="w-3 h-3 text-white" />}
+                    </div>
+                    {opt}
+                  </label>
+                ))}
               </div>
             </div>
           </div>
