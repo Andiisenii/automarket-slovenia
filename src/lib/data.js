@@ -528,8 +528,12 @@ export const brands = []
 export const defaultModels = {}
 
 
-// Car equipment categories - with proper structure for AddCarPage
-const carEquipmentCategories = {
+// ============================================================
+// CAR EQUIPMENT CATEGORIES - one per vehicle type
+// ============================================================
+
+// Equipment for AVTO (standard cars)
+const avtoEquipmentCategories = {
   'notranjost': {
     name: 'Notranjost',
     icon: 'Car',
@@ -844,6 +848,46 @@ const carEquipmentCategories = {
   }
 }
 
+// Equipment for MOTOR (motorcycles)
+const motorEquipmentCategories = {
+  'motor_oprema': {
+    name: 'Oprema',
+    icon: 'Settings',
+    subcategories: {
+      'motor_oprema_vse': {
+        name: 'Oprema',
+        features: [
+          'Športni izpuh',
+          'ABS zavorni sistem',
+          'Protizdrsni sistem (TCS)',
+          'Nadzor tlaka v pnevmatikah (RDC)',
+          'Elektronsko nastavljivo vzmetenje (ESA)',
+          'Vzvratna prestava',
+          'Tempomat',
+          'Varnostni zaščitni loki',
+          'Katalizator',
+          '12V vtičnica',
+          'Alarmna naprava',
+          'Kodno varovan vžig motorja',
+          'Radio',
+          'Nastavljiv sedež po višini',
+          'Gretje sedeža',
+          'Gretje ročic krmila',
+          'Stabilizator krmila',
+          'Prtljažni kovček',
+          'Stranski kovček',
+          'Vetrna zaščita',
+          'Navigacija',
+          'Airbag',
+          'Meglenke',
+          'Potovalni računalnik',
+          'Custom predelava',
+        ]
+      }
+    }
+  }
+}
+
 // Default auto-selected features (standard on most cars)
 export const DEFAULT_AUTO_SELECT_FEATURES = [
   // Varnost - basic safety that comes with every car
@@ -861,4 +905,33 @@ export const DEFAULT_AUTO_SELECT_FEATURES = [
   'Regulacija zdrsa pogonskih koles (ASR / DTC)',
 ]
 
+// carEquipmentCategories = avtoEquipmentCategories (backwards compat)
+const carEquipmentCategories = avtoEquipmentCategories
 export { carEquipmentCategories }
+
+// Map vehicle category → its equipment categories object
+export const vehicleEquipmentMap = {
+  'avto': avtoEquipmentCategories,
+  'moto': motorEquipmentCategories,
+}
+
+// Default features per vehicle category (used when switching category)
+export const DEFAULT_FEATURES_PER_CATEGORY = {
+  'avto': [
+    'Zavorni sistem (ABS)',
+    'Elektronski program stabilnosti (ESP / DSC)',
+    'Airbag - voznik',
+    'Airbag - sopotnik',
+    'Centralno zaklepanje',
+    'Centralno zaklepanje z daljinskim',
+    'Elektricni pomik prednjih stekel',
+    'Servo volan',
+    'Tempomat',
+    'Regulacija zdrsa pogonskih koles (ASR / DTC)',
+  ],
+  'moto': [
+    'ABS zavorni sistem',
+    'Tempomat',
+    'Radio',
+  ],
+}

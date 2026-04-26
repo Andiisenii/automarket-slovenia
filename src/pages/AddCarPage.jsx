@@ -10,7 +10,7 @@ import { useCars } from '@/lib/CarContext'
 import { packageDB, carDB } from '@/lib/database'
 import { supabase } from '@/lib/supabase'
 import { BrandLogo } from '@/components/ui/BrandLogo'
-import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, colors, vehicleConditionOptions, vehicleConditionSubOptions, carEquipmentCategories, DEFAULT_AUTO_SELECT_FEATURES, vehicleCategories, vehicleSubCategories, subCategoryDetails, emissionClasses, vehicleAgeOptions, ownerCountOptions, months, getYears, LUXURY_CAR_THRESHOLD, FALLBACK_BRANDS, FALLBACK_MODELS } from '@/lib/data'
+import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, colors, vehicleConditionOptions, vehicleConditionSubOptions, carEquipmentCategories, DEFAULT_AUTO_SELECT_FEATURES, vehicleCategories, vehicleSubCategories, subCategoryDetails, emissionClasses, vehicleAgeOptions, ownerCountOptions, months, getYears, LUXURY_CAR_THRESHOLD, FALLBACK_BRANDS, FALLBACK_MODELS, vehicleEquipmentMap, DEFAULT_FEATURES_PER_CATEGORY } from '@/lib/data'
 
 export function AddCarPage() {
   const navigate = useNavigate()
@@ -37,6 +37,8 @@ export function AddCarPage() {
     vehicleAge: '', hasWarranty: false, hasGuarantee: false, hasOldtimerCert: false,
     // Registration details
     firstRegMonth: '', firstRegYear: '', technicalValidUntil: '', ownerCount: '',
+    // Motor specific technical characteristics
+    engineCapacity: '', enginePowerKw: '', cylinderCount: '', engineStroke: '', diffLock: '', startType: '',
   })
 
   const [openFeaturesCategory, setOpenFeaturesCategory] = useState('notranjost')
@@ -187,7 +189,8 @@ const saveCustomModel = (brand, model) => {
   }
 
   const selectAllInCategory = (categoryKey) => {
-    const categoryData = carEquipmentCategories[categoryKey]
+    const equipMap = vehicleEquipmentMap[formData.vehicleCategory] || {}
+    const categoryData = equipMap[categoryKey]
     if (!categoryData) return
     
     const allFeatureNames = []
@@ -209,7 +212,8 @@ const saveCustomModel = (brand, model) => {
   const getSelectedCount = () => formData.featureIds.length
   
   const getSelectedInCategory = (categoryKey) => {
-    const categoryData = carEquipmentCategories[categoryKey]
+    const equipMap = vehicleEquipmentMap[formData.vehicleCategory] || {}
+    const categoryData = equipMap[categoryKey]
     if (!categoryData) return 0
     
     const allFeatureNames = []
@@ -240,6 +244,8 @@ const saveCustomModel = (brand, model) => {
         vehicleAge: editCar.vehicleAge || '', hasWarranty: editCar.hasWarranty || false, hasGuarantee: editCar.hasGuarantee || false, hasOldtimerCert: editCar.hasOldtimerCert || false,
         // Registration
         firstRegMonth: editCar.firstRegMonth || '', firstRegYear: editCar.firstRegYear || '', technicalValidUntil: editCar.technicalValidUntil || '', ownerCount: editCar.ownerCount || '',
+        // Motor specific
+        engineCapacity: editCar.engineCapacity || '', enginePowerKw: editCar.enginePowerKw || '', cylinderCount: editCar.cylinderCount || '', engineStroke: editCar.engineStroke || '', diffLock: editCar.diffLock || '', startType: editCar.startType || '',
       })
       setImages(editCar.images || [])
       if (editCar.hasFinancing) {
@@ -313,6 +319,15 @@ const saveCustomModel = (brand, model) => {
     document.addEventListener('visibilitychange', handleVisibility)
     return () => document.removeEventListener('visibilitychange', handleVisibility)
   }, [])
+
+  // Ensure openFeaturesCategory is always valid for the current vehicle category
+  useEffect(() => {
+    const equipMap = vehicleEquipmentMap[formData.vehicleCategory] || {}
+    const availableKeys = Object.keys(equipMap)
+    if (availableKeys.length > 0 && !availableKeys.includes(openFeaturesCategory)) {
+      setOpenFeaturesCategory(availableKeys[0])
+    }
+  }, [formData.vehicleCategory])
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -630,7 +645,23 @@ const saveCustomModel = (brand, model) => {
                     value={cat.value}
                     checked={formData.vehicleCategory === cat.value}
                     onChange={() => {
-                      setFormData(prev => ({ ...prev, vehicleCategory: cat.value, vehicleSubCategory: '', brand: '', model: '' }))
+                      const newCategory = cat.value
+                      const defaultFeatures = DEFAULT_FEATURES_PER_CATEGORY[newCategory] || []
+                      setFormData(prev => ({ 
+                        ...prev, 
+                        vehicleCategory: newCategory, 
+                        vehicleSubCategory: '', 
+                        vehicleSubCategoryDetail: '',
+                        brand: '', 
+                        model: '',
+                        featureIds: defaultFeatures
+                      }))
+                      // Reset open features category to first available
+                      const cats = vehicleEquipmentMap[newCategory]
+                      if (cats) {
+                        const firstKey = Object.keys(cats)[0]
+                        setOpenFeaturesCategory(firstKey)
+                      }
                     }}
                     className="sr-only"
                   />
@@ -886,6 +917,91 @@ const saveCustomModel = (brand, model) => {
           </div>
         </div>
 
+        {/* Tehnične karakteristike - samo za Motor */}
+        {formData.vehicleCategory === 'moto' && (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Tehnične karakteristike</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Prostornina motorja (ccm)</label>
+                <input
+                  type="number"
+                  placeholder="npr. 125"
+                  value={formData.engineCapacity || ''}
+                  onChange={(e) => handleChange('engineCapacity', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Moč motorja (kW)</label>
+                <input
+                  type="number"
+                  placeholder="npr. 11"
+                  value={formData.enginePowerKw || ''}
+                  onChange={(e) => handleChange('enginePowerKw', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Število valjev</label>
+                <select
+                  value={formData.cylinderCount || ''}
+                  onChange={(e) => handleChange('cylinderCount', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
+                >
+                  <option value="">Izberi...</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="6">6</option>
+                  <option value="8">8</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Takt motorja</label>
+                <select
+                  value={formData.engineStroke || ''}
+                  onChange={(e) => handleChange('engineStroke', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
+                >
+                  <option value="">Izberi...</option>
+                  <option value="2-takt">2-takt</option>
+                  <option value="4-takt">4-takt</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Blokada</label>
+                <select
+                  value={formData.diffLock || ''}
+                  onChange={(e) => handleChange('diffLock', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
+                >
+                  <option value="">Izberi...</option>
+                  <option value="Brez">Brez</option>
+                  <option value="Sprednja">Sprednja</option>
+                  <option value="Zadnja">Zadnja</option>
+                  <option value="Sprednja in zadnja">Sprednja in zadnja</option>
+                  <option value="Središčna (centralna)">Središčna (centralna)</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Zagon</label>
+                <select
+                  value={formData.startType || ''}
+                  onChange={(e) => handleChange('startType', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
+                >
+                  <option value="">Izberi...</option>
+                  <option value="Električni">Električni</option>
+                  <option value="Kick (nožen)">Kick (nožen)</option>
+                  <option value="Električni in kick">Električni in kick</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Poraba goriva in emisije */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Poraba goriva in emisije (NEDC)</h2>
@@ -1055,7 +1171,7 @@ const saveCustomModel = (brand, model) => {
           
           {/* Category tabs */}
           <div className="flex flex-wrap gap-2 mb-4">
-            {Object.entries(carEquipmentCategories).map(([key, category]) => {
+            {Object.entries(vehicleEquipmentMap[formData.vehicleCategory] || {}).map(([key, category]) => {
               const selectedInCategory = getSelectedInCategory(key)
               const isActive = openFeaturesCategory === key
               
@@ -1070,14 +1186,14 @@ const saveCustomModel = (brand, model) => {
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
-                  {key === 'notranjost' && <Car className="w-4 h-4" />}
-                  {key === 'info_multimedia' && <Wifi className="w-4 h-4" />}
-                  {key === 'uporabnost' && <Settings className="w-4 h-4" />}
-                  {key === 'sedeži_in_vrata' && <Star className="w-4 h-4" />}
-                  {key === 'podvozje' && <Settings className="w-4 h-4" />}
-                  {key === 'varnost' && <Shield className="w-4 h-4" />}
-                  {key === 'zunanjost' && <Sun className="w-4 h-4" />}
-                  {key === 'garancija_stanje' && <Award className="w-4 h-4" />}
+                  {category.icon === 'Car' && <Car className="w-4 h-4" />}
+                  {category.icon === 'Wifi' && <Wifi className="w-4 h-4" />}
+                  {category.icon === 'Settings' && <Settings className="w-4 h-4" />}
+                  {category.icon === 'Star' && <Star className="w-4 h-4" />}
+                  {category.icon === 'Shield' && <Shield className="w-4 h-4" />}
+                  {category.icon === 'Sun' && <Sun className="w-4 h-4" />}
+                  {category.icon === 'Award' && <Award className="w-4 h-4" />}
+                  {category.icon === 'Home' && <Award className="w-4 h-4" />}
                   {category.name}
                   {selectedInCategory > 0 && (
                     <span className={`text-xs px-1.5 py-0.5 rounded-full ${
@@ -1100,10 +1216,10 @@ const saveCustomModel = (brand, model) => {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
             >
-              {carEquipmentCategories[openFeaturesCategory] && (
+              {(vehicleEquipmentMap[formData.vehicleCategory] || {})[openFeaturesCategory] && (
                 <>
                   {/* Regular checkboxes for all categories */}
-                  {Object.entries(carEquipmentCategories[openFeaturesCategory].subcategories || {}).map(([subKey, subCategory]) => (
+                  {Object.entries((vehicleEquipmentMap[formData.vehicleCategory] || {})[openFeaturesCategory]?.subcategories || {}).map(([subKey, subCategory]) => (
                     <div key={subKey} className="mb-4">
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="text-sm font-semibold text-gray-700">{subCategory.name}</h3>
