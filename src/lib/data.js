@@ -1026,7 +1026,51 @@ const kamionAvtobusEquipmentCategories = {
 // Map subcategory → equipment (for Kamion)
 export const kamionSubCategoryEquipmentMap = {
   'Avtobusi': kamionAvtobusEquipmentCategories,
+  'UTV vozila': kamionUTVEquipmentCategories,
+  'Tovorne prikolice': {}, // no equipment, only form fields
 }
+
+// UTV equipment - same as motorcycle
+const kamionUTVEquipmentCategories = {
+  'utv_oprema': {
+    name: 'Oprema',
+    icon: 'Settings',
+    subcategories: {
+      'utv_oprema_vse': {
+        name: 'Oprema',
+        features: [
+          'Športni izpuh',
+          'ABS zavorni sistem',
+          'Protizdrsni sistem (TCS)',
+          'Nadzor tlaka v pnevmatikah (RDC)',
+          'Elektronsko nastavljivo vzmetenje (ESA)',
+          'Vzvratna prestava',
+          'Tempomat',
+          'Varnostni zaščitni loki',
+          'Katalizator',
+          '12V vtičnica',
+          'Alarmna naprava',
+          'Kodno varovan vžig motorja',
+          'Radio',
+          'Nastavljiv sedež po višini',
+          'Gretje sedeža',
+          'Gretje ročic krmila',
+          'Stabilizator krmila',
+          'Prtljažni kovček',
+          'Stranski kovček',
+          'Vetrna zaščita',
+          'Navigacija',
+          'Airbag',
+          'Meglenke',
+          'Potovalni računalnik',
+          'Custom predelava',
+        ]
+      }
+    }
+  }
+}
+
+// Tovorna prikolica - no equipment list, only form fields (dolžina, širina, osi, nosilnost, etc.)
 
 // Equipment for KAMION (trucks / delivery vehicles) - ALL items from user list
 const kamionEquipmentCategories = {

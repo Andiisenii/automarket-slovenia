@@ -44,6 +44,10 @@ export function AddCarPage() {
     zadnjaVrata: [], stranskaVrata: [],
     barvaOblazinjenja: '', oblazinjenje: '', strehaVozila: [],
     vin: '',
+    // Tovorna prikolica specific
+    dolžina: '', širina: '', števOsi: '', dovoljenaSkupnaTeža: '', volumen: '',
+    // UTV specific
+    utvEngineCapacity: '', utvEnginePowerKm: '', utvCylinderCount: '', utvEngineStroke: '', utvDiffLock: '', utvStartType: '',
   })
 
   const [openFeaturesCategory, setOpenFeaturesCategory] = useState('notranjost')
@@ -266,6 +270,10 @@ const saveCustomModel = (brand, model) => {
         zadnjaVrata: editCar.zadnjaVrata || [], stranskaVrata: editCar.stranskaVrata || [],
         barvaOblazinjenja: editCar.barvaOblazinjenja || '', oblazinjenje: editCar.oblazinjenje || '', strehaVozila: editCar.strehaVozila || [],
         vin: editCar.vin || '',
+        // Tovorna prikolica
+        dolžina: editCar.dolžina || '', širina: editCar.širina || '', števOsi: editCar.števOsi || '', dovoljenaSkupnaTeža: editCar.dovoljenaSkupnaTeža || '', volumen: editCar.volumen || '',
+        // UTV
+        utvEngineCapacity: editCar.utvEngineCapacity || '', utvEnginePowerKm: editCar.utvEnginePowerKm || '', utvCylinderCount: editCar.utvCylinderCount || '', utvEngineStroke: editCar.utvEngineStroke || '', utvDiffLock: editCar.utvDiffLock || '', utvStartType: editCar.utvStartType || '',
       })
       setImages(editCar.images || [])
       if (editCar.hasFinancing) {
@@ -702,10 +710,22 @@ const saveCustomModel = (brand, model) => {
                 value={formData.vehicleSubCategory || ''}
                 onChange={(e) => {
                   const newSubCat = e.target.value
-                  const isKamionAvtobus = formData.vehicleCategory === 'kamion' && newSubCat === 'Avtobusi'
-                  const defaultFeats = isKamionAvtobus
-                    ? (kamionSubCategoryEquipmentMap['Avtobusi'] ? Object.values(kamionSubCategoryEquipmentMap['Avtobusi']).flatMap(cat => Object.values(cat.subcategories || {}).flatMap(sub => sub.features || [])) : [])
-                    : DEFAULT_FEATURES_PER_CATEGORY[formData.vehicleCategory] || []
+                  // Determine default features based on category/subcategory
+                  let defaultFeats = []
+                  if (formData.vehicleCategory === 'kamion') {
+                    if (newSubCat === 'Avtobusi') {
+                      defaultFeats = kamionSubCategoryEquipmentMap['Avtobusi']
+                        ? Object.values(kamionSubCategoryEquipmentMap['Avtobusi']).flatMap(cat => Object.values(cat.subcategories || {}).flatMap(sub => sub.features || []))
+                        : []
+                    } else if (newSubCat === 'UTV vozila') {
+                      defaultFeats = kamionSubCategoryEquipmentMap['UTV vozila']
+                        ? Object.values(kamionSubCategoryEquipmentMap['UTV vozila']).flatMap(cat => Object.values(cat.subcategories || {}).flatMap(sub => sub.features || []))
+                        : []
+                    }
+                    // Tovorne prikolice has no equipment - defaultFeats stays empty
+                  } else {
+                    defaultFeats = DEFAULT_FEATURES_PER_CATEGORY[formData.vehicleCategory] || []
+                  }
                   setFormData(prev => ({ ...prev, vehicleSubCategory: newSubCat, featureIds: defaultFeats }))
                 }}
                 className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
@@ -1205,6 +1225,117 @@ const saveCustomModel = (brand, model) => {
                     {opt}
                   </label>
                 ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Dodatni podatki za Tovorna prikolica */}
+        {formData.vehicleCategory === 'kamion' && formData.vehicleSubCategory === 'Tovorne prikolice' && (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Karakteristike tovorne prikolice</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Dolžina (m)</label>
+                <input type="number" step="0.1" placeholder="npr. 6.0" value={formData.dolžina || ''}
+                  onChange={(e) => handleChange('dolžina', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Širina (m)</label>
+                <input type="number" step="0.1" placeholder="npr. 2.4" value={formData.širina || ''}
+                  onChange={(e) => handleChange('širina', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Štev. osi</label>
+                <select value={formData.števOsi || ''}
+                  onChange={(e) => handleChange('števOsi', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white">
+                  <option value="">Izberi...</option>
+                  {[1,2,3,4].map(n => <option key={n} value={n}>{n}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Nosilnost (kg)</label>
+                <input type="number" placeholder="npr. 15000" value={formData.nosilnost || ''}
+                  onChange={(e) => handleChange('nosilnost', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Dov. skupna teža (kg)</label>
+                <input type="number" placeholder="npr. 24000" value={formData.dovoljenaSkupnaTeža || ''}
+                  onChange={(e) => handleChange('dovoljenaSkupnaTeža', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Volumen (m³)</label>
+                <input type="number" step="0.1" placeholder="npr. 32.0" value={formData.volumen || ''}
+                  onChange={(e) => handleChange('volumen', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Dodatni podatki za UTV vozila */}
+        {formData.vehicleCategory === 'kamion' && formData.vehicleSubCategory === 'UTV vozila' && (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Tehnične karakteristike UTV</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Prostornina (ccm)</label>
+                <input type="number" placeholder="npr. 1000" value={formData.utvEngineCapacity || ''}
+                  onChange={(e) => handleChange('utvEngineCapacity', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Moč (KM)</label>
+                <input type="number" placeholder="npr. 85" value={formData.utvEnginePowerKm || ''}
+                  onChange={(e) => handleChange('utvEnginePowerKm', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Število valjev</label>
+                <select value={formData.utvCylinderCount || ''}
+                  onChange={(e) => handleChange('utvCylinderCount', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white">
+                  <option value="">Izberi...</option>
+                  {[1,2,3,4,6,8].map(n => <option key={n} value={n}>{n}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Takt motorja</label>
+                <select value={formData.utvEngineStroke || ''}
+                  onChange={(e) => handleChange('utvEngineStroke', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white">
+                  <option value="">Izberi...</option>
+                  <option value="2-takt">2-takt</option>
+                  <option value="4-takt">4-takt</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Blokada</label>
+                <select value={formData.utvDiffLock || ''}
+                  onChange={(e) => handleChange('utvDiffLock', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white">
+                  <option value="">Izberi...</option>
+                  <option value="Brez">Brez</option>
+                  <option value="Sprednja">Sprednja</option>
+                  <option value="Zadnja">Zadnja</option>
+                  <option value="Sprednja in zadnja">Sprednja in zadnja</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Zagon</label>
+                <select value={formData.utvStartType || ''}
+                  onChange={(e) => handleChange('utvStartType', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white">
+                  <option value="">Izberi...</option>
+                  <option value="Električni">Električni</option>
+                  <option value="Kick (nožen)">Kick (nožen)</option>
+                  <option value="Električni in kick">Električni in kick</option>
+                </select>
               </div>
             </div>
           </div>
