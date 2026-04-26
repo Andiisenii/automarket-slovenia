@@ -10,7 +10,7 @@ import { useCars } from '@/lib/CarContext'
 import { packageDB, carDB } from '@/lib/database'
 import { supabase } from '@/lib/supabase'
 import { BrandLogo } from '@/components/ui/BrandLogo'
-import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, colors, vehicleConditionOptions, vehicleConditionSubOptions, carEquipmentCategories, DEFAULT_AUTO_SELECT_FEATURES, vehicleCategories, vehicleSubCategories, subCategoryDetails, emissionClasses, vehicleAgeOptions, ownerCountOptions, months, getYears, LUXURY_CAR_THRESHOLD, FALLBACK_BRANDS, FALLBACK_MODELS, vehicleEquipmentMap, DEFAULT_FEATURES_PER_CATEGORY, kamionSubCategoryEquipmentMap } from '@/lib/data'
+import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, colors, vehicleConditionOptions, vehicleConditionSubOptions, carEquipmentCategories, DEFAULTAUTOSELECTFEATURES, vehicleCategories, vehicleSubCategories, subCategoryDetails, emissionClasses, vehicleAgeOptions, ownerCountOptions, months, getYears, LUXURYCARTHRESHOLD, FALLBACKBRANDS, FALLBACKMODELS, vehicleEquipmentMap, DEFAULTFEATURESPERCATEGORY, kamionSubCategoryEquipmentMap } from '@/lib/data'
 
 export function AddCarPage() {
   const navigate = useNavigate()
@@ -20,17 +20,17 @@ export function AddCarPage() {
   const { t, language } = useLanguage()
   const isSl = language === 'sl'
 
-  const [allBrands, setAllBrands] = useState(FALLBACK_BRANDS || [])
+  const [allBrands, setAllBrands] = useState(FALLBACKBRANDS || [])
   const [allCities, setAllCities] = useState([])
-  const [brandModels, setBrandModels] = useState(FALLBACK_MODELS || {})
+  const [brandModels, setBrandModels] = useState(FALLBACKMODELS || {})
   const [boostPackages, setBoostPackages] = useState({ private: [], business: [] })
   const [publishingPackages, setPublishingPackages] = useState([])
-  
+
   const [formData, setFormData] = useState({
     vehicleCategory: 'avto', vehicleSubCategory: '', vehicleSubCategoryDetail: '', brand: '', model: '', year: new Date().getFullYear(),
     price: '', mileage: '', fuelType: '', transmission: '', bodyType: '',
     engine: '', horsepower: '', color: '', city: '', description: '',
-    vehicleCondition: '', vehicleConditionSub: [], featureIds: DEFAULT_AUTO_SELECT_FEATURES,
+    vehicleCondition: '', vehicleConditionSub: [], featureIds: DEFAULTAUTOSELECTFEATURES,
     // Fuel consumption
     fuelConsumption: '', emissionClass: '', co2Emissions: '', autoPublishFuelData: false,
     // Vehicle age & ownership
@@ -45,7 +45,7 @@ export function AddCarPage() {
     barvaOblazinjenja: '', oblazinjenje: '', strehaVozila: [],
     vin: '',
     // Tovorna prikolica specific
-    dolÅ¾ina: '', Å¡irina: '', Å¡tevOsi: '', dovoljenaSkupnaTeÅ¾a: '', volumen: '',
+    dolzina: '', sirina: '', stevOsi: '', dovoljenaSkupnaTezza: '', volumen: '',
     // UTV specific
     utvEngineCapacity: '', utvEnginePowerKm: '', utvCylinderCount: '', utvEngineStroke: '', utvDiffLock: '', utvStartType: '',
   })
@@ -64,7 +64,7 @@ export function AddCarPage() {
   const [monthlyCarCount, setMonthlyCarCount] = useState(0)
   const [currentUserCarCount, setCurrentUserCarCount] = useState(0)
 
-  
+
 
   const userId = user?.id
 
@@ -92,7 +92,7 @@ export function AddCarPage() {
     const pkg = packageDB.getCurrentPackage()
     setUserPackage(pkg)
     setIsPremium(packageDB.isPremium())
-    
+
     // Load monthly car count
     if (userId) {
       const myCars = JSON.parse(localStorage.getItem('myListings') || '[]')
@@ -138,7 +138,7 @@ export function AddCarPage() {
   const [modelSuggestions, setModelSuggestions] = useState([])
 
 // Main brands with logos for /add-car
-const MAIN_BRANDS = [
+const MAINBRANDS = [
   { name: 'Volkswagen' },
   { name: 'BMW' },
   { name: 'Mercedes-Benz' },
@@ -151,19 +151,19 @@ const getGroupedModelsForBrand = (brand, brandModelsData, customModelsData) => {
   const models = brandModelsData[brand] || []
   const customModels = customModelsData[brand] || []
   const allModels = [...new Set([...models, ...customModels])]
-  
+
   if (allModels.length === 0) return []
-  
+
   // Group by first word (e.g., "Golf 1.4 TSI" -> "Golf", "A 180" -> "A")
   const grouped = {}
   allModels.forEach(model => {
     const parts = model.split(' ')
     const seriesName = parts[0] // First word is the series
-    
+
     if (!grouped[seriesName]) grouped[seriesName] = []
     grouped[seriesName].push(model)
   })
-  
+
   // Sort groups alphabetically and models within each group
   return Object.entries(grouped)
     .map(([category, models]) => ({
@@ -187,7 +187,7 @@ const saveCustomModel = (brand, model) => {
 
   // Feature selection helpers (using string feature names)
   const isFeatureSelected = (featureName) => formData.featureIds.includes(featureName)
-  
+
   const toggleFeature = (featureName) => {
     setFormData(prev => ({
       ...prev,
@@ -201,14 +201,14 @@ const saveCustomModel = (brand, model) => {
     const equipMap = getEquipMap()
     const categoryData = equipMap[categoryKey]
     if (!categoryData) return
-    
+
     const allFeatureNames = []
     Object.values(categoryData.subcategories || {}).forEach(sub => {
       if (sub.features) {
         allFeatureNames.push(...sub.features)
       }
     })
-    
+
     const allSelected = allFeatureNames.every(name => formData.featureIds.includes(name))
     setFormData(prev => ({
       ...prev,
@@ -229,19 +229,19 @@ const saveCustomModel = (brand, model) => {
   }
 
   const getSelectedCount = () => formData.featureIds.length
-  
+
   const getSelectedInCategory = (categoryKey) => {
     const equipMap = getEquipMap()
     const categoryData = equipMap[categoryKey]
     if (!categoryData) return 0
-    
+
     const allFeatureNames = []
     Object.values(categoryData.subcategories || {}).forEach(sub => {
       if (sub.features) {
         allFeatureNames.push(...sub.features)
       }
     })
-    
+
     return allFeatureNames.filter(name => formData.featureIds.includes(name)).length
   }
 
@@ -250,11 +250,11 @@ const saveCustomModel = (brand, model) => {
       setFormData({
         brand: editCar.brand || '', model: editCar.model || '',
         year: editCar.year || new Date().getFullYear(), price: editCar.price || '',
-        mileage: editCar.mileage || '', fuelType: editCar.fuelType || editCar.fuel_type || '', 
-        transmission: editCar.transmission || '', bodyType: editCar.bodyType || editCar.body_type || '', 
+        mileage: editCar.mileage || '', fuelType: editCar.fuelType || editCar.fueltype || '',
+        transmission: editCar.transmission || '', bodyType: editCar.bodyType || editCar.bodytype || '',
         engine: editCar.engine || '', horsepower: editCar.horsepower || '',
         color: editCar.color || '', city: editCar.city || '', description: editCar.description || '',
-        vehicleCondition: editCar.vehicleCondition || editCar.vehicle_condition || '',
+        vehicleCondition: editCar.vehicleCondition || editCar.vehiclecondition || '',
         vehicleConditionSub: editCar.vehicleConditionSub || [],
         featureIds: editCar.featureIds || [],
         // Fuel
@@ -271,7 +271,7 @@ const saveCustomModel = (brand, model) => {
         barvaOblazinjenja: editCar.barvaOblazinjenja || '', oblazinjenje: editCar.oblazinjenje || '', strehaVozila: editCar.strehaVozila || [],
         vin: editCar.vin || '',
         // Tovorna prikolica
-        dolÅ¾ina: editCar.dolÅ¾ina || '', Å¡irina: editCar.Å¡irina || '', Å¡tevOsi: editCar.Å¡tevOsi || '', dovoljenaSkupnaTeÅ¾a: editCar.dovoljenaSkupnaTeÅ¾a || '', volumen: editCar.volumen || '',
+        dolzina: editCar.dolzina || '', sirina: editCar.sirina || '', stevOsi: editCar.stevOsi || '', dovoljenaSkupnaTezza: editCar.dovoljenaSkupnaTezza || '', volumen: editCar.volumen || '',
         // UTV
         utvEngineCapacity: editCar.utvEngineCapacity || '', utvEnginePowerKm: editCar.utvEnginePowerKm || '', utvCylinderCount: editCar.utvCylinderCount || '', utvEngineStroke: editCar.utvEngineStroke || '', utvDiffLock: editCar.utvDiffLock || '', utvStartType: editCar.utvStartType || '',
       })
@@ -292,43 +292,43 @@ const saveCustomModel = (brand, model) => {
         const { data, error } = await supabase
           .from('packages')
           .select('*')
-          .eq('is_active', true)
-        
+          .eq('isactive', true)
+
         if (error) {
           console.error('Error fetching packages:', error)
           return
         }
-        
+
         console.log('Packages fetched:', JSON.stringify(data).substring(0, 200))
         if (data && data.length > 0) {
           const pubPkgs = data.filter(p => p.type === 'publishing')
           console.log('Publishing packages count:', pubPkgs.length, pubPkgs)
-          
+
           // Set publishing packages with discount info
           setPublishingPackages(pubPkgs.map(p => ({
             id: p.id,
             name: p.name,
-            name_sl: p.name_sl || p.name,
+            namesl: p.namesl || p.name,
             price: parseFloat(p.price),
-            discount_percent: parseInt(p.discount_percent) || 0,
-            discount_active: p.discount_active == 1,
-            min_days: p.min_days || 30
+            discountpercent: parseInt(p.discountpercent) || 0,
+            discountactive: p.discountactive == 1,
+            mindays: p.mindays || 30
           })))
-          
+
           setBoostPackages({
-            private: data.filter(p => p.type === 'boost_private').map(p => ({
+            private: data.filter(p => p.type === 'boostprivate').map(p => ({
               id: p.id,
               name: p.name,
-              name_sl: p.name_sl || p.name,
+              namesl: p.namesl || p.name,
               price: parseFloat(p.price),
-              min_days: p.min_days || 1
+              mindays: p.mindays || 1
             })),
-            business: data.filter(p => p.type === 'boost_business').map(p => ({
+            business: data.filter(p => p.type === 'boostbusiness').map(p => ({
               id: p.id,
               name: p.name,
-              name_sl: p.name_sl || p.name,
+              namesl: p.namesl || p.name,
               price: parseFloat(p.price),
-              min_days: p.min_days || 1
+              mindays: p.mindays || 1
             }))
           })
         }
@@ -337,7 +337,7 @@ const saveCustomModel = (brand, model) => {
       }
     }
     fetchPackages()
-    
+
     // Re-fetch when page becomes visible again (e.g., after admin changes)
     const handleVisibility = () => {
       if (document.visibilityState === 'visible') {
@@ -390,7 +390,7 @@ const saveCustomModel = (brand, model) => {
     })
   }
 
-  const removeImage = (index) => { setImages(prev => prev.filter((_, i) => i !== index)) }
+  const removeImage = (index) => { setImages(prev => prev.filter((, i) => i !== index)) }
 
   const validateForm = () => {
     const newErrors = {}
@@ -408,15 +408,15 @@ const saveCustomModel = (brand, model) => {
   }
 
   // Note: userPackage, isPremium, isBusiness, currentUserCarCount are declared as state
-  
-  // FREE_CAR_LIMIT = 2 cars without package, after that need to buy a package
-  const FREE_CAR_LIMIT = 2
-  
+
+  // FREECARLIMIT = 2 cars without package, after that need to buy a package
+  const FREECARLIMIT = 2
+
   // Logic: Premium always can post. No package = max 2 free cars. Basic/other package = unlimited.
   const canPost = () => {
     // Premium users can always post
     if (isPremium) return { allowed: true, reason: null }
-    
+
     // If user has a valid package (not expired), they can post
     if (userPackage && userPackage.expiresAt) {
       const expiresAt = new Date(userPackage.expiresAt)
@@ -424,21 +424,21 @@ const saveCustomModel = (brand, model) => {
         return { allowed: true, reason: null }
       }
     }
-    
+
     // No valid package - check if under free limit
-    if (currentUserCarCount < FREE_CAR_LIMIT) {
+    if (currentUserCarCount < FREECARLIMIT) {
       return { allowed: true, reason: null }
     }
-    
+
     // Over free limit, needs package
-    return { 
-      allowed: false, 
-      reason: isSl 
-        ? `Brez paketa lahko objavite najveÄ ${FREE_CAR_LIMIT} vozila. Za veÄ kupite paket.`
-        : `Without a package you can only list ${FREE_CAR_LIMIT} cars. Buy a package to list more.`
+    return {
+      allowed: false,
+      reason: isSl
+        ? `Brez paketa lahko objavite najveÄ ${FREECARLIMIT} vozila. Za veÄ kupite paket.`
+        : `Without a package you can only list ${FREECARLIMIT} cars. Buy a package to list more.`
     }
   }
-  
+
   const canPostCar = canPost()
 
   const handleSubmit = (e) => {
@@ -452,8 +452,8 @@ const saveCustomModel = (brand, model) => {
       const carData = {
         ...formData,
         images: defaultImages,
-        fuel_type: formData.fuelType,
-        body_type: formData.bodyType,
+        fueltype: formData.fuelType,
+        bodytype: formData.bodyType,
         hasFinancing: hasFinancing,
         monthlyBudget: hasFinancing ? monthlyBudget : null,
         downPaymentType: hasFinancing && downPaymentValue ? downPaymentType : null,
@@ -467,12 +467,12 @@ const saveCustomModel = (brand, model) => {
 
     if (canPostCar.allowed) {
       const carPrice = parseFloat(formData.price) || 0
-      const isLuxuryCar = !isBusiness && carPrice > LUXURY_CAR_THRESHOLD
+      const isLuxuryCar = !isBusiness && carPrice > LUXURYCARTHRESHOLD
       const carData = {
         ...formData,
         images: defaultImages,
-        fuel_type: formData.fuelType,
-        body_type: formData.bodyType,
+        fueltype: formData.fuelType,
+        bodytype: formData.bodyType,
         featured: isPremium || isBusiness,
         promoted: selectedBoost ? true : false,
         hasBoost: !!selectedBoost,
@@ -499,8 +499,8 @@ const saveCustomModel = (brand, model) => {
     const carDataForPayment = {
       ...formData,
       images: defaultImages,
-      fuel_type: formData.fuelType,
-      body_type: formData.bodyType,
+      fueltype: formData.fuelType,
+      bodytype: formData.bodyType,
       hasFinancing: hasFinancing,
       monthlyBudget: hasFinancing ? monthlyBudget : null,
       downPaymentType: hasFinancing && downPaymentValue ? downPaymentType : null,
@@ -553,13 +553,13 @@ const saveCustomModel = (brand, model) => {
       </div>
 
       <form onSubmit={handleSubmit} className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
+
         {/* Financing Package Modal */}
         <AnimatePresence>
           {showFinancingModal && (
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }} 
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 className="bg-white rounded-2xl max-w-md w-full overflow-hidden"
@@ -567,7 +567,7 @@ const saveCustomModel = (brand, model) => {
                 <div className="p-6 border-b">
                   <div className="flex items-center justify-between">
                     <h3 className="text-xl font-bold text-gray-900">Financiranje - Paket vseh cen</h3>
-                    <button 
+                    <button
                       onClick={() => setShowFinancingModal(false)}
                       className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                     >
@@ -579,7 +579,7 @@ const saveCustomModel = (brand, model) => {
                   <p className="text-gray-600 mb-4">
                     Za dostop do financiranja potrebujete paket "Paket vseh cen".
                   </p>
-                  
+
                   {/* Package Details */}
                   <div className="bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-xl p-4 mb-4">
                     <div className="flex items-center gap-2 mb-3">
@@ -604,14 +604,14 @@ const saveCustomModel = (brand, model) => {
                         <span>ugodna cena</span>
                       </li>
                     </ul>
-                    
+
                     {/* Price based on user type */}
                     <div className="border-t border-orange-200 pt-3 mt-3">
                       <div className="flex justify-between items-center">
                         <span className="text-gray-600">Cena:</span>
                         <div className="text-right">
                           <span className="text-2xl font-bold text-orange-600">
-                            â‚¬{isBusiness ? '0.75' : '1.50'}
+                            â'¬{isBusiness ? '0.75' : '1.50'}
                           </span>
                           <span className="text-gray-500 ml-1">/dan</span>
                         </div>
@@ -623,12 +623,12 @@ const saveCustomModel = (brand, model) => {
                       <div className="flex justify-between items-center mt-1">
                         <span className="text-gray-500 text-sm">Skupaj:</span>
                         <span className="text-gray-700 font-bold">
-                          â‚¬{((isBusiness ? 0.75 : 1.50) * (isBusiness ? 30 : 15)).toFixed(2)}
+                          â'¬{((isBusiness ? 0.75 : 1.50) * (isBusiness ? 30 : 15)).toFixed(2)}
                         </span>
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="flex gap-3 mt-6">
                     <button
                       onClick={() => setShowFinancingModal(false)}
@@ -653,7 +653,7 @@ const saveCustomModel = (brand, model) => {
         </AnimatePresence>
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-6">{t('basicInfo')}</h2>
-          
+
           {/* Vehicle Category Selection */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-3">Vrsta vozila</label>
@@ -674,13 +674,13 @@ const saveCustomModel = (brand, model) => {
                     checked={formData.vehicleCategory === cat.value}
                     onChange={() => {
                       const newCategory = cat.value
-                      const defaultFeatures = DEFAULT_FEATURES_PER_CATEGORY[newCategory] || []
-                      setFormData(prev => ({ 
-                        ...prev, 
-                        vehicleCategory: newCategory, 
-                        vehicleSubCategory: '', 
+                      const defaultFeatures = DEFAULTFEATURESPERCATEGORY[newCategory] || []
+                      setFormData(prev => ({
+                        ...prev,
+                        vehicleCategory: newCategory,
+                        vehicleSubCategory: '',
                         vehicleSubCategoryDetail: '',
-                        brand: '', 
+                        brand: '',
                         model: '',
                         featureIds: defaultFeatures
                       }))
@@ -699,7 +699,7 @@ const saveCustomModel = (brand, model) => {
               ))}
             </div>
           </div>
-          
+
           {/* Vehicle SubCategory Selection - only show if options exist */}
           {vehicleSubCategories[formData.vehicleCategory]?.options?.length > 0 && (
             <div className="mb-6">
@@ -724,7 +724,7 @@ const saveCustomModel = (brand, model) => {
                     }
                     // Tovorne prikolice has no equipment - defaultFeats stays empty
                   } else {
-                    defaultFeats = DEFAULT_FEATURES_PER_CATEGORY[formData.vehicleCategory] || []
+                    defaultFeats = DEFAULTFEATURESPERCATEGORY[formData.vehicleCategory] || []
                   }
                   setFormData(prev => ({ ...prev, vehicleSubCategory: newSubCat, featureIds: defaultFeats }))
                 }}
@@ -737,7 +737,7 @@ const saveCustomModel = (brand, model) => {
               </select>
             </div>
           )}
-          
+
           {/* Vehicle SubCategory Detail Selection - 3rd level */}
           {formData.vehicleSubCategory && subCategoryDetails[formData.vehicleSubCategory]?.options?.length > 0 && (
             <div className="mb-6">
@@ -756,12 +756,12 @@ const saveCustomModel = (brand, model) => {
               </select>
             </div>
           )}
-          
+
           {/* Brand Logo Selection - mobile.de style */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-3">Priljubljene znamke</label>
             <div className="grid grid-cols-6 gap-3">
-              {MAIN_BRANDS.map(brand => (
+              {MAINBRANDS.map(brand => (
                 <label
                   key={brand.name}
                   className={`relative flex items-center justify-center p-3 rounded-xl border-2 cursor-pointer transition-all min-h-[70px] ${
@@ -791,7 +791,7 @@ const saveCustomModel = (brand, model) => {
               ))}
             </div>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="relative">
               <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('brand')} *</label>
@@ -843,8 +843,8 @@ const saveCustomModel = (brand, model) => {
               {errors.year && <p className="text-red-500 text-sm mt-1">{errors.year}</p>}
             </div>
             <div className="relative">
-              <Input label={t('price_label').replace('(â‚¬)', '') + ' *'} type="number" placeholder="50000" value={formData.price} onChange={(e) => handleChange('price', e.target.value)} error={errors.price} />
-              <span className="absolute right-4 top-9 text-gray-500 font-medium">â‚¬</span>
+              <Input label={t('pricelabel').replace('(â'¬)', '') + ' *'} type="number" placeholder="50000" value={formData.price} onChange={(e) => handleChange('price', e.target.value)} error={errors.price} />
+              <span className="absolute right-4 top-9 text-gray-500 font-medium">â'¬</span>
             </div>
 
             <div className="md:col-span-2">
@@ -898,11 +898,11 @@ const saveCustomModel = (brand, model) => {
               </div>
             </div>
 
-            <Input label={t('mileage_label')} type="number" placeholder="50000" value={formData.mileage} onChange={(e) => handleChange('mileage', parseInt(e.target.value))} />
-            <Dropdown label={t('fuelType_label') + ' *'} name="fuelType" value={formData.fuelType} options={fuelTypes} />
-            <Dropdown label={t('transmission_label') + ' *'} name="transmission" value={formData.transmission} options={transmissions} />
-            <Dropdown label={t('bodyType_label') + ' *'} name="bodyType" value={formData.bodyType} options={bodyTypes} />
-            
+            <Input label={t('mileagelabel')} type="number" placeholder="50000" value={formData.mileage} onChange={(e) => handleChange('mileage', parseInt(e.target.value))} />
+            <Dropdown label={t('fuelTypelabel') + ' *'} name="fuelType" value={formData.fuelType} options={fuelTypes} />
+            <Dropdown label={t('transmissionlabel') + ' *'} name="transmission" value={formData.transmission} options={transmissions} />
+            <Dropdown label={t('bodyTypelabel') + ' *'} name="bodyType" value={formData.bodyType} options={bodyTypes} />
+
             {/* Stanje vozila - Radio buttons */}
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-3">Stanje vozila *</label>
@@ -934,7 +934,7 @@ const saveCustomModel = (brand, model) => {
                   </label>
                 ))}
               </div>
-              
+
               {/* Sub-options checkboxes */}
               {formData.vehicleCondition && vehicleConditionSubOptions[formData.vehicleCondition] && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2 p-4 bg-gray-50 rounded-xl">
@@ -957,7 +957,7 @@ const saveCustomModel = (brand, model) => {
                 </div>
               )}
             </div>
-            
+
             <Dropdown label={t('color') + ' *'} name="color" value={formData.color} options={colors} color={true} />
             <Input label={t('engine')} placeholder={isSl ? 'npr. 2.0 TDI' : 'e.g. 2.0L TFSI'} value={formData.engine} onChange={(e) => handleChange('engine', e.target.value)} />
             <Input label={t('power') + ' (HP)'} type="number" placeholder="200" value={formData.horsepower} onChange={(e) => handleChange('horsepower', parseInt(e.target.value))} />
@@ -990,7 +990,7 @@ const saveCustomModel = (brand, model) => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Å tevilo valjev</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Å tevilo valjev</label>
                 <select
                   value={formData.cylinderCount || ''}
                   onChange={(e) => handleChange('cylinderCount', e.target.value)}
@@ -1041,7 +1041,7 @@ const saveCustomModel = (brand, model) => {
                 >
                   <option value="">Izberi...</option>
                   <option value="ElektriÄni">ElektriÄni</option>
-                  <option value="Kick (noÅ¾en)">Kick (noÅ¾en)</option>
+                  <option value="Kick (noÅen)">Kick (noÅen)</option>
                   <option value="ElektriÄni in kick">ElektriÄni in kick</option>
                 </select>
               </div>
@@ -1055,7 +1055,7 @@ const saveCustomModel = (brand, model) => {
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Dodatni podatki za dostavno vozilo</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Å tevilo airbagov</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Å tevilo airbagov</label>
                 <select
                   value={formData.airbagCountKamion || ''}
                   onChange={(e) => handleChange('airbagCountKamion', e.target.value)}
@@ -1078,7 +1078,7 @@ const saveCustomModel = (brand, model) => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Tovorni prostor (mÂ³)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Tovorni prostor (mÂ3)</label>
                 <input
                   type="number"
                   step="0.1"
@@ -1108,7 +1108,7 @@ const saveCustomModel = (brand, model) => {
                   <option value="">Izberi...</option>
                   <option value="Ärna">ÄŒrna</option>
                   <option value="siva">Siva</option>
-                  <option value="beÅ¾">BeÅ¾</option>
+                  <option value="beÅ">BeÅ</option>
                   <option value="rjava">Rjava</option>
                   <option value="modra">Modra</option>
                   <option value="rdeÄa">RdeÄa</option>
@@ -1124,7 +1124,7 @@ const saveCustomModel = (brand, model) => {
                   <option value="">Izberi...</option>
                   <option value="blago">Blago</option>
                   <option value="usnje">Usnje</option>
-                  <option value="delno_usnje">Delno usnje</option>
+                  <option value="delnousnje">Delno usnje</option>
                   <option value="alcantara">Alcantara</option>
                   <option value="tkanina">Tkanina</option>
                   <option value="velur">Velur</option>
@@ -1136,7 +1136,7 @@ const saveCustomModel = (brand, model) => {
             <div className="mt-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">Zadnja vrata</label>
               <div className="flex flex-wrap gap-3">
-                {['DviÅ¾na zadnja vrata', 'Dvokrilna zadnja vrata', 'Zastekljena zadnja vrata'].map(opt => (
+                {['DviÅna zadnja vrata', 'Dvokrilna zadnja vrata', 'Zastekljena zadnja vrata'].map(opt => (
                   <label key={opt} className={`flex items-center gap-2 px-4 py-2 rounded-xl border cursor-pointer transition-all text-sm ${
                     formData.zadnjaVrata.includes(opt)
                       ? 'border-orange-500 bg-orange-50 text-orange-700'
@@ -1231,26 +1231,26 @@ const saveCustomModel = (brand, model) => {
         )}
 
         {/* Dodatni podatki za Tovorna prikolica */}
-        {formData.vehicleCategory === 'kamion' && formData.vehicleSubCategory === 'Tovorne_prikolice' && (
+        {formData.vehicleCategory === 'kamion' && formData.vehicleSubCategory === 'Tovorneprikolice' && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Karakteristike tovorne prikolice</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">DolÅ¾ina (m)</label>
-                <input type="number" step="0.1" placeholder="npr. 6.0" value={formData.dolÅ¾ina || ''}
-                  onChange={(e) => handleChange('dolÅ¾ina', e.target.value)}
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Dolzina (m)</label>
+                <input type="number" step="0.1" placeholder="npr. 6.0" value={formData.dolzina || ''}
+                  onChange={(e) => handleChange('dolzina', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Å irina (m)</label>
-                <input type="number" step="0.1" placeholder="npr. 2.4" value={formData.Å¡irina || ''}
-                  onChange={(e) => handleChange('Å¡irina', e.target.value)}
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Sirina (m)</label>
+                <input type="number" step="0.1" placeholder="npr. 2.4" value={formData.sirina || ''}
+                  onChange={(e) => handleChange('sirina', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Å tev. osi</label>
-                <select value={formData.Å¡tevOsi || ''}
-                  onChange={(e) => handleChange('Å¡tevOsi', e.target.value)}
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Stev. osi</label>
+                <select value={formData.stevOsi || ''}
+                  onChange={(e) => handleChange('stevOsi', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white">
                   <option value="">Izberi...</option>
                   {[1,2,3,4].map(n => <option key={n} value={n}>{n}</option>)}
@@ -1263,13 +1263,13 @@ const saveCustomModel = (brand, model) => {
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Dov. skupna teÅ¾a (kg)</label>
-                <input type="number" placeholder="npr. 24000" value={formData.dovoljenaSkupnaTeÅ¾a || ''}
-                  onChange={(e) => handleChange('dovoljenaSkupnaTeÅ¾a', e.target.value)}
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Dov. skupna Tezza (kg)</label>
+                <input type="number" placeholder="npr. 24000" value={formData.dovoljenaSkupnaTezza || ''}
+                  onChange={(e) => handleChange('dovoljenaSkupnaTezza', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Volumen (mÂ³)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Volumen (m3)</label>
                 <input type="number" step="0.1" placeholder="npr. 32.0" value={formData.volumen || ''}
                   onChange={(e) => handleChange('volumen', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
@@ -1296,7 +1296,7 @@ const saveCustomModel = (brand, model) => {
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Å tevilo valjev</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Å tevilo valjev</label>
                 <select value={formData.utvCylinderCount || ''}
                   onChange={(e) => handleChange('utvCylinderCount', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white">
@@ -1333,7 +1333,7 @@ const saveCustomModel = (brand, model) => {
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white">
                   <option value="">Izberi...</option>
                   <option value="ElektriÄni">ElektriÄni</option>
-                  <option value="Kick (noÅ¾en)">Kick (noÅ¾en)</option>
+                  <option value="Kick (noÅen)">Kick (noÅen)</option>
                   <option value="ElektriÄni in kick">ElektriÄni in kick</option>
                 </select>
               </div>
@@ -1388,7 +1388,7 @@ const saveCustomModel = (brand, model) => {
                 onChange={(e) => handleChange('autoPublishFuelData', e.target.checked)}
                 className="w-5 h-5 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
               />
-              <span className="text-sm text-gray-700">Podatke o porabi Å¾elim avtomatiÄno objaviti ob oglasu</span>
+              <span className="text-sm text-gray-700">Podatke o porabi Åelim avtomatiÄno objaviti ob oglasu</span>
             </label>
           </div>
         </div>
@@ -1411,7 +1411,7 @@ const saveCustomModel = (brand, model) => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Å tevilo lastnikov</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Å tevilo lastnikov</label>
               <select
                 value={formData.ownerCount}
                 onChange={(e) => handleChange('ownerCount', e.target.value)}
@@ -1424,7 +1424,7 @@ const saveCustomModel = (brand, model) => {
               </select>
             </div>
           </div>
-          
+
           {/* Garancija checkboxes */}
           <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
             <label className="flex items-center gap-2 p-3 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50">
@@ -1507,21 +1507,21 @@ const saveCustomModel = (brand, model) => {
               {getSelectedCount()} izbrano
             </span>
           </div>
-          
+
           {/* Category tabs */}
           <div className="flex flex-wrap gap-2 mb-4">
             {Object.entries(getEquipMap()).map(([key, category]) => {
               const selectedInCategory = getSelectedInCategory(key)
               const isActive = openFeaturesCategory === key
-              
+
               return (
                 <button
                   key={key}
                   type="button"
                   onClick={() => setOpenFeaturesCategory(key)}
                   className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
-                    isActive 
-                      ? 'bg-orange-100 text-orange-700' 
+                    isActive
+                      ? 'bg-orange-100 text-orange-700'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
@@ -1583,7 +1583,7 @@ const saveCustomModel = (brand, model) => {
                           {subCategory.features.every(f => isFeatureSelected(f)) ? 'Ponastavi' : 'Izberi vse'}
                         </button>
                       </div>
-                      
+
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                         {subCategory.features.map((featureName) => {
                           const selected = isFeatureSelected(featureName)
@@ -1591,8 +1591,8 @@ const saveCustomModel = (brand, model) => {
                             <label
                               key={featureName}
                               className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border cursor-pointer transition-all text-sm ${
-                                selected 
-                                  ? 'border-orange-500 bg-orange-50 text-orange-700' 
+                                selected
+                                  ? 'border-orange-500 bg-orange-50 text-orange-700'
                                   : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50'
                               }`}
                             >
@@ -1603,8 +1603,8 @@ const saveCustomModel = (brand, model) => {
                                 className="sr-only"
                               />
                               <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors flex-shrink-0 ${
-                                selected 
-                                  ? 'border-orange-500 bg-orange-500' 
+                                selected
+                                  ? 'border-orange-500 bg-orange-500'
                                   : 'border-gray-300'
                               }`}>
                                 {selected && <Check className="w-3 h-3 text-white" />}
@@ -1623,9 +1623,9 @@ const saveCustomModel = (brand, model) => {
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-6">{t('city_label')}</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-6">{t('citylabel')}</h2>
           <div className="relative">
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('city_label')} *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('citylabel')} *</label>
             <select
               value={formData.city || ''}
               onChange={(e) => handleChange('city', e.target.value)}
@@ -1658,11 +1658,11 @@ const saveCustomModel = (brand, model) => {
             </label>
           </div>
           <p className="text-sm text-gray-500">Upload as many photos as you want.</p>
-          {isPremium && <p className="text-sm text-green-600 font-medium mt-2">âœ“ Premium: HD photos + 360Â° enabled</p>}
+          {isPremium && <p className="text-sm text-green-600 font-medium mt-2">âœ" Premium: HD photos + 360Â° enabled</p>}
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-6">{t('description_label')}</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-6">{t('descriptionlabel')}</h2>
           <textarea placeholder={isSl ? 'Opisite svoje vozilo...' : 'Describe your car...'} value={formData.description} onChange={(e) => handleChange('description', e.target.value)} className={"w-full px-4 py-3 bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 min-h-[150px] resize-y " + (errors.description ? 'border-red-500' : 'border-gray-200')} />
           {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
         </div>
@@ -1685,9 +1685,9 @@ const saveCustomModel = (brand, model) => {
             </div>
           </div>
         )}
-        
+
         {/* Show remaining free listings */}
-        {canPostCar.allowed && !isPremium && currentUserCarCount < FREE_CAR_LIMIT && (
+        {canPostCar.allowed && !isPremium && currentUserCarCount < FREECARLIMIT && (
           <div className="bg-green-50 border border-green-200 rounded-2xl p-4 mb-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -1699,15 +1699,15 @@ const saveCustomModel = (brand, model) => {
                     {isSl ? 'Brezplacna objava!' : 'Free listing!'}
                   </p>
                   <p className="text-sm text-green-600">
-                    {isSl 
-                      ? `Imate ${FREE_CAR_LIMIT - currentUserCarCount} brezplacnih objav preostalo`
-                      : `You have ${FREE_CAR_LIMIT - currentUserCarCount} free listings remaining`
+                    {isSl
+                      ? `Imate ${FREECARLIMIT - currentUserCarCount} brezplacnih objav preostalo`
+                      : `You have ${FREECARLIMIT - currentUserCarCount} free listings remaining`
                     }
                   </p>
                 </div>
               </div>
               <span className="text-2xl font-bold text-green-700">
-                {currentUserCarCount}/{FREE_CAR_LIMIT}
+                {currentUserCarCount}/{FREECARLIMIT}
               </span>
             </div>
           </div>
