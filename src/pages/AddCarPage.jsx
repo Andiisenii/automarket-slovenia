@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, Upload, X, Check, CreditCard, ChevronDown, Shield, Settings, Wifi, Car, Fuel, Star, ChevronUp, Sun, Award, XCircle, Zap } from 'lucide-react'
@@ -45,7 +45,7 @@ export function AddCarPage() {
     barvaOblazinjenja: '', oblazinjenje: '', strehaVozila: [],
     vin: '',
     // Tovorna prikolica specific
-    dolžina: '', širina: '', števOsi: '', dovoljenaSkupnaTeža: '', volumen: '',
+    dolÅ¾ina: '', Å¡irina: '', Å¡tevOsi: '', dovoljenaSkupnaTeÅ¾a: '', volumen: '',
     // UTV specific
     utvEngineCapacity: '', utvEnginePowerKm: '', utvCylinderCount: '', utvEngineStroke: '', utvDiffLock: '', utvStartType: '',
   })
@@ -271,7 +271,7 @@ const saveCustomModel = (brand, model) => {
         barvaOblazinjenja: editCar.barvaOblazinjenja || '', oblazinjenje: editCar.oblazinjenje || '', strehaVozila: editCar.strehaVozila || [],
         vin: editCar.vin || '',
         // Tovorna prikolica
-        dolžina: editCar.dolžina || '', širina: editCar.širina || '', števOsi: editCar.števOsi || '', dovoljenaSkupnaTeža: editCar.dovoljenaSkupnaTeža || '', volumen: editCar.volumen || '',
+        dolÅ¾ina: editCar.dolÅ¾ina || '', Å¡irina: editCar.Å¡irina || '', Å¡tevOsi: editCar.Å¡tevOsi || '', dovoljenaSkupnaTeÅ¾a: editCar.dovoljenaSkupnaTeÅ¾a || '', volumen: editCar.volumen || '',
         // UTV
         utvEngineCapacity: editCar.utvEngineCapacity || '', utvEnginePowerKm: editCar.utvEnginePowerKm || '', utvCylinderCount: editCar.utvCylinderCount || '', utvEngineStroke: editCar.utvEngineStroke || '', utvDiffLock: editCar.utvDiffLock || '', utvStartType: editCar.utvStartType || '',
       })
@@ -434,7 +434,7 @@ const saveCustomModel = (brand, model) => {
     return { 
       allowed: false, 
       reason: isSl 
-        ? `Brez paketa lahko objavite največ ${FREE_CAR_LIMIT} vozila. Za več kupite paket.`
+        ? `Brez paketa lahko objavite najveÄ ${FREE_CAR_LIMIT} vozila. Za veÄ kupite paket.`
         : `Without a package you can only list ${FREE_CAR_LIMIT} cars. Buy a package to list more.`
     }
   }
@@ -611,19 +611,19 @@ const saveCustomModel = (brand, model) => {
                         <span className="text-gray-600">Cena:</span>
                         <div className="text-right">
                           <span className="text-2xl font-bold text-orange-600">
-                            €{isBusiness ? '0.75' : '1.50'}
+                            â‚¬{isBusiness ? '0.75' : '1.50'}
                           </span>
                           <span className="text-gray-500 ml-1">/dan</span>
                         </div>
                       </div>
                       <div className="flex justify-between items-center mt-1">
-                        <span className="text-gray-500 text-sm">Minimalno naročilo:</span>
+                        <span className="text-gray-500 text-sm">Minimalno naroÄilo:</span>
                         <span className="text-gray-700 font-medium">{isBusiness ? '30' : '15'} dni</span>
                       </div>
                       <div className="flex justify-between items-center mt-1">
                         <span className="text-gray-500 text-sm">Skupaj:</span>
                         <span className="text-gray-700 font-bold">
-                          €{((isBusiness ? 0.75 : 1.50) * (isBusiness ? 30 : 15)).toFixed(2)}
+                          â‚¬{((isBusiness ? 0.75 : 1.50) * (isBusiness ? 30 : 15)).toFixed(2)}
                         </span>
                       </div>
                     </div>
@@ -717,9 +717,9 @@ const saveCustomModel = (brand, model) => {
                       defaultFeats = kamionSubCategoryEquipmentMap['Avtobusi']
                         ? Object.values(kamionSubCategoryEquipmentMap['Avtobusi']).flatMap(cat => Object.values(cat.subcategories || {}).flatMap(sub => sub.features || []))
                         : []
-                    } else if (newSubCat === 'UTV') {
-                      defaultFeats = kamionSubCategoryEquipmentMap['UTV']
-                        ? Object.values(kamionSubCategoryEquipmentMap['UTV']).flatMap(cat => Object.values(cat.subcategories || {}).flatMap(sub => sub.features || []))
+                    } else if (newSubCat === 'KamUTV') {
+                      defaultFeats = kamionSubCategoryEquipmentMap['KamUTV']
+                        ? Object.values(kamionSubCategoryEquipmentMap['KamUTV']).flatMap(cat => Object.values(cat.subcategories || {}).flatMap(sub => sub.features || []))
                         : []
                     }
                     // Tovorne prikolice has no equipment - defaultFeats stays empty
@@ -843,8 +843,8 @@ const saveCustomModel = (brand, model) => {
               {errors.year && <p className="text-red-500 text-sm mt-1">{errors.year}</p>}
             </div>
             <div className="relative">
-              <Input label={t('price_label').replace('(€)', '') + ' *'} type="number" placeholder="50000" value={formData.price} onChange={(e) => handleChange('price', e.target.value)} error={errors.price} />
-              <span className="absolute right-4 top-9 text-gray-500 font-medium">€</span>
+              <Input label={t('price_label').replace('(â‚¬)', '') + ' *'} type="number" placeholder="50000" value={formData.price} onChange={(e) => handleChange('price', e.target.value)} error={errors.price} />
+              <span className="absolute right-4 top-9 text-gray-500 font-medium">â‚¬</span>
             </div>
 
             <div className="md:col-span-2">
@@ -964,10 +964,10 @@ const saveCustomModel = (brand, model) => {
           </div>
         </div>
 
-        {/* Tehnične karakteristike - samo za Motor */}
+        {/* TehniÄne karakteristike - samo za Motor */}
         {formData.vehicleCategory === 'moto' && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Tehnične karakteristike</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">TehniÄne karakteristike</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Prostornina motorja (ccm)</label>
@@ -980,7 +980,7 @@ const saveCustomModel = (brand, model) => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Moč motorja (kW)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">MoÄ motorja (kW)</label>
                 <input
                   type="number"
                   placeholder="npr. 11"
@@ -990,7 +990,7 @@ const saveCustomModel = (brand, model) => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Število valjev</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Å tevilo valjev</label>
                 <select
                   value={formData.cylinderCount || ''}
                   onChange={(e) => handleChange('cylinderCount', e.target.value)}
@@ -1029,7 +1029,7 @@ const saveCustomModel = (brand, model) => {
                   <option value="Sprednja">Sprednja</option>
                   <option value="Zadnja">Zadnja</option>
                   <option value="Sprednja in zadnja">Sprednja in zadnja</option>
-                  <option value="Središčna (centralna)">Središčna (centralna)</option>
+                  <option value="SrediÅ¡Äna (centralna)">SrediÅ¡Äna (centralna)</option>
                 </select>
               </div>
               <div>
@@ -1040,9 +1040,9 @@ const saveCustomModel = (brand, model) => {
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
                 >
                   <option value="">Izberi...</option>
-                  <option value="Električni">Električni</option>
-                  <option value="Kick (nožen)">Kick (nožen)</option>
-                  <option value="Električni in kick">Električni in kick</option>
+                  <option value="ElektriÄni">ElektriÄni</option>
+                  <option value="Kick (noÅ¾en)">Kick (noÅ¾en)</option>
+                  <option value="ElektriÄni in kick">ElektriÄni in kick</option>
                 </select>
               </div>
             </div>
@@ -1055,7 +1055,7 @@ const saveCustomModel = (brand, model) => {
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Dodatni podatki za dostavno vozilo</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Število airbagov</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Å tevilo airbagov</label>
                 <select
                   value={formData.airbagCountKamion || ''}
                   onChange={(e) => handleChange('airbagCountKamion', e.target.value)}
@@ -1078,7 +1078,7 @@ const saveCustomModel = (brand, model) => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Tovorni prostor (m³)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Tovorni prostor (mÂ³)</label>
                 <input
                   type="number"
                   step="0.1"
@@ -1089,7 +1089,7 @@ const saveCustomModel = (brand, model) => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">VIN / štev. šasije</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">VIN / Å¡tev. Å¡asije</label>
                 <input
                   type="text"
                   placeholder="npr. WVZZZ123456789012"
@@ -1106,12 +1106,12 @@ const saveCustomModel = (brand, model) => {
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
                 >
                   <option value="">Izberi...</option>
-                  <option value="črna">Črna</option>
+                  <option value="Ärna">ÄŒrna</option>
                   <option value="siva">Siva</option>
-                  <option value="bež">Bež</option>
+                  <option value="beÅ¾">BeÅ¾</option>
                   <option value="rjava">Rjava</option>
                   <option value="modra">Modra</option>
-                  <option value="rdeča">Rdeča</option>
+                  <option value="rdeÄa">RdeÄa</option>
                 </select>
               </div>
               <div>
@@ -1136,7 +1136,7 @@ const saveCustomModel = (brand, model) => {
             <div className="mt-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">Zadnja vrata</label>
               <div className="flex flex-wrap gap-3">
-                {['Dvižna zadnja vrata', 'Dvokrilna zadnja vrata', 'Zastekljena zadnja vrata'].map(opt => (
+                {['DviÅ¾na zadnja vrata', 'Dvokrilna zadnja vrata', 'Zastekljena zadnja vrata'].map(opt => (
                   <label key={opt} className={`flex items-center gap-2 px-4 py-2 rounded-xl border cursor-pointer transition-all text-sm ${
                     formData.zadnjaVrata.includes(opt)
                       ? 'border-orange-500 bg-orange-50 text-orange-700'
@@ -1200,7 +1200,7 @@ const saveCustomModel = (brand, model) => {
             <div className="mt-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">Streha vozila</label>
               <div className="flex flex-wrap gap-3">
-                {['El. pomik', 'Povišana', 'Nizka'].map(opt => (
+                {['El. pomik', 'PoviÅ¡ana', 'Nizka'].map(opt => (
                   <label key={opt} className={`flex items-center gap-2 px-4 py-2 rounded-xl border cursor-pointer transition-all text-sm ${
                     formData.strehaVozila.includes(opt)
                       ? 'border-orange-500 bg-orange-50 text-orange-700'
@@ -1236,21 +1236,21 @@ const saveCustomModel = (brand, model) => {
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Karakteristike tovorne prikolice</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Dolžina (m)</label>
-                <input type="number" step="0.1" placeholder="npr. 6.0" value={formData.dolžina || ''}
-                  onChange={(e) => handleChange('dolžina', e.target.value)}
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">DolÅ¾ina (m)</label>
+                <input type="number" step="0.1" placeholder="npr. 6.0" value={formData.dolÅ¾ina || ''}
+                  onChange={(e) => handleChange('dolÅ¾ina', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Širina (m)</label>
-                <input type="number" step="0.1" placeholder="npr. 2.4" value={formData.širina || ''}
-                  onChange={(e) => handleChange('širina', e.target.value)}
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Å irina (m)</label>
+                <input type="number" step="0.1" placeholder="npr. 2.4" value={formData.Å¡irina || ''}
+                  onChange={(e) => handleChange('Å¡irina', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Štev. osi</label>
-                <select value={formData.števOsi || ''}
-                  onChange={(e) => handleChange('števOsi', e.target.value)}
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Å tev. osi</label>
+                <select value={formData.Å¡tevOsi || ''}
+                  onChange={(e) => handleChange('Å¡tevOsi', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white">
                   <option value="">Izberi...</option>
                   {[1,2,3,4].map(n => <option key={n} value={n}>{n}</option>)}
@@ -1263,13 +1263,13 @@ const saveCustomModel = (brand, model) => {
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Dov. skupna teža (kg)</label>
-                <input type="number" placeholder="npr. 24000" value={formData.dovoljenaSkupnaTeža || ''}
-                  onChange={(e) => handleChange('dovoljenaSkupnaTeža', e.target.value)}
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Dov. skupna teÅ¾a (kg)</label>
+                <input type="number" placeholder="npr. 24000" value={formData.dovoljenaSkupnaTeÅ¾a || ''}
+                  onChange={(e) => handleChange('dovoljenaSkupnaTeÅ¾a', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Volumen (m³)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Volumen (mÂ³)</label>
                 <input type="number" step="0.1" placeholder="npr. 32.0" value={formData.volumen || ''}
                   onChange={(e) => handleChange('volumen', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
@@ -1279,9 +1279,9 @@ const saveCustomModel = (brand, model) => {
         )}
 
         {/* Dodatni podatki za UTV vozila */}
-        {formData.vehicleCategory === 'kamion' && formData.vehicleSubCategory === 'UTV' && (
+        {formData.vehicleCategory === 'kamion' && formData.vehicleSubCategory === 'KamUTV' && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Tehnične karakteristike UTV</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">TehniÄne karakteristike UTV</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Prostornina (ccm)</label>
@@ -1290,13 +1290,13 @@ const saveCustomModel = (brand, model) => {
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Moč (KM)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">MoÄ (KM)</label>
                 <input type="number" placeholder="npr. 85" value={formData.utvEnginePowerKm || ''}
                   onChange={(e) => handleChange('utvEnginePowerKm', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Število valjev</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Å tevilo valjev</label>
                 <select value={formData.utvCylinderCount || ''}
                   onChange={(e) => handleChange('utvCylinderCount', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white">
@@ -1332,9 +1332,9 @@ const saveCustomModel = (brand, model) => {
                   onChange={(e) => handleChange('utvStartType', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white">
                   <option value="">Izberi...</option>
-                  <option value="Električni">Električni</option>
-                  <option value="Kick (nožen)">Kick (nožen)</option>
-                  <option value="Električni in kick">Električni in kick</option>
+                  <option value="ElektriÄni">ElektriÄni</option>
+                  <option value="Kick (noÅ¾en)">Kick (noÅ¾en)</option>
+                  <option value="ElektriÄni in kick">ElektriÄni in kick</option>
                 </select>
               </div>
             </div>
@@ -1388,14 +1388,14 @@ const saveCustomModel = (brand, model) => {
                 onChange={(e) => handleChange('autoPublishFuelData', e.target.checked)}
                 className="w-5 h-5 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
               />
-              <span className="text-sm text-gray-700">Podatke o porabi želim avtomatično objaviti ob oglasu</span>
+              <span className="text-sm text-gray-700">Podatke o porabi Å¾elim avtomatiÄno objaviti ob oglasu</span>
             </label>
           </div>
         </div>
 
-        {/* Starost in lastništvo */}
+        {/* Starost in lastniÅ¡tvo */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Starost in lastništvo</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Starost in lastniÅ¡tvo</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Starost vozila</label>
@@ -1411,7 +1411,7 @@ const saveCustomModel = (brand, model) => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Število lastnikov</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Å tevilo lastnikov</label>
               <select
                 value={formData.ownerCount}
                 onChange={(e) => handleChange('ownerCount', e.target.value)}
@@ -1488,7 +1488,7 @@ const saveCustomModel = (brand, model) => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Tehnični pregled velja do</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">TehniÄni pregled velja do</label>
               <input
                 type="date"
                 value={formData.technicalValidUntil}
@@ -1658,7 +1658,7 @@ const saveCustomModel = (brand, model) => {
             </label>
           </div>
           <p className="text-sm text-gray-500">Upload as many photos as you want.</p>
-          {isPremium && <p className="text-sm text-green-600 font-medium mt-2">✓ Premium: HD photos + 360° enabled</p>}
+          {isPremium && <p className="text-sm text-green-600 font-medium mt-2">âœ“ Premium: HD photos + 360Â° enabled</p>}
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
