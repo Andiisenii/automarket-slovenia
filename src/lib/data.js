@@ -991,6 +991,12 @@ const kamionEquipmentCategories = {
           'Osvetlitev tovornega prostora',
           'Zastekljen tovorni prostor',
           '12V vtičnica',
+          'Spalna kabina',
+          'Servisna knjiga potrjena',
+          'Garažirano',
+          'Nepoškodovano',
+          'Nekarambolirano',
+          'Slovensko poreklo',
         ]
       }
     }
@@ -1006,6 +1012,7 @@ const kamionEquipmentCategories = {
           'Avtomatska klimatska naprava / digitalna',
           'Klimatska naprava - 2 conska',
           'Dodatno gretje',
+          'Webasto',
           'Tonirana stekla',
           'Električni pomik prednjih stekel',
           'El. nastavljiva zunanja ogledala',
