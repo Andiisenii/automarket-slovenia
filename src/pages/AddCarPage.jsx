@@ -717,9 +717,9 @@ const saveCustomModel = (brand, model) => {
                       defaultFeats = kamionSubCategoryEquipmentMap['Avtobusi']
                         ? Object.values(kamionSubCategoryEquipmentMap['Avtobusi']).flatMap(cat => Object.values(cat.subcategories || {}).flatMap(sub => sub.features || []))
                         : []
-                    } else if (newSubCat === 'UTV vozila') {
-                      defaultFeats = kamionSubCategoryEquipmentMap['UTV vozila']
-                        ? Object.values(kamionSubCategoryEquipmentMap['UTV vozila']).flatMap(cat => Object.values(cat.subcategories || {}).flatMap(sub => sub.features || []))
+                    } else if (newSubCat === 'UTV') {
+                      defaultFeats = kamionSubCategoryEquipmentMap['UTV']
+                        ? Object.values(kamionSubCategoryEquipmentMap['UTV']).flatMap(cat => Object.values(cat.subcategories || {}).flatMap(sub => sub.features || []))
                         : []
                     }
                     // Tovorne prikolice has no equipment - defaultFeats stays empty
@@ -1231,7 +1231,7 @@ const saveCustomModel = (brand, model) => {
         )}
 
         {/* Dodatni podatki za Tovorna prikolica */}
-        {formData.vehicleCategory === 'kamion' && formData.vehicleSubCategory === 'Tovorne prikolice' && (
+        {formData.vehicleCategory === 'kamion' && formData.vehicleSubCategory === 'Tovorne_prikolice' && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Karakteristike tovorne prikolice</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1279,7 +1279,7 @@ const saveCustomModel = (brand, model) => {
         )}
 
         {/* Dodatni podatki za UTV vozila */}
-        {formData.vehicleCategory === 'kamion' && formData.vehicleSubCategory === 'UTV vozila' && (
+        {formData.vehicleCategory === 'kamion' && formData.vehicleSubCategory === 'UTV' && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Tehnične karakteristike UTV</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

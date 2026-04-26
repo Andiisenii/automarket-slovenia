@@ -259,8 +259,8 @@ export const vehicleSubCategories = {
       'Dostavna vozila',
       'Tovorna vozila',
       'Avtobusi',
-      'Tovorne prikolice',
-      'UTV vozila',
+      'Tovorne_prikolice',
+      'UTV',
     ]
   },
   'kombi': {
@@ -269,8 +269,8 @@ export const vehicleSubCategories = {
       'Dostavna vozila',
       'Tovorna vozila',
       'Avtobusi',
-      'Tovorne prikolice',
-      'UTV vozila',
+      'Tovorne_prikolice',
+      'UTV',
     ]
   },
   'traktor': {
@@ -351,7 +351,7 @@ export const subCategoryDetails = {
     options: [] // No detailed subcategory - just show label
   },
   // For Kombi and Kamion - UTV vozila subcategory
-  'UTV vozila': {
+  'UTV': {
     label: 'Vrsta UTV vozila',
     options: [] // No detailed subcategory
   },
@@ -459,7 +459,7 @@ export const subCategoryDetails = {
     options: [] // No subcategories
   },
   // For Kombi and Kamion - Tovorne prikolice subcategory
-  'Tovorne prikolice': {
+  'Tovorne_prikolice': {
     label: 'Vrsta tovorne prikolice',
     options: [
       'ni pomembno',
@@ -491,7 +491,7 @@ export const subCategoryDetails = {
     ]
   },
   // For Kombi and Kamion - UTV vozila subcategory
-  'UTV vozila': {
+  'UTV': {
     label: 'Vrsta UTV vozila',
     options: [
       'ATV',
@@ -1026,8 +1026,8 @@ const kamionAvtobusEquipmentCategories = {
 // Map subcategory → equipment (for Kamion)
 export const kamionSubCategoryEquipmentMap = {
   'Avtobusi': kamionAvtobusEquipmentCategories,
-  'UTV vozila': kamionUTVEquipmentCategories,
-  'Tovorne prikolice': {}, // no equipment, only form fields
+  'UTV': kamionUTVEquipmentCategories,
+  'Tovorne_prikolice': {}, // no equipment, only form fields
 }
 
 // UTV equipment - same as motorcycle
