@@ -909,7 +909,7 @@ export const DEFAULT_AUTO_SELECT_FEATURES = [
 const carEquipmentCategories = avtoEquipmentCategories
 export { carEquipmentCategories }
 
-// Equipment for KAMION (trucks / delivery vehicles)
+// Equipment for KAMION (trucks / delivery vehicles) - only NEW items not in avtoEquipmentCategories
 const kamionEquipmentCategories = {
   'podvozje': {
     name: 'Podvozje',
@@ -920,14 +920,10 @@ const kamionEquipmentCategories = {
         features: [
           'Podvozje: lahka (ALU) platišča',
           'Pomoč pri zaviranju BAS',
-          'Regulacija nivoja podvozja (ADS)',
-          'Zračno vzmetenje',
           'Nadzor zibanja prikolice TSC',
           'Prilagodljiv način obremenitve LAC',
-          'Štirikolesni pogon (4x4 / 4WD / Quattro)',
           'Podaljšana medosna razdalja',
           'Ojačano vzmetenje',
-          'Aktivno vzmetenje (ABC - Active Body Control)',
           'Sistem proti prevračanju RSC',
         ]
       }
@@ -941,19 +937,12 @@ const kamionEquipmentCategories = {
         name: 'Varnost',
         features: [
           'Nadzor zračnega tlaka v pnevmatikah RDK',
-          'Xenonski žarometi',
-          'Bi-xenonski žarometi',
           'LED žarometi',
           'Prednje (dnevne) LED luči',
           'Zadnje LED luči',
-          'Meglenke',
-          'Adaptive light / dinamično prilagodljivi žarometi',
           'Sistem za prepoznavo prometnih znakov',
           '3. zavorna luč',
           'Naprava za pranje žarometov',
-          'Alarmna naprava',
-          'Blokada motorja',
-          'Kodno varovan vžig motorja',
           'Sistem za opozarjanje na mrtvi kot',
           'Senzor za dež',
           'Sistem za samodejno zaviranje v sili',
@@ -962,62 +951,39 @@ const kamionEquipmentCategories = {
       }
     }
   },
-  'notranjost': {
+  'notranjost_k': {
     name: 'Notranjost',
     icon: 'Car',
     subcategories: {
-      'notranjost_k': {
+      'notranjost_k_v': {
         name: 'Notranjost',
         features: [
           'Paket za kadilce',
           'Sedeži: komfortni',
           'Sedeži: ortopedski',
-          'Sedeži: nastavitev po višini',
-          'Sedeži: el. nastavitev',
-          'Sedeži: paket Memory',
           'Sedeži: gretje',
           'Sedeži: hlajenje / ventilacija',
           'Hladilni predal',
-          'Sredinski naslon za roko med sedeži',
           'Zložljiv sovoznikov sedež',
           'Sovoznik: sedež za 2 osebi',
-          'Vzglavniki na vseh sedežih',
           'Pregradna stena',
           'Polica pod stropom kabine',
           'Osvetlitev tovornega prostora',
           'Zastekljen tovorni prostor',
-          '12V vtičnica',
         ]
       }
     }
   },
-  'udobje': {
+  'udobje_k': {
     name: 'Udobje',
     icon: 'Settings',
     subcategories: {
-      'udobje_k': {
+      'udobje_k_v': {
         name: 'Udobje',
         features: [
           'Klimatska naprava - ročna',
-          'Avtomatska klimatska naprava / digitalna',
-          'Klimatska naprava - 2 conska',
           'Dodatno gretje',
           'Tonirana stekla',
-          'Električni pomik prednjih stekel',
-          'El. nastavljiva zunanja ogledala',
-          'Ogrevanje zunanjih ogledal',
-          'El. zložljiva zunanja ogledala',
-          'Keyless Go',
-          'Centralno zaklepanje',
-          'Centralno zaklepanje z dalj. upravljanjem',
-          'Električni paket',
-          'Nastavljiv volan po višini',
-          'Nastavljiv volan po globini',
-          'Servo volan',
-          'Volanski obroč oblečen v usnje',
-          'Multifunkcijski volan',
-          'Tempomat',
-          'Aktivni tempomat (Adaptive Cruise Control)',
           'El. parkirna zavora',
         ]
       }
@@ -1027,23 +993,10 @@ const kamionEquipmentCategories = {
     name: 'Info-Multimedia',
     icon: 'Wifi',
     subcategories: {
-      'info_k': {
+      'info_k_v': {
         name: 'Info-Multimedia',
         features: [
-          'Avtoradio',
-          'Avtoradio / CD',
-          'CD izmenjevalnik / strežnik',
-          'MP3 predvajalnik',
           'DVD predvajalnik',
-          'Trdi disk za shranjevanje podatkov',
-          'USB priključek (iPod, HD, ...)',
-          'TV sprejemnik / tuner',
-          'Digitalni radio DAB',
-          'Predpriprava za mobilni telefon',
-          'Avtotelefon',
-          'Potovalni računalnik',
-          'Komunikacijski paket',
-          'Navigacija',
           'Navigacija + TV',
         ]
       }
@@ -1053,22 +1006,18 @@ const kamionEquipmentCategories = {
     name: 'Uporabnost',
     icon: 'Settings',
     subcategories: {
-      'uporabnost_k': {
+      'uporabnost_k_v': {
         name: 'Uporabnost',
         features: [
           'Povišana streha kabine',
           'Dvižni rob strehe',
           'Mrežnasta pregrada tovornega prostora',
-          'Strešne sani',
           'Vlečna kljuka',
           'Pomoč pri speljevanju v klanec',
           'Sistem za aktivno pomoč pri parkiranju',
-          'Parkirni senzorji PDC',
-          'Pomoč pri parkiranju: kamera',
           'Pomoč pri parkiranju: prednji senzorji',
           'Pomoč pri parkiranju: zadnji senzorji',
           'Pomoč pri parkiranju: pogled 360 stopinj',
-          'Vzvratna kamera',
           'Vozilo prilagojeno invalidu',
         ]
       }
