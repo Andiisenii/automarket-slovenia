@@ -10,7 +10,7 @@ import { useCars } from '@/lib/CarContext'
 import { packageDB, carDB } from '@/lib/database'
 import { supabase } from '@/lib/supabase'
 import { BrandLogo } from '@/components/ui/BrandLogo'
-import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, colors, vehicleConditionOptions, vehicleConditionSubOptions, carEquipmentCategories, DEFAULT_AUTO_SELECT_FEATURES, vehicleCategories, vehicleSubCategories, subCategoryDetails, emissionClasses, vehicleAgeOptions, ownerCountOptions, months, getYears, LUXURY_CAR_THRESHOLD, FALLBACK_BRANDS, FALLBACK_MODELS, vehicleEquipmentMap, DEFAULT_FEATURES_PER_CATEGORY } from '@/lib/data'
+import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, colors, vehicleConditionOptions, vehicleConditionSubOptions, carEquipmentCategories, DEFAULT_AUTO_SELECT_FEATURES, vehicleCategories, vehicleSubCategories, subCategoryDetails, emissionClasses, vehicleAgeOptions, ownerCountOptions, months, getYears, LUXURY_CAR_THRESHOLD, FALLBACK_BRANDS, FALLBACK_MODELS, vehicleEquipmentMap, DEFAULT_FEATURES_PER_CATEGORY, kamionSubCategoryEquipmentMap } from '@/lib/data'
 
 export function AddCarPage() {
   const navigate = useNavigate()
@@ -194,7 +194,7 @@ const saveCustomModel = (brand, model) => {
   }
 
   const selectAllInCategory = (categoryKey) => {
-    const equipMap = vehicleEquipmentMap[formData.vehicleCategory] || {}
+    const equipMap = getEquipMap()
     const categoryData = equipMap[categoryKey]
     if (!categoryData) return
     
@@ -214,10 +214,20 @@ const saveCustomModel = (brand, model) => {
     }))
   }
 
+  // Get the correct equipment map based on vehicle category AND subcategory
+  const getEquipMap = () => {
+    // Kamion has subcategory-specific equipment
+    if (formData.vehicleCategory === 'kamion' && formData.vehicleSubCategory) {
+      const subMap = kamionSubCategoryEquipmentMap[formData.vehicleSubCategory]
+      if (subMap) return subMap
+    }
+    return vehicleEquipmentMap[formData.vehicleCategory] || {}
+  }
+
   const getSelectedCount = () => formData.featureIds.length
   
   const getSelectedInCategory = (categoryKey) => {
-    const equipMap = vehicleEquipmentMap[formData.vehicleCategory] || {}
+    const equipMap = getEquipMap()
     const categoryData = equipMap[categoryKey]
     if (!categoryData) return 0
     
@@ -330,14 +340,14 @@ const saveCustomModel = (brand, model) => {
     return () => document.removeEventListener('visibilitychange', handleVisibility)
   }, [])
 
-  // Ensure openFeaturesCategory is always valid for the current vehicle category
+  // Ensure openFeaturesCategory is always valid for the current vehicle category/subcategory
   useEffect(() => {
-    const equipMap = vehicleEquipmentMap[formData.vehicleCategory] || {}
+    const equipMap = getEquipMap()
     const availableKeys = Object.keys(equipMap)
     if (availableKeys.length > 0 && !availableKeys.includes(openFeaturesCategory)) {
       setOpenFeaturesCategory(availableKeys[0])
     }
-  }, [formData.vehicleCategory])
+  }, [formData.vehicleCategory, formData.vehicleSubCategory])
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -690,7 +700,14 @@ const saveCustomModel = (brand, model) => {
               </label>
               <select
                 value={formData.vehicleSubCategory || ''}
-                onChange={(e) => setFormData(prev => ({ ...prev, vehicleSubCategory: e.target.value }))}
+                onChange={(e) => {
+                  const newSubCat = e.target.value
+                  const isKamionAvtobus = formData.vehicleCategory === 'kamion' && newSubCat === 'Avtobusi'
+                  const defaultFeats = isKamionAvtobus
+                    ? (kamionSubCategoryEquipmentMap['Avtobusi'] ? Object.values(kamionSubCategoryEquipmentMap['Avtobusi']).flatMap(cat => Object.values(cat.subcategories || {}).flatMap(sub => sub.features || [])) : [])
+                    : DEFAULT_FEATURES_PER_CATEGORY[formData.vehicleCategory] || []
+                  setFormData(prev => ({ ...prev, vehicleSubCategory: newSubCat, featureIds: defaultFeats }))
+                }}
                 className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
               >
                 <option value="">Izberi...</option>
@@ -1362,7 +1379,7 @@ const saveCustomModel = (brand, model) => {
           
           {/* Category tabs */}
           <div className="flex flex-wrap gap-2 mb-4">
-            {Object.entries(vehicleEquipmentMap[formData.vehicleCategory] || {}).map(([key, category]) => {
+            {Object.entries(getEquipMap()).map(([key, category]) => {
               const selectedInCategory = getSelectedInCategory(key)
               const isActive = openFeaturesCategory === key
               
@@ -1407,10 +1424,10 @@ const saveCustomModel = (brand, model) => {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
             >
-              {(vehicleEquipmentMap[formData.vehicleCategory] || {})[openFeaturesCategory] && (
+              {getEquipMap()[openFeaturesCategory] && (
                 <>
                   {/* Regular checkboxes for all categories */}
-                  {Object.entries((vehicleEquipmentMap[formData.vehicleCategory] || {})[openFeaturesCategory]?.subcategories || {}).map(([subKey, subCategory]) => (
+                  {Object.entries(getEquipMap()[openFeaturesCategory]?.subcategories || {}).map(([subKey, subCategory]) => (
                     <div key={subKey} className="mb-4">
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="text-sm font-semibold text-gray-700">{subCategory.name}</h3>

@@ -910,6 +910,124 @@ export const DEFAULT_AUTO_SELECT_FEATURES = [
 const carEquipmentCategories = avtoEquipmentCategories
 export { carEquipmentCategories }
 
+// Equipment for KAMION - AVTOBUSI subcategory
+const kamionAvtobusEquipmentCategories = {
+  'podvozje_a': {
+    name: 'Podvozje',
+    icon: 'Settings',
+    subcategories: {
+      'podvozje_a_v': {
+        name: 'Podvozje',
+        features: [
+          'Zavorni sistem (ABS)',
+          'Pomoč pri zaviranju BAS',
+          'Elektronski program stabilnosti (ESP)',
+        ]
+      }
+    }
+  },
+  'varnost_a': {
+    name: 'Varnost',
+    icon: 'Shield',
+    subcategories: {
+      'varnost_a_v': {
+        name: 'Varnost',
+        features: [
+          'Število airbagov',
+          'Nadzor zračnega tlaka v pnevmatikah (RDK)',
+          'Senzor za dež',
+          'Xenonski žarometi',
+          'Meglenke',
+          'Naprava za pranje žarometov',
+          'Alarmna naprava',
+        ]
+      }
+    }
+  },
+  'notranjost_a': {
+    name: 'Notranjost',
+    icon: 'Car',
+    subcategories: {
+      'notranjost_a_v': {
+        name: 'Notranjost',
+        features: [
+          'Kuhinja',
+          'Hladilnik',
+          'WC',
+          'Sedeži: komfortni',
+          'Sedeži: ortopedski',
+          'Sedeži: nastavitev po višini',
+          'Sedeži: el. nastavitev',
+          'Sedeži: paket Memory',
+          'Sedeži: gretje',
+          'Sedeži: hlajenje / ventilacija',
+          'Sredinski naslon za roko med sedeži',
+          'Zložljiv sovoznikov sedež',
+          'Sovoznik: sedež za 2 osebi',
+          'Servisna knjiga potrjena',
+          'Garažirano',
+          'Nepoškodovano',
+          'Nekarambolirano',
+          'Slovensko poreklo',
+        ]
+      }
+    }
+  },
+  'udobje_a': {
+    name: 'Udobje',
+    icon: 'Settings',
+    subcategories: {
+      'udobje_a_v': {
+        name: 'Udobje',
+        features: [
+          'Klimatska naprava - ročna',
+          'Avtomatska klimatska naprava / digitalna',
+          'Klimatska naprava - 2 conska',
+          'Webasto',
+          'Tonirana stekla',
+          'Električni pomik prednjih stekel',
+          'El. nastavljiva zunanja ogledala',
+          'Ogrevanje zunanjih ogledal',
+          'Centralno zaklepanje',
+          'Električni paket',
+          'Nastavljiv volan po višini',
+          'Nastavljiv volan po globini',
+          'Servo volan',
+          'Volanski obroč oblečen v usnje',
+          'Multifunkcijski volan',
+          'Tempomat',
+        ]
+      }
+    }
+  },
+  'info_a': {
+    name: 'Info-Multimedia',
+    icon: 'Wifi',
+    subcategories: {
+      'info_a_v': {
+        name: 'Info-Multimedia',
+        features: [
+          'Avtoradio',
+          'Avtoradio / CD',
+          'DVD predvajalnik',
+          'TV sprejemnik / tuner',
+          'Predpriprava za mobilni telefon',
+          'Avtotelefon',
+          'Potovalni računalnik',
+          'Komunikacijski paket',
+          'Navigacija',
+          'Navigacija + TV',
+        ]
+      }
+    }
+  },
+}
+
+// Map subcategory → equipment (for Kamion)
+export const kamionSubCategoryEquipmentMap = {
+  'Avtobusi': kamionAvtobusEquipmentCategories,
+}
+
 // Equipment for KAMION (trucks / delivery vehicles) - ALL items from user list
 const kamionEquipmentCategories = {
   'podvozje_k': {
