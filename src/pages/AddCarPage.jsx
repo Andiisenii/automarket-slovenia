@@ -441,7 +441,7 @@ const saveCustomModel = (brand, model) => {
 
   const canPostCar = canPost()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!validateForm()) return
     if (formData.brand && formData.model) { saveCustomModel(formData.brand, formData.model) }
@@ -459,7 +459,16 @@ const saveCustomModel = (brand, model) => {
         downPaymentType: hasFinancing && downPaymentValue ? downPaymentType : null,
         downPaymentValue: hasFinancing && downPaymentValue ? downPaymentValue : null,
       }
-      updateCar(editCarId, carData)
+      // Update locally first
+      carDB.updateCar(editCarId, carData)
+      
+      // Try backend update, don't fail if offline
+      try {
+        await updateCar(editCarId, carData)
+      } catch (e) {
+        console.warn('Backend update failed, using local data:', e)
+      }
+      
       alert('Car updated successfully!')
       navigate('/dashboard')
       return
@@ -490,7 +499,16 @@ const saveCustomModel = (brand, model) => {
         },
         views: 0, createdAt: new Date().toISOString().split('T')[0], status: 'active',
       }
-      addCar(carData)
+      // Save locally first as backup
+      carDB.addCar(carData)
+      
+      // Try to save to backend, but don't fail if backend is down
+      try {
+        await addCar(carData)
+      } catch (e) {
+        console.warn('Backend save failed, using local data:', e)
+      }
+      
       alert('Vozilo objavljeno brezplacno!')
       navigate('/dashboard')
       return
