@@ -4,13 +4,19 @@ import { supabase } from './supabase'
 
 const CarContext = createContext(null)
 
+// Helper to convert empty strings to null for numeric fields
+const toNumberOrNull = (val) => {
+  if (val === '' || val === null || val === undefined) return null
+  const num = Number(val)
+  return isNaN(num) ? null : num
+}
+
 export function CarProvider({ children }) {
   const { user } = useAuth()
   const [cars, setCars] = useState([])
   const [myListings, setMyListings] = useState([])
   const [loading, setLoading] = useState(true)
 
-  // Fetch all cars when user changes
   useEffect(() => {
     loadCars()
   }, [user])
@@ -18,7 +24,6 @@ export function CarProvider({ children }) {
   const loadCars = async () => {
     setLoading(true)
     try {
-      // Get all public cars from Supabase
       const { data, error } = await supabase
         .from('cars')
         .select('*')
@@ -27,7 +32,6 @@ export function CarProvider({ children }) {
 
       if (error) {
         console.error('Error loading cars from Supabase:', error)
-        // Fallback to localStorage
         const localCars = JSON.parse(localStorage.getItem('automarket_cars') || '[]')
         setCars(localCars)
         if (user?.id) {
@@ -36,17 +40,13 @@ export function CarProvider({ children }) {
         }
       } else {
         console.log('Cars loaded from Supabase:', data?.length)
-        // Transform Supabase data to app format
         const transformedCars = (data || []).map(transformCarFromSupabase)
         setCars(transformedCars)
-        
-        // Get user's own cars if logged in
         if (user?.id) {
           const myCars = transformedCars.filter(c => c.userId === user.id)
           setMyListings(myCars)
         }
       }
-      
     } catch (e) {
       console.error('Error loading cars:', e)
     } finally {
@@ -55,89 +55,87 @@ export function CarProvider({ children }) {
   }
 
   const transformCarToSupabase = (carData) => {
-    // Convert camelCase to snake_case for Supabase
     return {
-      user_id: carData.userId,
-      vehicle_category: carData.vehicleCategory,
-      vehicle_sub_category: carData.vehicleSubCategory,
-      vehicle_sub_category_detail: carData.vehicleSubCategoryDetail,
-      brand: carData.brand,
-      model: carData.model,
-      year: carData.year,
-      price: carData.price,
-      mileage: carData.mileage,
-      fuel_type: carData.fueltype || carData.fuelType,
-      transmission: carData.transmission,
-      body_type: carData.bodytype || carData.bodyType,
-      engine: carData.engine,
-      horsepower: carData.horsepower,
-      color: carData.color,
-      city: carData.city,
-      description: carData.description,
-      vehicle_condition: carData.vehicleCondition,
-      vehicle_condition_sub: carData.vehicleConditionSub,
-      images: carData.images,
-      feature_ids: carData.featureIds,
-      fuel_consumption: carData.fuelConsumption,
-      emission_class: carData.emissionClass,
-      co2_emissions: carData.co2Emissions,
-      auto_publish_fuel_data: carData.autoPublishFuelData,
-      vehicle_age: carData.vehicleAge,
-      has_warranty: carData.hasWarranty,
-      has_guarantee: carData.hasGuarantee,
-      has_oldtimer_cert: carData.hasOldtimerCert,
-      first_reg_month: carData.firstRegMonth,
-      first_reg_year: carData.firstRegYear,
-      technical_valid_until: carData.technicalValidUntil,
-      owner_count: carData.ownerCount,
-      engine_capacity: carData.engineCapacity,
-      engine_power_kw: carData.enginePowerKw,
-      cylinder_count: carData.cylinderCount,
-      engine_stroke: carData.engineStroke,
-      diff_lock: carData.diffLock,
-      start_type: carData.startType,
-      airbag_count_kamion: carData.airbagCountKamion,
-      nosilnost: carData.nosilnost,
-      tovorni_prostor: carData.tovorniProstor,
-      zadnja_vrata: carData.zadnjaVrata,
-      stranska_vrata: carData.stranskaVrata,
-      barva_oblazinjenja: carData.barvaOblazinjenja,
-      oblazinjenje: carData.oblazinjenje,
-      streha_vozila: carData.strehaVozila,
-      vin: carData.vin,
-      dolzina: carData.dolzina,
-      sirina: carData.sirina,
-      stev_osi: carData.stevOsi,
-      dovoljena_skupna_tezza: carData.dovoljenaSkupnaTezza,
-      volumen: carData.volumen,
-      utv_engine_capacity: carData.utvEngineCapacity,
-      utv_engine_power_km: carData.utvEnginePowerKm,
-      utv_cylinder_count: carData.utvCylinderCount,
-      utv_engine_stroke: carData.utvEngineStroke,
-      utv_diff_lock: carData.utvDiffLock,
-      utv_start_type: carData.utvStartType,
-      seller_name: carData.seller?.name,
-      seller_phone: carData.seller?.phone,
-      seller_user_type: carData.seller?.userType,
-      seller_verified: carData.seller?.verified,
-      views: carData.views || 0,
+      user_id: toNumberOrNull(carData.userId) || carData.userId,
+      vehicle_category: carData.vehicleCategory || 'avto',
+      vehicle_sub_category: carData.vehicleSubCategory || null,
+      vehicle_sub_category_detail: carData.vehicleSubCategoryDetail || null,
+      brand: carData.brand || null,
+      model: carData.model || null,
+      year: toNumberOrNull(carData.year),
+      price: toNumberOrNull(carData.price),
+      mileage: toNumberOrNull(carData.mileage),
+      fuel_type: carData.fueltype || carData.fuelType || null,
+      transmission: carData.transmission || null,
+      body_type: carData.bodytype || carData.bodyType || null,
+      engine: carData.engine || null,
+      horsepower: toNumberOrNull(carData.horsepower),
+      color: carData.color || null,
+      city: carData.city || null,
+      description: carData.description || null,
+      vehicle_condition: carData.vehicleCondition || null,
+      vehicle_condition_sub: carData.vehicleConditionSub || [],
+      images: carData.images || [],
+      feature_ids: carData.featureIds || [],
+      fuel_consumption: toNumberOrNull(carData.fuelConsumption),
+      emission_class: carData.emissionClass || null,
+      co2_emissions: toNumberOrNull(carData.co2Emissions),
+      auto_publish_fuel_data: carData.autoPublishFuelData || false,
+      vehicle_age: carData.vehicleAge || null,
+      has_warranty: carData.hasWarranty || false,
+      has_guarantee: carData.hasGuarantee || false,
+      has_oldtimer_cert: carData.hasOldtimerCert || false,
+      first_reg_month: carData.firstRegMonth || null,
+      first_reg_year: toNumberOrNull(carData.firstRegYear),
+      technical_valid_until: carData.technicalValidUntil || null,
+      owner_count: toNumberOrNull(carData.ownerCount),
+      engine_capacity: toNumberOrNull(carData.engineCapacity),
+      engine_power_kw: toNumberOrNull(carData.enginePowerKw),
+      cylinder_count: toNumberOrNull(carData.cylinderCount),
+      engine_stroke: carData.engineStroke || null,
+      diff_lock: carData.diffLock || null,
+      start_type: carData.startType || null,
+      airbag_count_kamion: toNumberOrNull(carData.airbagCountKamion),
+      nosilnost: toNumberOrNull(carData.nosilnost),
+      tovorni_prostor: toNumberOrNull(carData.tovorniProstor),
+      zadnja_vrata: carData.zadnjaVrata || [],
+      stranska_vrata: carData.stranskaVrata || [],
+      barva_oblazinjenja: carData.barvaOblazinjenja || null,
+      oblazinjenje: carData.oblazinjenje || null,
+      streha_vozila: carData.strehaVozila || [],
+      vin: carData.vin || null,
+      dolzina: toNumberOrNull(carData.dolzina),
+      sirina: toNumberOrNull(carData.sirina),
+      stev_osi: toNumberOrNull(carData.stevOsi),
+      dovoljena_skupna_tezza: toNumberOrNull(carData.dovoljenaSkupnaTezza),
+      volumen: toNumberOrNull(carData.volumen),
+      utv_engine_capacity: toNumberOrNull(carData.utvEngineCapacity),
+      utv_engine_power_km: toNumberOrNull(carData.utvEnginePowerKm),
+      utv_cylinder_count: toNumberOrNull(carData.utvCylinderCount),
+      utv_engine_stroke: carData.utvEngineStroke || null,
+      utv_diff_lock: carData.utvDiffLock || null,
+      utv_start_type: carData.utvStartType || null,
+      seller_name: carData.seller?.name || null,
+      seller_phone: carData.seller?.phone || null,
+      seller_user_type: carData.seller?.userType || null,
+      seller_verified: carData.seller?.verified || false,
+      views: toNumberOrNull(carData.views) || 0,
       status: carData.status || 'active',
-      has_boost: carData.hasBoost,
-      boost_package: carData.boostPackage,
-      boost_days: carData.boostDays,
-      boost_spent: carData.boostSpent,
-      is_featured: carData.featured,
-      is_promoted: carData.promoted,
-      is_luxury_car: carData.isLuxuryCar,
-      has_financing: carData.hasFinancing,
-      monthly_budget: carData.monthlyBudget,
-      down_payment_type: carData.downPaymentType,
-      down_payment_value: carData.downPaymentValue,
+      has_boost: carData.hasBoost || false,
+      boost_package: carData.boostPackage || null,
+      boost_days: toNumberOrNull(carData.boostDays),
+      boost_spent: toNumberOrNull(carData.boostSpent),
+      is_featured: carData.featured || false,
+      is_promoted: carData.promoted || false,
+      is_luxury_car: carData.isLuxuryCar || false,
+      has_financing: carData.hasFinancing || false,
+      monthly_budget: toNumberOrNull(carData.monthlyBudget),
+      down_payment_type: carData.downPaymentType || null,
+      down_payment_value: toNumberOrNull(carData.downPaymentValue),
     }
   }
 
   const transformCarFromSupabase = (dbCar) => {
-    // Convert snake_case from Supabase to camelCase for app
     return {
       id: dbCar.id,
       userId: dbCar.user_id,
