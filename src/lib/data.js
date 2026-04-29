@@ -1163,9 +1163,9 @@ const avtoEquipmentCategories = {
 
           'Tonirana stekla',
 
-          'Elektricni pomik prednjih stekel',
+          'Električni pomik prednjih stekel',
 
-          'Elektricni pomik prednjih in zadnjih stekel',
+          'Električni pomik prednjih in zadnjih stekel',
 
           'El. nastavijiva zunanja ogledala',
 
@@ -1185,7 +1185,7 @@ const avtoEquipmentCategories = {
 
           'Start-Stop sistem',
 
-          'Elektricni paket',
+          'Električni paket',
 
           'Nastavijiv volan po visini',
 
@@ -1823,7 +1823,7 @@ export const DEFAULTAUTOSELECTFEATURES = [
 
   'Centralno zaklepanje z daljinskim',
 
-  'Elektricni pomik prednjih stekel',
+  'Električni pomik prednjih stekel',
 
   'Servo volan',
 
@@ -2555,7 +2555,7 @@ export const DEFAULTFEATURESPERCATEGORY = {
 
     'Centralno zaklepanje z daljinskim',
 
-    'Elektricni pomik prednjih stekel',
+    'Električni pomik prednjih stekel',
 
     'Servo volan',
 
