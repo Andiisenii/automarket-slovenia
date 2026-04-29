@@ -272,11 +272,13 @@ export function CarProvider({ children }) {
     // Build title from brand and model
     const title = `${carData.brand || ''} ${carData.model || ''} ${carData.year || ''}`.trim()
     
-    // Only insert fields that work with Supabase schema
-    const basicData = {
+    // Insert all fields including equipment and specifications
+    const allData = {
       title: title,
       user_id: user.id,
       vehicle_category: carData.vehicleCategory || 'avto',
+      vehicle_sub_category: carData.vehicleSubCategory || null,
+      vehicle_sub_category_detail: carData.vehicleSubCategoryDetail || null,
       brand: carData.brand || null,
       model: carData.model || null,
       year: toNumberOrNull(carData.year),
@@ -288,19 +290,81 @@ export function CarProvider({ children }) {
       color: carData.color || null,
       city: carData.city || null,
       description: carData.description || null,
+      // Equipment & Features
+      feature_ids: carData.featureIds && carData.featureIds.length > 0 ? carData.featureIds : null,
+      vehicle_condition: carData.vehicleCondition || null,
+      vehicle_condition_sub: carData.vehicleConditionSub || [],
+      // Specs
+      engine: carData.engine || null,
+      horsepower: toNumberOrNull(carData.horsepower),
+      engine_capacity: toNumberOrNull(carData.engineCapacity),
+      engine_power_kw: toNumberOrNull(carData.enginePowerKw),
+      cylinder_count: toNumberOrNull(carData.cylinderCount),
+      engine_stroke: carData.engineStroke || null,
+      diff_lock: carData.diffLock || null,
+      start_type: carData.startType || null,
+      // Fuel
+      fuel_consumption: toNumberOrNull(carData.fuelConsumption),
+      emission_class: carData.emissionClass || null,
+      co2_emissions: toNumberOrNull(carData.co2Emissions),
+      auto_publish_fuel_data: carData.autoPublishFuelData || false,
+      // Vehicle Age & Ownership
+      vehicle_age: carData.vehicleAge || null,
+      has_warranty: carData.hasWarranty || false,
+      has_guarantee: carData.hasGuarantee || false,
+      has_oldtimer_cert: carData.hasOldtimerCert || false,
+      // Registration
+      first_reg_month: carData.firstRegMonth || null,
+      first_reg_year: toNumberOrNull(carData.firstRegYear),
+      technical_valid_until: carData.technicalValidUntil || null,
+      owner_count: toNumberOrNull(carData.ownerCount),
+      // Kamion specific
+      airbag_count_kamion: toNumberOrNull(carData.airbagCountKamion),
+      nosilnost: toNumberOrNull(carData.nosilnost),
+      tovorni_prostor: toNumberOrNull(carData.tovorniProstor),
+      zadnja_vrata: carData.zadnjaVrata || [],
+      stranska_vrata: carData.stranskaVrata || [],
+      barva_oblazinjenja: carData.barvaOblazinjenja || null,
+      oblazinjenje: carData.oblazinjenje || null,
+      streha_vozila: carData.strehaVozila || [],
+      vin: carData.vin || null,
+      // Tovorna prikolica specific
+      dolzina: toNumberOrNull(carData.dolzina),
+      sirina: toNumberOrNull(carData.sirina),
+      stev_osi: toNumberOrNull(carData.stevOsi),
+      dovoljena_skupna_tezza: toNumberOrNull(carData.dovoljenaSkupnaTezza),
+      volumen: toNumberOrNull(carData.volumen),
+      // UTV specific
+      utv_engine_capacity: toNumberOrNull(carData.utvEngineCapacity),
+      utv_engine_power_km: toNumberOrNull(carData.utvEnginePowerKm),
+      utv_cylinder_count: toNumberOrNull(carData.utvCylinderCount),
+      utv_engine_stroke: carData.utvEngineStroke || null,
+      utv_diff_lock: carData.utvDiffLock || null,
+      utv_start_type: carData.utvStartType || null,
+      // Seller
+      seller_name: carData.seller?.name || null,
+      seller_phone: carData.seller?.phone || null,
+      seller_user_type: carData.seller?.userType || null,
+      seller_verified: carData.seller?.verified || false,
+      // Status
       status: 'active',
       views: 0,
       featured: false,
       promoted: false,
       has_boost: false,
+      boost_package: null,
+      boost_days: null,
       boost_spent: 0,
-      is_luxury_car: false,
-      has_financing: false,
+      is_luxury_car: carData.isLuxuryCar || false,
+      has_financing: carData.hasFinancing || false,
+      monthly_budget: toNumberOrNull(carData.monthlyBudget),
+      down_payment_type: carData.downPaymentType || null,
+      down_payment_value: toNumberOrNull(carData.downPaymentValue),
     }
     
     const { data, error } = await supabase
       .from('cars')
-      .insert(basicData)
+      .insert(allData)
       .select()
       .single()
     
