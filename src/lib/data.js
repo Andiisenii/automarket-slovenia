@@ -86,11 +86,11 @@ export const getAllCities = async () => {
 }
 
 // Fuel types
-export const fuelTypes = ['Bencin', 'Dizel', 'Hybrid', 'ElektriÄni', 'Plin (LPG)']
+export const fuelTypes = ['Bencin', 'Dizel', 'Hybrid', 'Električni', 'Plin (LPG)']
 
 
 // Transmissions
-export const transmissions = ['Avtomatski', 'RoÄni', 'Polavtomatski']
+export const transmissions = ['Avtomatski', 'Ročni', 'Polavtomatski']
 
 
 // Body types
@@ -101,23 +101,23 @@ export const bodyTypes = ['Traktor', 'Limuzina', 'Hatchback', 'Coupe', 'Kombi', 
 export const doorCounts = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30+']
 
 // Colors
-export const colors = ['Bela', 'ÄŒrna', 'Siva', 'RdeÄa', 'Modra', 'Zelena', 'Rumena', 'OranÅna', 'Rjava', 'BeÅ']
+export const colors = ['Bela', 'ÄŒrna', 'Siva', 'Rdeča', 'Modra', 'Zelena', 'Rumena', 'OranÅna', 'Rjava', 'BeÅ']
 
 // Vehicle condition options
 export const vehicleConditionOptions = [
-  { value: 'Vozno', label: 'Vozno', description: 'NEpoÅ¡kodovano, Ni karambolirano' },
-  { value: 'NEvozno', label: 'NEvozno', description: 'poÅ¡kodovano, karambolirano' },
+  { value: 'Vozno', label: 'Vozno', description: 'NEpoškodovano, Ni karambolirano' },
+  { value: 'NEvozno', label: 'NEvozno', description: 'poškodovano, karambolirano' },
   { value: 'Vokvari', label: 'V okvari', description: 'vendar NI karambolirano' },
 ]
 
 // Vehicle condition sub options
 export const vehicleConditionSubOptions = {
   'Vozno': [
-    { id: 'neposkodovano', label: 'NEpoÅ¡kodovano' },
+    { id: 'neposkodovano', label: 'NEpoškodovano' },
     { id: 'nikarambolirano', label: 'Ni karambolirano' },
   ],
   'NEvozno': [
-    { id: 'poskodovano', label: 'poÅ¡kodovano' },
+    { id: 'poskodovano', label: 'poškodovano' },
     { id: 'karambolirano', label: 'karambolirano' },
   ],
   'Vokvari': [
@@ -136,7 +136,7 @@ export const garancijaOptions = [
   { value: '2leti', label: '2 leti' },
   { value: '3leta', label: '3 leta' },
   { value: '4leta', label: '4 leta' },
-  { value: '5let', label: '5 let ali veÄ' },
+  { value: '5let', label: '5 let ali več' },
   { value: 'podogovoru', label: 'Po dogovoru' },
   { value: 'ustrezengarancijskilist', label: 'Ustrezen garancijski list' },
   { value: 'neustrezengarancijskilist', label: 'Neustrezen garancijski list' },
@@ -197,17 +197,17 @@ export const LUXURYFEE = 5
 // Slavenian cities
 export const slovenianCities = [
   'Ljubljana', 'Maribor', 'Celje', 'Kranj', 'Koper', 'Nova Gorica',
-  'KrÅ¡ko', 'Novo Mesto', 'Ptuj', 'Trbovlje', 'Kamnik', 'Jesenice', 'Å1⁄2alec',
+  'Krško', 'Novo Mesto', 'Ptuj', 'Trbovlje', 'Kamnik', 'Jesenice', 'Å1⁄2alec',
   'Å1⁄2irovnica', 'Bled', 'Bohinj', 'BreÅice', 'Cerklje ob Krki', 'Cerknica',
   'Cerkno', 'Crnomelj', 'Dravograd', 'Gornja Radgona', 'Grosuplje', 'Hrastnik',
-  'Idrija', 'Ilirska Bistrica', 'Izola', 'Jurovski Dol', 'Kanal ob SoÄi',
-  'KoÄevje', 'Komen', 'Kozina', 'Kranjska Gora', 'Lendava', 'Litija', 'Logatec',
+  'Idrija', 'Ilirska Bistrica', 'Izola', 'Jurovski Dol', 'Kanal ob Soči',
+  'Kočevje', 'Komen', 'Kozina', 'Kranjska Gora', 'Lendava', 'Litija', 'Logatec',
   'Metlika', 'MeÅica', 'Murska Sobota', 'Muta', 'Nazaret', 'OrmoÅ', 'Piran',
-  'Postojna', 'Prevalje', 'RadeÄe', 'Radlje ob Dravi', 'Radovljica', 'Ravne na KoroÅ¡kem',
-  'Ribnica', 'RogaÅ¡ka Slatina', 'Rogatec', 'RuÅ¡e', 'SeÅana', 'Slovenska Bistrica',
-  'Slovenske Konjice', 'Å entjur', 'Å kofja Loka', 'Å marje pri JelÅ¡ah', 'Tolmin',
-  'Trebnje', 'TrÅiÄ', 'TurniÅ¡Äe', 'Velenje', 'Vinica', 'Vipava', 'Vitanje',
-  'Vodice', 'VoÅec', 'Zagorje ob Savi', 'ZavrÄ', 'ZreÄe', 'Å1⁄2elezniki'
+  'Postojna', 'Prevalje', 'Radeče', 'Radlje ob Dravi', 'Radovljica', 'Ravne na Koroškem',
+  'Ribnica', 'Rogaška Slatina', 'Rogatec', 'Ruše', 'SeÅana', 'Slovenska Bistrica',
+  'Slovenske Konjice', 'Å entjur', 'Å kofja Loka', 'Å marje pri Jelšah', 'Tolmin',
+  'Trebnje', 'TrÅič', 'Turnišče', 'Velenje', 'Vinica', 'Vipava', 'Vitanje',
+  'Vodice', 'VoÅec', 'Zagorje ob Savi', 'Zavrč', 'Zreče', 'Å1⁄2elezniki'
 ]
 
 // Vehicle type categories
@@ -324,7 +324,7 @@ export const subCategoryDetails = {
       'Komunalno vozilo',
       'Kontejnerski tovornjak',
       'Kiper',
-      'MeÅ¡alnik betona',
+      'Mešalnik betona',
       'S cisterno',
       'S hladilnikom',
       'S kesonom',
@@ -333,9 +333,9 @@ export const subCategoryDetails = {
       'S prekucnikom',
       'Smetarsko vozilo',
       'Storitveni',
-      'Tovornjak-Å¡asija',
-      'VlaÄilec',
-      'Z dviÅno ploÅ¡Äadjo',
+      'Tovornjak-šasija',
+      'Vlačilec',
+      'Z dviÅno ploščadjo',
       'Z mobilnim vrtalnikom',
       'Z Åerjavom',
       'Za hlode',
@@ -359,17 +359,17 @@ export const subCategoryDetails = {
     label: 'Vrsta gradbene mehanizacije',
     options: [
       'ni pomembno',
-      'bager / goseniÄar',
+      'bager / goseničar',
       'bager / na kolesih',
       'buldoÅer',
       'demper',
       'drobilec',
       'dvigalo',
-      'dviÅna ploÅ¡Äad',
+      'dviÅna ploščad',
       'freza',
       'greder',
       'kladivo',
-      'kombinirka / rovokopaÄ',
+      'kombinirka / rovokopač',
       'kompresor / agregat',
       'mehanizacija za kamnolom',
       'mini bager',
@@ -387,17 +387,17 @@ export const subCategoryDetails = {
       'balirka',
       'brana',
       'cisterna za prevoz',
-      'Äesalnik',
+      'česalnik',
       'dognojevalec',
       'freza',
       'izkopalnik / okopalnik',
       'kmetijski kombajn',
       'kosilnica',
-      'meÅ¡alnica krmil',
+      'mešalnica krmil',
       'motokultivator',
-      'mulÄar',
+      'mulčar',
       'nakladalec',
-      'obraÄalnik',
+      'obračalnik',
       'odjemalec silaÅe',
       'ovijalka za bale',
       'plug',
@@ -405,8 +405,8 @@ export const subCategoryDetails = {
       'sadilna tehnika',
       'samonakladalka',
       'sejalnica',
-      'Å¡kropilnica',
-      'Å¡rotar',
+      'škropilnica',
+      'šrotar',
       'traktor',
       'traktorska prikolica',
       'traktorski plato',
@@ -421,11 +421,11 @@ export const subCategoryDetails = {
     label: 'Vrsta viličarja',
     options: [
       'ni pomembno',
-      'Äelni',
+      'čelni',
       'paletni',
-      'boÄni',
+      'bočni',
       'regalni',
-      'roÄni',
+      'ročni',
       'teleskopski',
       'komisionirni',
     ]
@@ -442,11 +442,11 @@ export const subCategoryDetails = {
     ]
   },
   'Počitniška prikolica': {
-    label: 'Vrsta poÄitniÅ¡ke prikolice',
+    label: 'Vrsta počitniške prikolice',
     options: [] // No subcategories
   },
   'Mobilna hišica': {
-    label: 'Vrsta mobilne hiÅ¡ice',
+    label: 'Vrsta mobilne hišice',
     options: [] // No subcategories
   },
   'Sneljivi bivalnik': {
@@ -454,7 +454,7 @@ export const subCategoryDetails = {
     options: [] // No subcategories
   },
   'Šotorska prikolica': {
-    label: 'Vrsta Å¡otorske prikolice',
+    label: 'Vrsta šotorske prikolice',
     options: [] // No subcategories
   },
   // For Kombi and Kamion - Tovorne prikolice subcategory
@@ -462,7 +462,7 @@ export const subCategoryDetails = {
     label: 'Vrsta tovorne prikolice',
     options: [
       'ni pomembno',
-      'Betonski meÅ¡alnik',
+      'Betonski mešalnik',
       'Cisterna',
       'Delovni oder',
       'Hladilnik',
@@ -480,10 +480,10 @@ export const subCategoryDetails = {
       'Transporter dolgega materiala',
       'Walking floor',
       'za transport stekla',
-      'za Äolne',
+      'za čolne',
       'za konje',
       'za prevoz lesa',
-      'za prevoz pijaÄ',
+      'za prevoz pijač',
       'za prevoz vozil',
       'za prevoz Åivine',
       'Ostale prikolice',
@@ -634,13 +634,13 @@ const avtoEquipmentCategories = {
           'Deljiva zad.klop 1/3 - 2/3',
           'Deljiva zad.klop 1/3-1/3-1/3',
           'Isofix sistem za pritrditev sedeza',
-          'Integrirani otroÅ¡ki sedez',
+          'Integrirani otroški sedez',
           'Vreca za smuci',
           'Mrezasta pregrada tovornega prostora',
           'Rolo prijaznega prostora',
           'Navodila za uporabo v SLO jeziku',
           'Dvojno dno prtljaznika',
-          'StreÅ¡ne sani',
+          'Strešne sani',
           'Predpriprava za mobilni telefon',
           'Avtatelefon',
           'Potovalni racunalnik',
@@ -690,7 +690,7 @@ const avtoEquipmentCategories = {
           'Obloga vrat - krom'
         ]
       },
-      'Å¡tevilovrat': {
+      'številovrat': {
         name: 'Å tevilo vrat',
         features: [
           'Vrat: 2',
@@ -705,8 +705,8 @@ const avtoEquipmentCategories = {
     name: 'Podvozje',
     icon: 'Settings',
     subcategories: {
-      'platiÅ¡Äa': {
-        name: 'PlatiÅ¡Äa',
+      'platišča': {
+        name: 'Platišča',
         features: ['Platisca (ALU)']
       },
       'zavornisistem': {
@@ -743,7 +743,7 @@ const avtoEquipmentCategories = {
     name: 'Varnost',
     icon: 'Shield',
     subcategories: {
-      'Å¡teviloairbagov': {
+      'številoairbagov': {
         name: 'Å tevilo airbagov',
         features: [
           'Airbag - voznik',
@@ -754,7 +754,7 @@ const avtoEquipmentCategories = {
         ]
       },
       'Åarometiinluci': {
-        name: 'Å1⁄2arometi in luÄi',
+        name: 'Å1⁄2arometi in luči',
         features: [
           'Nadzor zracnega tlaka v pnevmatikah (RDK)',
           'Xenonski zarometi',
@@ -782,8 +782,8 @@ const avtoEquipmentCategories = {
           'Opozorilnik varnostne razdalje'
         ]
       },
-      'zaÅ¡Äita': {
-        name: 'ZaÅ¡Äita',
+      'zaščita': {
+        name: 'Zaščita',
         features: [
           'Alarmna naprava',
           'Blokada motorja',
@@ -806,14 +806,14 @@ const avtoEquipmentCategories = {
       'zunanjostvse': {
         name: 'Zunanjost',
         features: [
-          'Roofracks - StreÅ¡ne sani',
+          'Roofracks - Strešne sani',
           'Towbar - Vlecna kljuka',
-          'ZasenÄena stekla',
+          'Zasenčena stekla',
           'Privacy stekla',
           'Karbon paket zunanj',
           'Å portni izpuh',
           'Automatski Åarometi',
-          'OznaÄevalne luci LED'
+          'Označevalne luci LED'
         ]
       }
     }
@@ -863,23 +863,23 @@ const motorEquipmentCategories = {
           'Elektronsko nastavljivo vzmetenje (ESA)',
           'Vzvratna prestava',
           'Tempomat',
-          'Varnostni zaÅ¡Äitni loki',
+          'Varnostni zaščitni loki',
           'Katalizator',
-          '12V vtiÄnica',
+          '12V vtičnica',
           'Alarmna naprava',
           'Kodno varovan vÅig motorja',
           'Radio',
-          'Nastavljiv sedeÅ po viÅ¡ini',
+          'Nastavljiv sedeÅ po višini',
           'Gretje sedeÅa',
-          'Gretje roÄic krmila',
+          'Gretje ročic krmila',
           'Stabilizator krmila',
-          'PrtljaÅni kovÄek',
-          'Stranski kovÄek',
-          'Vetrna zaÅ¡Äita',
+          'PrtljaÅni kovček',
+          'Stranski kovček',
+          'Vetrna zaščita',
           'Navigacija',
           'Airbag',
           'Meglenke',
-          'Potovalni raÄunalnik',
+          'Potovalni računalnik',
           'Custom predelava',
         ]
       }
@@ -918,7 +918,7 @@ const kamionAvtobusEquipmentCategories = {
         name: 'Podvozje',
         features: [
           'Zavorni sistem (ABS)',
-          'PomoÄ pri zaviranju BAS',
+          'Pomoč pri zaviranju BAS',
           'Elektronski program stabilnosti (ESP)',
         ]
       }
@@ -932,7 +932,7 @@ const kamionAvtobusEquipmentCategories = {
         name: 'Varnost',
         features: [
           'Å tevilo airbagov',
-          'Nadzor zraÄnega tlaka v pnevmatikah (RDK)',
+          'Nadzor zračnega tlaka v pnevmatikah (RDK)',
           'Senzor za deÅ',
           'Xenonski Åarometi',
           'Meglenke',
@@ -954,7 +954,7 @@ const kamionAvtobusEquipmentCategories = {
           'WC',
           'SedeÅi: komfortni',
           'SedeÅi: ortopedski',
-          'SedeÅi: nastavitev po viÅ¡ini',
+          'SedeÅi: nastavitev po višini',
           'SedeÅi: el. nastavitev',
           'SedeÅi: paket Memory',
           'SedeÅi: gretje',
@@ -964,7 +964,7 @@ const kamionAvtobusEquipmentCategories = {
           'Sovoznik: sedeÅ za 2 osebi',
           'Servisna knjiga potrjena',
           'GaraÅirano',
-          'NepoÅ¡kodovano',
+          'Nepoškodovano',
           'Nekarambolirano',
           'Slovensko poreklo',
         ]
@@ -978,20 +978,20 @@ const kamionAvtobusEquipmentCategories = {
       'udobjeav': {
         name: 'Udobje',
         features: [
-          'Klimatska naprava - roÄna',
+          'Klimatska naprava - ročna',
           'Avtomatska klimatska naprava / digitalna',
           'Klimatska naprava - 2 conska',
           'Webasto',
           'Tonirana stekla',
-          'ElektriÄni pomik prednjih stekel',
+          'Električni pomik prednjih stekel',
           'El. nastavljiva zunanja ogledala',
           'Ogrevanje zunanjih ogledal',
           'Centralno zaklepanje',
-          'ElektriÄni paket',
-          'Nastavljiv volan po viÅ¡ini',
+          'Električni paket',
+          'Nastavljiv volan po višini',
           'Nastavljiv volan po globini',
           'Servo volan',
-          'Volanski obroÄ obleÄen v usnje',
+          'Volanski obroč oblečen v usnje',
           'Multifunkcijski volan',
           'Tempomat',
         ]
@@ -1011,7 +1011,7 @@ const kamionAvtobusEquipmentCategories = {
           'TV sprejemnik / tuner',
           'Predpriprava za mobilni telefon',
           'Avtotelefon',
-          'Potovalni raÄunalnik',
+          'Potovalni računalnik',
           'Komunikacijski paket',
           'Navigacija',
           'Navigacija + TV',
@@ -1037,23 +1037,23 @@ const kamionKamUTVEquipmentCategories = {
           'Elektronsko nastavljivo vzmetenje (ESA)',
           'Vzvratna prestava',
           'Tempomat',
-          'Varnostni zaÅ¡Äitni loki',
+          'Varnostni zaščitni loki',
           'Katalizator',
-          '12V vtiÄnica',
+          '12V vtičnica',
           'Alarmna naprava',
           'Kodno varovan vÅig motorja',
           'Radio',
-          'Nastavljiv sedeÅ po viÅ¡ini',
+          'Nastavljiv sedeÅ po višini',
           'Gretje sedeÅa',
-          'Gretje roÄic krmila',
+          'Gretje ročic krmila',
           'Stabilizator krmila',
-          'PrtljaÅni kovÄek',
-          'Stranski kovÄek',
-          'Vetrna zaÅ¡Äita',
+          'PrtljaÅni kovček',
+          'Stranski kovček',
+          'Vetrna zaščita',
           'Navigacija',
           'Airbag',
           'Meglenke',
-          'Potovalni raÄunalnik',
+          'Potovalni računalnik',
           'Custom predelava',
         ]
       }
@@ -1061,7 +1061,7 @@ const kamionKamUTVEquipmentCategories = {
   }
 }
 
-// Tovorna prikolica - no equipment list, only form fields (dolÅina, Å¡irina, osi, nosilnost, etc.)
+// Tovorna prikolica - no equipment list, only form fields (dolÅina, širina, osi, nosilnost, etc.)
 
 // Equipment for KAMION (trucks / delivery vehicles) - ALL items from user list
 const kamionEquipmentCategories = {
@@ -1072,19 +1072,19 @@ const kamionEquipmentCategories = {
       'podvozjekv': {
         name: 'Podvozje',
         features: [
-          'Podvozje: lahka (ALU) platiÅ¡Äa',
+          'Podvozje: lahka (ALU) platišča',
           'Zavorni sistem (ABS)',
-          'PomoÄ pri zaviranju BAS',
+          'Pomoč pri zaviranju BAS',
           'Elektronski program stabilnosti (ESP)',
           'Regulacija nivoja podvozja (ADS)',
-          'ZraÄno vzmetenje',
+          'Zračno vzmetenje',
           'Nadzor zibanja prikolice TSC',
-          'Prilagodljiv naÄin obremenitve LAC',
+          'Prilagodljiv način obremenitve LAC',
           'Å tirikolesni pogon (4x4 / 4WD)',
-          'PodaljÅ¡ana medosna razdalja',
-          'OjaÄano vzmetenje',
+          'Podaljšana medosna razdalja',
+          'Ojačano vzmetenje',
           'Aktivno vzmetenje (ABC)',
-          'Sistem proti prevraÄanju RSC',
+          'Sistem proti prevračanju RSC',
         ]
       }
     }
@@ -1097,16 +1097,16 @@ const kamionEquipmentCategories = {
         name: 'Varnost',
         features: [
           'Å tevilo airbagov',
-          'Nadzor zraÄnega tlaka v pnevmatikah (RDK)',
+          'Nadzor zračnega tlaka v pnevmatikah (RDK)',
           'Xenonski Åarometi',
           'Bi-xenonski Åarometi',
           'LED Åarometi',
-          'Prednje (dnevne) LED luÄi',
-          'Zadnje LED luÄi',
+          'Prednje (dnevne) LED luči',
+          'Zadnje LED luči',
           'Meglenke',
-          'Adaptive light / dinamiÄno prilagodljivi Åarometi',
+          'Adaptive light / dinamično prilagodljivi Åarometi',
           'Sistem za prepoznavo prometnih znakov',
-          '3. zavorna luÄ',
+          '3. zavorna luč',
           'Naprava za pranje Åarometov',
           'Alarmna naprava',
           'Blokada motorja',
@@ -1129,7 +1129,7 @@ const kamionEquipmentCategories = {
           'Paket za kadilce',
           'SedeÅi: komfortni',
           'SedeÅi: ortopedski',
-          'SedeÅi: nastavitev po viÅ¡ini',
+          'SedeÅi: nastavitev po višini',
           'SedeÅi: el. nastavitev',
           'SedeÅi: paket Memory',
           'SedeÅi: gretje',
@@ -1143,11 +1143,11 @@ const kamionEquipmentCategories = {
           'Polica pod stropom kabine',
           'Osvetlitev tovornega prostora',
           'Zastekljen tovorni prostor',
-          '12V vtiÄnica',
+          '12V vtičnica',
           'Spalna kabina',
           'Servisna knjiga potrjena',
           'GaraÅirano',
-          'NepoÅ¡kodovano',
+          'Nepoškodovano',
           'Nekarambolirano',
           'Slovensko poreklo',
         ]
@@ -1161,24 +1161,24 @@ const kamionEquipmentCategories = {
       'udobjekv': {
         name: 'Udobje',
         features: [
-          'Klimatska naprava - roÄna',
+          'Klimatska naprava - ročna',
           'Avtomatska klimatska naprava / digitalna',
           'Klimatska naprava - 2 conska',
           'Dodatno gretje',
           'Webasto',
           'Tonirana stekla',
-          'ElektriÄni pomik prednjih stekel',
+          'Električni pomik prednjih stekel',
           'El. nastavljiva zunanja ogledala',
           'Ogrevanje zunanjih ogledal',
           'El. zloÅljiva zunanja ogledala',
           'Keyless Go',
           'Centralno zaklepanje',
           'Centralno zaklepanje z dalj. upravljanjem',
-          'ElektriÄni paket',
-          'Nastavljiv volan po viÅ¡ini',
+          'Električni paket',
+          'Nastavljiv volan po višini',
           'Nastavljiv volan po globini',
           'Servo volan',
-          'Volanski obroÄ obleÄen v usnje',
+          'Volanski obroč oblečen v usnje',
           'Multifunkcijski volan',
           'Tempomat',
           'Aktivni tempomat (Adaptive Cruise Control)',
@@ -1200,12 +1200,12 @@ const kamionEquipmentCategories = {
           'MP3 predvajalnik',
           'DVD predvajalnik',
           'Trdi disk za shranjevanje podatkov',
-          'USB prikljuÄek (iPod, HD, ...)',
+          'USB priključek (iPod, HD, ...)',
           'TV sprejemnik / tuner',
           'Digitalni radio DAB',
           'Predpriprava za mobilni telefon',
           'Avtotelefon',
-          'Potovalni raÄunalnik',
+          'Potovalni računalnik',
           'Komunikacijski paket',
           'Navigacija',
           'Navigacija + TV',
@@ -1220,18 +1220,18 @@ const kamionEquipmentCategories = {
       'uporabnostkv': {
         name: 'Uporabnost',
         features: [
-          'PoviÅ¡ana streha kabine',
+          'Povišana streha kabine',
           'DviÅni rob strehe',
           'MreÅnasta pregrada tovornega prostora',
-          'StreÅ¡ne sani',
-          'VleÄna kljuka',
-          'PomoÄ pri speljevanju v klanec',
-          'Sistem za aktivno pomoÄ pri parkiranju',
+          'Strešne sani',
+          'Vlečna kljuka',
+          'Pomoč pri speljevanju v klanec',
+          'Sistem za aktivno pomoč pri parkiranju',
           'Parkirni senzorji PDC',
-          'PomoÄ pri parkiranju: kamera',
-          'PomoÄ pri parkiranju: prednji senzorji',
-          'PomoÄ pri parkiranju: zadnji senzorji',
-          'PomoÄ pri parkiranju: pogled 360 stopinj',
+          'Pomoč pri parkiranju: kamera',
+          'Pomoč pri parkiranju: prednji senzorji',
+          'Pomoč pri parkiranju: zadnji senzorji',
+          'Pomoč pri parkiranju: pogled 360 stopinj',
           'Vzvratna kamera',
           'Vozilo prilagojeno invalidu',
         ]
