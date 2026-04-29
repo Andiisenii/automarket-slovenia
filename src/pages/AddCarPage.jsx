@@ -292,7 +292,7 @@ const saveCustomModel = (brand, model) => {
         const { data, error } = await supabase
           .from('packages')
           .select('*')
-          .eq('isactive', true)
+          .eq('is_active', true)
 
         if (error) {
           console.error('Error fetching packages:', error)
