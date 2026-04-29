@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { API_URL } from '@/lib/api'
+import { supabase } from '@/lib/supabase'
 import {
   ArrowLeft, Heart, Share2, Eye, Calendar, Gauge, Fuel,
   Settings, Shield, Phone, MessageCircle,
@@ -33,24 +33,31 @@ export function CarDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  // Fetch fresh car data from API
+  // Fetch fresh car data from Supabase
   useEffect(() => {
     const fetchCar = async () => {
       setLoading(true)
       setError(null)
 
       try {
-        // Fetch directly from API to ensure fresh data
-        const response = await fetch(`${API_URL}/cars.php?id=${id}`, {
-          headers: { 'X-Pinggy-No-Screen': 'true' }
-        })
-        const data = await response.json()
+        // Fetch directly from Supabase
+        const { data: dbCar, error } = await supabase
+          .from('cars')
+          .select('*')
+          .eq('id', parseInt(id))
+          .single()
 
-        if (data.success && data.car) {
-          // Transform API response from snake_case to camelCase
-          const carData = data.car
+        if (error) {
+          console.error('Supabase error:', error)
+          throw error
+        }
+
+        if (dbCar) {
+          // Transform from snake_case to camelCase
+          const carData = dbCar
           const transformedCar = {
             ...carData,
+            title: carData.title || `${carData.brand} ${carData.model}`.trim(),
             fuelType: carData.fuel_type || carData.fuelType || '',
             bodyType: carData.body_type || carData.bodyType || '',
             transmission: carData.transmission || carData.transmission || '',
@@ -80,13 +87,7 @@ export function CarDetailPage() {
           console.log('Transformed car data:', transformedCar)
           setCar(transformedCar)
         } else {
-          // Fallback to context if API fails
-          const contextCar = getCarById(parseInt(id))
-          if (contextCar) {
-            setCar(contextCar)
-          } else {
-            setError('Car not found')
-          }
+          setError('Car not found')
         }
       } catch (err) {
         console.error('Error fetching car:', err)
@@ -95,7 +96,7 @@ export function CarDetailPage() {
         if (contextCar) {
           setCar(contextCar)
         } else {
-          setError('Failed to load car')
+          setError('Failed to load car from Supabase: ' + err.message)
         }
       }
 
