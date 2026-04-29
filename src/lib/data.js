@@ -374,7 +374,34 @@ export const getYears = (startYear = 1990, endYear = 2026) => {
 
 // Export empty arrays for compatibility - data comes from Supabase now
 
-export const FALLBACKBRANDS = []
+export const FALLBACKBRANDS = [
+  // Premium German
+  'Audi', 'BMW', 'Mercedes-Benz', 'Porsche', 'Volkswagen',
+  // Other European
+  'Opel', 'Smart', 'Ford', 'Fiat', 'Alfa Romeo', 'Lancia', 'Maserati',
+  'Peugeot', 'Citroen', 'Renault', 'DS', 'Dacia',
+  'Jaguar', 'Land Rover', 'Mini', 'Bentley', 'Rolls-Royce', 'Aston Martin', 'McLaren',
+  'Volvo', 'Saab', 'Skoda', 'Seat', 'Cupra',
+  'Lada', 'ZAZ', 'UAZ',
+  // Japanese
+  'Toyota', 'Honda', 'Nissan', 'Mazda', 'Subaru', 'Mitsubishi', 'Suzuki', 'Lexus', 'Acura', 'Infiniti', 'Daihatsu', 'Hino', 'Toyota ProAce',
+  // Korean
+  'Hyundai', 'Kia', 'Genesis', 'SsangYong',
+  // American
+  'Chevrolet', 'Dodge', 'Jeep', 'Chrysler', 'Cadillac', 'Lincoln', 'GMC', 'Buick', 'Ram', 'Tesla', 'Rivian', 'Lucid',
+  // Chinese
+  'BYD', 'Chery', 'Geely', 'Great Wall', 'NIO', 'Xpeng', 'Li Auto',
+  // Indian
+  'Tata', 'Mahindra', 'Maruti Suzuki',
+  // Turkish
+  'Anadolu Isuzu', 'BMC',
+  // Trucks/Commercial
+  'MAN', 'Scania', 'Iveco', 'DAF', 'Volvo Trucks', 'Renault Trucks', 'Fuso', 'Isuzu', 'Hino',
+  // Agricultural
+  'John Deere', 'Massey Ferguson', 'Case IH', 'New Holland', 'Fendt', 'Kubota', 'Claas', 'Deutz-Fahr', 'Valtra', 'Steyr', 'JCB', 'McCormick', 'Landini', 'Zetor', 'SAME', 'Agrale', 'Belarus', 'MTZ', 'YTO',
+  // Other
+  'Polestar', 'Fisker',
+]
 
 export const FALLBACKMODELS = {}
 
@@ -1048,7 +1075,7 @@ export const subCategoryDetails = {
 
 // Brands and default models - empty, data from Supabase
 
-export const brands = []
+export const brands = FALLBACKBRANDS
 
 export const defaultModels = {}
 
