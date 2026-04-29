@@ -134,11 +134,11 @@ export const getModelsForBrand = async (brand) => {
 
     if (brandData) {
 
-      const models = await getFromSupabase('models', 'name,brandid')
+      const models = await getFromSupabase('models', 'name,brand_id')
 
       if (models && models.length > 0) {
 
-        return models.filter(m => m.brandid === brandData.id).map(m => m.name)
+        return models.filter(m => m.brand_id === brandData.id).map(m => m.name)
 
       }
 
