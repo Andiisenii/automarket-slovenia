@@ -717,9 +717,9 @@ const saveCustomModel = (brand, model) => {
                       defaultFeats = kamionSubCategoryEquipmentMap['Avtobusi']
                         ? Object.values(kamionSubCategoryEquipmentMap['Avtobusi']).flatMap(cat => Object.values(cat.subcategories || {}).flatMap(sub => sub.features || []))
                         : []
-                    } else if (newSubCat === 'KamUTV') {
-                      defaultFeats = kamionSubCategoryEquipmentMap['KamUTV']
-                        ? Object.values(kamionSubCategoryEquipmentMap['KamUTV']).flatMap(cat => Object.values(cat.subcategories || {}).flatMap(sub => sub.features || []))
+                    } else if (newSubCat === 'UTV Vozila') {
+                      defaultFeats = kamionSubCategoryEquipmentMap['UTV Vozila']
+                        ? Object.values(kamionSubCategoryEquipmentMap['UTV Vozila']).flatMap(cat => Object.values(cat.subcategories || {}).flatMap(sub => sub.features || []))
                         : []
                     }
                     // Tovorne prikolice has no equipment - defaultFeats stays empty
@@ -1279,7 +1279,7 @@ const saveCustomModel = (brand, model) => {
         )}
 
         {/* Dodatni podatki za UTV vozila */}
-        {formData.vehicleCategory === 'kamion' && formData.vehicleSubCategory === 'KamUTV' && (
+        {formData.vehicleCategory === 'kamion' && formData.vehicleSubCategory === 'UTV Vozila' && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">TehniÄne karakteristike UTV</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

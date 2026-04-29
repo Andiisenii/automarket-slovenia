@@ -1,4 +1,4 @@
-﻿// Data helpers - fetches from Supabase only
+﻿﻿// Data helpers - fetches from Supabase only
 // Supabase configuration
 const SUPABASEURL = 'https://pajbxchnenouxeaimsdr.supabase.co'
 const SUPABASEKEY = 'sbpublishableCQVFr7jAHNfQV5DXvxQiZgh7Cq6MRH'
@@ -259,8 +259,8 @@ export const vehicleSubCategories = {
       'Dostavna vozila',
       'Tovorna vozila',
       'Avtobusi',
-      'Tovorneprikolice',
-      'KamUTV',
+      'Tovorne prikolice',
+      'UTV Vozila',
     ]
   },
   'kombi': {
@@ -269,8 +269,8 @@ export const vehicleSubCategories = {
       'Dostavna vozila',
       'Tovorna vozila',
       'Avtobusi',
-      'Tovorneprikolice',
-      'KamUTV',
+      'Tovorne prikolice',
+      'UTV Vozila',
     ]
   },
   'traktor': {
@@ -278,7 +278,7 @@ export const vehicleSubCategories = {
     options: [
       'Gradbena mehanizacija',
       'Kmetijska mehanizacija',
-      'ViliÄarji',
+      'Viličarji',
       'Gozdarska mehanizacija',
       'Komunalna mehanizacija',
     ]
@@ -287,11 +287,10 @@ export const vehicleSubCategories = {
     label: 'Izberite podrubriko',
     options: [
       'Avtodom',
-      'PoÄitniÅ¡ka prikolica',
-      'Mobilna hiÅ¡ica',
-      'Snemljivi bivalnik',
-      'Å otorska prikolica',
-      'Navtika',
+      'Počitniška prikolica',
+      'Mobilna hišica',
+      'Sneljivi bivalnik',
+      'Šotorska prikolica',
       'E-kolo',
       'E-skiro',
     ]
@@ -351,7 +350,7 @@ export const subCategoryDetails = {
     options: [] // No detailed subcategory - just show label
   },
   // For Kombi and Kamion - UTV vozila subcategory
-  'KamUTV': {
+  'UTV Vozila': {
     label: 'Vrsta UTV vozila',
     options: [] // No detailed subcategory
   },
@@ -417,9 +416,9 @@ export const subCategoryDetails = {
       'ostala mehanizacija',
     ]
   },
-  // Traktor - ViliÄarji
-  'ViliÄarji': {
-    label: 'Vrsta viliÄarja',
+  // Traktor - Viličarjiarji
+  'Viličarji': {
+    label: 'Vrsta viličarja',
     options: [
       'ni pomembno',
       'Äelni',
@@ -442,24 +441,24 @@ export const subCategoryDetails = {
       'ni pomembno',
     ]
   },
-  'PoÄitniÅ¡ka prikolica': {
+  'Počitniška prikolica': {
     label: 'Vrsta poÄitniÅ¡ke prikolice',
     options: [] // No subcategories
   },
-  'Mobilna hiÅ¡ica': {
+  'Mobilna hišica': {
     label: 'Vrsta mobilne hiÅ¡ice',
     options: [] // No subcategories
   },
-  'Snemljivi bivalnik': {
+  'Sneljivi bivalnik': {
     label: 'Vrsta snemljivega bivalnika',
     options: [] // No subcategories
   },
-  'Å otorska prikolica': {
+  'Šotorska prikolica': {
     label: 'Vrsta Å¡otorske prikolice',
     options: [] // No subcategories
   },
   // For Kombi and Kamion - Tovorne prikolice subcategory
-  'Tovorneprikolice': {
+  'Tovorne prikolice': {
     label: 'Vrsta tovorne prikolice',
     options: [
       'ni pomembno',
@@ -491,11 +490,11 @@ export const subCategoryDetails = {
     ]
   },
   // For Kombi and Kamion - UTV vozila subcategory
-  'KamUTV': {
+  'UTV Vozila': {
     label: 'Vrsta UTV vozila',
     options: [
       'ATV',
-      'KamUTV',
+      'UTV Vozila',
       '3-kolesnik',
     ]
   },
@@ -504,7 +503,7 @@ export const subCategoryDetails = {
     options: [
       'Gradbena mehanizacija',
       'Kmetijska mehanizacija',
-      'ViliÄarji',
+      'Viličarji',
       'Gozdarska mehanizacija',
       'Komunalna mehanizacija',
     ]
@@ -513,11 +512,10 @@ export const subCategoryDetails = {
     label: 'Izberite podrubriko',
     options: [
       'Avtodom',
-      'PoÄitniÅ¡ka prikolica',
-      'Mobilna hiÅ¡ica',
-      'Snemljivi bivalnik',
-      'Å otorska prikolica',
-      'Navtika',
+      'Počitniška prikolica',
+      'Mobilna hišica',
+      'Sneljivi bivalnik',
+      'Šotorska prikolica',
       'E-kolo',
       'E-skiro',
     ]
@@ -1245,8 +1243,8 @@ const kamionEquipmentCategories = {
 // Map subcategory â†' equipment (for Kamion)
 export const kamionSubCategoryEquipmentMap = {
   'Avtobusi': kamionAvtobusEquipmentCategories,
-  'KamUTV': kamionKamUTVEquipmentCategories,
-  'Tovorneprikolice': {}, // no equipment, only form fields
+  'UTV Vozila': kamionKamUTVEquipmentCategories,
+  'Tovorne prikolice': {}, // no equipment, only form fields
 }
 
 // Map vehicle category â†' its equipment categories object
