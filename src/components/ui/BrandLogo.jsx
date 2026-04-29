@@ -1,5 +1,3 @@
-import { twMerge } from 'tailwind-merge'
-
 // Local logo paths (from public/logos folder)
 const BRAND_LOGOS = {
   'Volkswagen': '/logos/vw.jpg',
@@ -10,12 +8,12 @@ const BRAND_LOGOS = {
   'Ford': '/logos/ford.png',
 }
 
-export function BrandLogo({ name, className, showLabel = false }) {
+export function BrandLogo({ name, className = '', showLabel = false }) {
   const logoPath = BRAND_LOGOS[name]
   
   if (logoPath) {
     return (
-      <div className={twMerge('flex flex-col items-center gap-1', className)}>
+      <div className={`flex flex-col items-center gap-1 ${className}`}>
         <img 
           src={logoPath}
           alt={name}
@@ -29,7 +27,7 @@ export function BrandLogo({ name, className, showLabel = false }) {
   }
   
   return (
-    <div className={twMerge('w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center text-sm font-bold text-gray-500', className)}>
+    <div className={`w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center text-sm font-bold text-gray-500 ${className}`}>
       {name?.charAt(0) || '?'}
     </div>
   )
