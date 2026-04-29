@@ -4,7 +4,7 @@
 
 const SUPABASEURL = 'https://pajbxchnenouxeaimsdr.supabase.co'
 
-const SUPABASEKEY = 'sbpublishableCQVFr7jAHNfQV5DXvxQiZgh7Cq6MRH'
+const SUPABASEKEY = 'sb_publishable_CQVFr7jAHNfQV5DXvxQiZg_h7Cq6MRH'
 
 
 
