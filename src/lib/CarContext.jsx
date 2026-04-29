@@ -227,10 +227,48 @@ export function CarProvider({ children }) {
     await loadCars()
   }
 
+  // Test function to add a sample car
+  const addTestCar = async () => {
+    console.log('Adding test car to Supabase...')
+    const testCar = {
+      user_id: user?.id || 1,
+      vehicle_category: 'avto',
+      brand: 'BMW',
+      model: '320d',
+      year: 2020,
+      price: 25000,
+      mileage: 50000,
+      fuel_type: 'Dizel',
+      transmission: 'Avtomatski',
+      body_type: 'Limuzina',
+      color: 'Črna',
+      city: 'Ljubljana',
+      description: 'Test car - BMW 320d M Sport',
+      status: 'active',
+      seller_name: user?.name || 'Test User',
+      seller_phone: user?.phone || '+386 00 000 000',
+    }
+    
+    const { data, error } = await supabase
+      .from('cars')
+      .insert(testCar)
+      .select()
+      .single()
+    
+    if (error) {
+      console.error('Test car error:', error)
+      alert('Test car error: ' + error.message)
+    } else {
+      console.log('Test car added!', data)
+      alert('Test car added successfully!')
+      await loadCars()
+    }
+  }
+
   const addCar = async (carData) => {
     if (!user) throw new Error('Must be logged in to add a car')
     
-    // Only insert basic fields first to test
+    // Only insert basic fields
     const basicData = {
       user_id: user.id,
       vehicle_category: carData.vehicleCategory || 'avto',
@@ -329,6 +367,7 @@ export function CarProvider({ children }) {
     addCar,
     updateCar,
     deleteCar,
+    addTestCar,
     getCarById: (id) => cars.find(c => c.id === id)
   }
 
