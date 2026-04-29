@@ -230,11 +230,39 @@ export function CarProvider({ children }) {
   const addCar = async (carData) => {
     if (!user) throw new Error('Must be logged in to add a car')
     
-    const supabaseData = transformCarToSupabase(carData)
+    // Only insert basic fields first to test
+    const basicData = {
+      user_id: user.id,
+      vehicle_category: carData.vehicleCategory || 'avto',
+      vehicle_sub_category: carData.vehicleSubCategory || null,
+      vehicle_sub_category_detail: carData.vehicleSubCategoryDetail || null,
+      brand: carData.brand || null,
+      model: carData.model || null,
+      year: toNumberOrNull(carData.year),
+      price: toNumberOrNull(carData.price),
+      mileage: toNumberOrNull(carData.mileage),
+      fuel_type: carData.fuelType || null,
+      transmission: carData.transmission || null,
+      body_type: carData.bodyType || null,
+      engine: carData.engine || null,
+      horsepower: toNumberOrNull(carData.horsepower),
+      color: carData.color || null,
+      city: carData.city || null,
+      description: carData.description || null,
+      vehicle_condition: carData.vehicleCondition || null,
+      images: carData.images && carData.images.length > 0 ? carData.images : null,
+      feature_ids: carData.featureIds && carData.featureIds.length > 0 ? carData.featureIds : null,
+      seller_name: carData.seller?.name || null,
+      seller_phone: carData.seller?.phone || null,
+      seller_user_type: carData.seller?.userType || null,
+      seller_verified: carData.seller?.verified || false,
+      views: 0,
+      status: 'active',
+    }
     
     const { data, error } = await supabase
       .from('cars')
-      .insert(supabaseData)
+      .insert(basicData)
       .select()
       .single()
     
