@@ -30,14 +30,14 @@ export const getAllBrands = async () => {
   if (brandsCache && (now - lastFetchTime) < CACHEDURATION) {
     return brandsCache.map(b => b.name || b)
   }
-  
+
   const brands = await getFromSupabase('brands', 'id,name')
   if (brands && brands.length > 0) {
     brandsCache = brands
     lastFetchTime = now
     return brands.map(b => b.name)
   }
-  
+
   return []
 }
 
@@ -47,21 +47,21 @@ export const getBrandsWithModels = async () => {
   if (brandsCache && (now - lastFetchTime) < CACHEDURATION) {
     return brandsCache
   }
-  
+
   const brands = await getFromSupabase('brands', 'id,name')
   if (brands && brands.length > 0) {
     brandsCache = brands
     lastFetchTime = now
     return brands
   }
-  
+
   return []
 }
 
 // Get models for a specific brand
 export const getModelsForBrand = async (brand) => {
   if (!brand) return []
-  
+
   const brands = await getFromSupabase('brands', 'id,name')
   if (brands && brands.length > 0) {
     const brandData = brands.find(b => b.name === brand)
@@ -72,7 +72,7 @@ export const getModelsForBrand = async (brand) => {
       }
     }
   }
-  
+
   return []
 }
 
@@ -197,17 +197,17 @@ export const LUXURYFEE = 5
 // Slavenian cities
 export const slovenianCities = [
   'Ljubljana', 'Maribor', 'Celje', 'Kranj', 'Koper', 'Nova Gorica',
-  'KrÅ¡ko', 'Novo Mesto', 'Ptuj', 'Trbovlje', 'Kamnik', 'Jesenice', 'Å½alec',
-  'Å½irovnica', 'Bled', 'Bohinj', 'BreÅice', 'Cerklje ob Krki', 'Cerknica',
+  'KrÅ¡ko', 'Novo Mesto', 'Ptuj', 'Trbovlje', 'Kamnik', 'Jesenice', 'Å1⁄2alec',
+  'Å1⁄2irovnica', 'Bled', 'Bohinj', 'BreÅice', 'Cerklje ob Krki', 'Cerknica',
   'Cerkno', 'Crnomelj', 'Dravograd', 'Gornja Radgona', 'Grosuplje', 'Hrastnik',
   'Idrija', 'Ilirska Bistrica', 'Izola', 'Jurovski Dol', 'Kanal ob SoÄi',
   'KoÄevje', 'Komen', 'Kozina', 'Kranjska Gora', 'Lendava', 'Litija', 'Logatec',
   'Metlika', 'MeÅica', 'Murska Sobota', 'Muta', 'Nazaret', 'OrmoÅ', 'Piran',
   'Postojna', 'Prevalje', 'RadeÄe', 'Radlje ob Dravi', 'Radovljica', 'Ravne na KoroÅ¡kem',
   'Ribnica', 'RogaÅ¡ka Slatina', 'Rogatec', 'RuÅ¡e', 'SeÅana', 'Slovenska Bistrica',
-  'Slovenske Konjice', 'Å entjur', 'Å kofja Loka', 'Å marje pri JelÅ¡ah', 'Tolmin',
+  'Slovenske Konjice', 'Å entjur', 'Å kofja Loka', 'Å marje pri JelÅ¡ah', 'Tolmin',
   'Trebnje', 'TrÅiÄ', 'TurniÅ¡Äe', 'Velenje', 'Vinica', 'Vipava', 'Vitanje',
-  'Vodice', 'VoÅec', 'Zagorje ob Savi', 'ZavrÄ', 'ZreÄe', 'Å½elezniki'
+  'Vodice', 'VoÅec', 'Zagorje ob Savi', 'ZavrÄ', 'ZreÄe', 'Å1⁄2elezniki'
 ]
 
 // Vehicle type categories
@@ -290,7 +290,7 @@ export const vehicleSubCategories = {
       'PoÄitniÅ¡ka prikolica',
       'Mobilna hiÅ¡ica',
       'Snemljivi bivalnik',
-      'Å otorska prikolica',
+      'Å otorska prikolica',
       'Navtika',
       'E-kolo',
       'E-skiro',
@@ -308,8 +308,8 @@ export const subCategoryDetails = {
       'Furgon',
       'Kombi',
       'Kamionet',
-      'Å asija s kabino',
-      'Å asija z nadgradnjo',
+      'Å asija s kabino',
+      'Å asija z nadgradnjo',
       'Pick up',
     ]
   },
@@ -454,7 +454,7 @@ export const subCategoryDetails = {
     label: 'Vrsta snemljivega bivalnika',
     options: [] // No subcategories
   },
-  'Å otorska prikolica': {
+  'Å otorska prikolica': {
     label: 'Vrsta Å¡otorske prikolice',
     options: [] // No subcategories
   },
@@ -516,7 +516,7 @@ export const subCategoryDetails = {
       'PoÄitniÅ¡ka prikolica',
       'Mobilna hiÅ¡ica',
       'Snemljivi bivalnik',
-      'Å otorska prikolica',
+      'Å otorska prikolica',
       'Navtika',
       'E-kolo',
       'E-skiro',
@@ -693,7 +693,7 @@ const avtoEquipmentCategories = {
         ]
       },
       'Å¡tevilovrat': {
-        name: 'Å tevilo vrat',
+        name: 'Å tevilo vrat',
         features: [
           'Vrat: 2',
           'Vrat: 3',
@@ -733,10 +733,10 @@ const avtoEquipmentCategories = {
       'vrstapodvozja': {
         name: 'Vrsta podvozja',
         features: [
-          'Å portno podvozje',
+          'Å portno podvozje',
           'Aktivno vzmetenje (ABC - Active Body Control)',
           'Zracno vzmetenje',
-          'Å tirikolesni pogon (4x4 / 4WD / Quattro)'
+          'Å tirikolesni pogon (4x4 / 4WD / Quattro)'
         ]
       }
     }
@@ -746,7 +746,7 @@ const avtoEquipmentCategories = {
     icon: 'Shield',
     subcategories: {
       'Å¡teviloairbagov': {
-        name: 'Å tevilo airbagov',
+        name: 'Å tevilo airbagov',
         features: [
           'Airbag - voznik',
           'Airbag - sopotnik',
@@ -756,7 +756,7 @@ const avtoEquipmentCategories = {
         ]
       },
       'Åarometiinluci': {
-        name: 'Å½arometi in luÄi',
+        name: 'Å1⁄2arometi in luÄi',
         features: [
           'Nadzor zracnega tlaka v pnevmatikah (RDK)',
           'Xenonski zarometi',
@@ -813,7 +813,7 @@ const avtoEquipmentCategories = {
           'ZasenÄena stekla',
           'Privacy stekla',
           'Karbon paket zunanj',
-          'Å portni izpuh',
+          'Å portni izpuh',
           'Automatski Åarometi',
           'OznaÄevalne luci LED'
         ]
@@ -858,7 +858,7 @@ const motorEquipmentCategories = {
       'motoropremavse': {
         name: 'Oprema',
         features: [
-          'Å portni izpuh',
+          'Å portni izpuh',
           'ABS zavorni sistem',
           'Protizdrsni sistem (TCS)',
           'Nadzor tlaka v pnevmatikah (RDC)',
@@ -933,7 +933,7 @@ const kamionAvtobusEquipmentCategories = {
       'varnostav': {
         name: 'Varnost',
         features: [
-          'Å tevilo airbagov',
+          'Å tevilo airbagov',
           'Nadzor zraÄnega tlaka v pnevmatikah (RDK)',
           'Senzor za deÅ',
           'Xenonski Åarometi',
@@ -1023,13 +1023,6 @@ const kamionAvtobusEquipmentCategories = {
   },
 }
 
-// Map subcategory â†’ equipment (for Kamion)
-export const kamionSubCategoryEquipmentMap = {
-  'Avtobusi': kamionAvtobusEquipmentCategories,
-  'KamUTV': kamionKamUTVEquipmentCategories,
-  'Tovorneprikolice': {}, // no equipment, only form fields
-}
-
 // UTV equipment - same as motorcycle
 const kamionKamUTVEquipmentCategories = {
   'utvoprema': {
@@ -1039,7 +1032,7 @@ const kamionKamUTVEquipmentCategories = {
       'utvopremavse': {
         name: 'Oprema',
         features: [
-          'Å portni izpuh',
+          'Å portni izpuh',
           'ABS zavorni sistem',
           'Protizdrsni sistem (TCS)',
           'Nadzor tlaka v pnevmatikah (RDC)',
@@ -1089,7 +1082,7 @@ const kamionEquipmentCategories = {
           'ZraÄno vzmetenje',
           'Nadzor zibanja prikolice TSC',
           'Prilagodljiv naÄin obremenitve LAC',
-          'Å tirikolesni pogon (4x4 / 4WD)',
+          'Å tirikolesni pogon (4x4 / 4WD)',
           'PodaljÅ¡ana medosna razdalja',
           'OjaÄano vzmetenje',
           'Aktivno vzmetenje (ABC)',
@@ -1105,7 +1098,7 @@ const kamionEquipmentCategories = {
       'varnostkv': {
         name: 'Varnost',
         features: [
-          'Å tevilo airbagov',
+          'Å tevilo airbagov',
           'Nadzor zraÄnega tlaka v pnevmatikah (RDK)',
           'Xenonski Åarometi',
           'Bi-xenonski Åarometi',
@@ -1249,7 +1242,14 @@ const kamionEquipmentCategories = {
   },
 }
 
-// Map vehicle category â†’ its equipment categories object
+// Map subcategory â†' equipment (for Kamion)
+export const kamionSubCategoryEquipmentMap = {
+  'Avtobusi': kamionAvtobusEquipmentCategories,
+  'KamUTV': kamionKamUTVEquipmentCategories,
+  'Tovorneprikolice': {}, // no equipment, only form fields
+}
+
+// Map vehicle category â†' its equipment categories object
 export const vehicleEquipmentMap = {
   'avto': avtoEquipmentCategories,
   'moto': motorEquipmentCategories,
