@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button'
 import { useAuth } from '@/lib/AuthContext'
 import { useCars } from '@/lib/CarContext'
 import { packageDB, paymentDB, carDB } from '@/lib/database'
-import { brands, defaultModels, fuelTypes, transmissions, bodyTypes, colors, slovenianCities, LUXURY_CAR_THRESHOLD, LUXURY_FEE } from '@/lib/data'
+import { brands, defaultModels, fuelTypes, transmissions, bodyTypes, colors, slovenianCities, LUXURYCARTHRESHOLD, LUXURYFEE } from '@/lib/data'
 
 export function PaymentPage() {
   const navigate = useNavigate()
@@ -131,8 +131,8 @@ export function PaymentPage() {
   const boostPackages = getBoostPackages()
   
   // Calculate totals
-  const isLuxuryCar = carData?.price > LUXURY_CAR_THRESHOLD && !isBusiness
-  const luxuryFee = isLuxuryCar ? LUXURY_FEE : 0
+  const isLuxuryCar = carData?.price > LUXURYCARTHRESHOLD && !isBusiness
+  const luxuryFee = isLuxuryCar ? LUXURYFEE : 0
   const selectedPkg = publishingPackages.find(p => p.id === selectedPackage)
   const packagePrice = selectedPkg 
     ? (selectedPkg.discount_active && selectedPkg.discount_percent > 0 

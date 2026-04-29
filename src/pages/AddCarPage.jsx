@@ -390,7 +390,7 @@ const saveCustomModel = (brand, model) => {
     })
   }
 
-  const removeImage = (index) => { setImages(prev => prev.filter((, i) => i !== index)) }
+  const removeImage = (index) => { setImages(prev => prev.filter((_, i) => i !== index)) }
 
   const validateForm = () => {
     const newErrors = {}
@@ -843,8 +843,8 @@ const saveCustomModel = (brand, model) => {
               {errors.year && <p className="text-red-500 text-sm mt-1">{errors.year}</p>}
             </div>
             <div className="relative">
-              <Input label={t('pricelabel').replace('(â'¬)', '') + ' *'} type="number" placeholder="50000" value={formData.price} onChange={(e) => handleChange('price', e.target.value)} error={errors.price} />
-              <span className="absolute right-4 top-9 text-gray-500 font-medium">â'¬</span>
+              <Input label={t('pricelabel').replace('(€)', '') + ' *'} type="number" placeholder="50000" value={formData.price} onChange={(e) => handleChange('price', e.target.value)} error={errors.price} />
+              <span className="absolute right-4 top-9 text-gray-500 font-medium">€</span>
             </div>
 
             <div className="md:col-span-2">
