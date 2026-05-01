@@ -18,6 +18,39 @@ export function SearchFilters({ onSearch, onClear }) {
   const [allBrands, setAllBrands] = useState([])
   const [allCities, setAllCities] = useState([])
   const [brandModels, setBrandModels] = useState({})
+  const [customBrandInput, setCustomBrandInput] = useState('')
+  const [customModelInput, setCustomModelInput] = useState('')
+  const [showCustomBrand, setShowCustomBrand] = useState(false)
+  const [showCustomModel, setShowCustomModel] = useState(false)
+  
+  // Save custom brand and model to localStorage
+  const saveCustomBrandModel = (brand, model = '') => {
+    if (!brand) return
+    const savedBrands = JSON.parse(localStorage.getItem('automarket_custom_brands') || '{}')
+    savedBrands[brand] = model ? [model] : []
+    localStorage.setItem('automarket_custom_brands', JSON.stringify(savedBrands))
+    if (!allBrands.includes(brand)) {
+      setAllBrands(prev => [...prev, brand])
+    }
+    if (model) {
+      setBrandModels(prev => ({ ...prev, [brand]: [...(prev[brand] || []), model] }))
+    }
+  }
+  
+  // Handle custom brand selection
+  const handleCustomBrand = () => {
+    if (customBrandInput.trim()) {
+      saveCustomBrandModel(customBrandInput.trim(), customModelInput.trim())
+      handleChange('brand', customBrandInput.trim())
+      if (customModelInput.trim()) {
+        handleChange('models', [customModelInput.trim()])
+      }
+      setCustomBrandInput('')
+      setCustomModelInput('')
+      setShowCustomBrand(false)
+      setShowCustomModel(false)
+    }
+  }
   
   // Load saved custom brands and models
   useEffect(() => {
@@ -442,11 +475,47 @@ export function SearchFilters({ onSearch, onClear }) {
         <div className="relative min-w-[120px]">
           <select
             value={filters.brand || ''}
-            onChange={(e) => handleChange('brand', e.target.value)}
+            onChange={(e) => {
+              if (e.target.value === '__custom__') {
+                setShowCustomBrand(true)
+              } else {
+                handleChange('brand', e.target.value)
+              }
+            }}
             className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm appearance-none bg-no-repeat bg-[right_0.5rem_center]"
           >
             <option value="">Znamka</option>
             {allBrands.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+            <option value="__custom__">+ Drugo (Other)</option>
+            </select>
+            {showCustomBrand && (
+              <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-20 p-2">
+                <input
+                  type="text"
+                  placeholder="Vnesite znamko..."
+                  value={customBrandInput}
+                  onChange={(e) => setCustomBrandInput(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg mb-2"
+                />
+                <input
+                  type="text"
+                  placeholder="Model (opcijsko)..."
+                  value={customModelInput}
+                  onChange={(e) => setCustomModelInput(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg mb-2"
+                />
+                <button onClick={handleCustomBrand} className="w-full py-2 bg-primary-500 text-white rounded-lg">
+                  Dodaj
+                </button>
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => setShowCustomBrand(!showCustomBrand)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+              {showCustomBrand ? <X size={16} /> : <Plus size={16} />}
+            </button>
           </select>
         </div>
         

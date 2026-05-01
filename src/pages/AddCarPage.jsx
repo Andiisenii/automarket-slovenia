@@ -187,6 +187,16 @@ const getCustomModels = () => { try { return JSON.parse(localStorage.getItem('cu
 
 
 const saveCustomModel = (brand, model) => {
+  if (!brand || !model) return
+  
+  // Save custom brand (if not already saved)
+  const savedBrands = JSON.parse(localStorage.getItem('automarket_custom_brands') || '{}')
+  if (!savedBrands[brand]) {
+    savedBrands[brand] = []
+    localStorage.setItem('automarket_custom_brands', JSON.stringify(savedBrands))
+  }
+  
+  // Save custom model
   const customModels = getCustomModels()
   if (!customModels[brand]) customModels[brand] = []
   if (!customModels[brand].includes(model)) {
