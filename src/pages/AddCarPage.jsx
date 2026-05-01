@@ -782,40 +782,42 @@ const saveCustomModel = (brand, model) => {
             </div>
           )}
 
-          {/* Brand Logo Selection - mobile.de style */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-3">Priljubljene znamke</label>
-            <div className="grid grid-cols-6 gap-3">
-              {MAINBRANDS.map(brand => (
-                <label
-                  key={brand.name}
-                  className={`relative flex items-center justify-center p-3 rounded-xl border-2 cursor-pointer transition-all min-h-[70px] ${
-                    formData.brand === brand.name
-                      ? 'border-primary-500 bg-primary-50'
-                      : 'border-gray-200 bg-gray-50 hover:border-gray-300 hover:bg-gray-100'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="select-popular-make"
-                    value={brand.name}
-                    checked={formData.brand === brand.name}
-                    onChange={() => {
-                      handleChange('brand', brand.name)
-                      setFormData(prev => ({ ...prev, brand: brand.name, model: '' }))
-                    }}
-                    className="sr-only"
-                  />
-                  <BrandLogo name={brand.name} className="h-10 w-auto" />
-                  {formData.brand === brand.name && (
-                    <div className="absolute -top-2 -right-2 w-6 h-6 bg-primary-500 rounded-full flex items-center justify-center shadow">
-                      <Check className="w-4 h-4 text-white" />
-                    </div>
-                  )}
-                </label>
-              ))}
+          {/* Brand Logo Selection - mobile.de style - samo za Avto */}
+          {formData.vehicleCategory === 'avto' && (
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-3">Priljubljene znamke</label>
+              <div className="grid grid-cols-6 gap-3">
+                {MAINBRANDS.map(brand => (
+                  <label
+                    key={brand.name}
+                    className={`relative flex items-center justify-center p-3 rounded-xl border-2 cursor-pointer transition-all min-h-[70px] ${
+                      formData.brand === brand.name
+                        ? 'border-primary-500 bg-primary-50'
+                        : 'border-gray-200 bg-gray-50 hover:border-gray-300 hover:bg-gray-100'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="select-popular-make"
+                      value={brand.name}
+                      checked={formData.brand === brand.name}
+                      onChange={() => {
+                        handleChange('brand', brand.name)
+                        setFormData(prev => ({ ...prev, brand: brand.name, model: '' }))
+                      }}
+                      className="sr-only"
+                    />
+                    <BrandLogo name={brand.name} className="h-10 w-auto" />
+                    {formData.brand === brand.name && (
+                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-primary-500 rounded-full flex items-center justify-center shadow">
+                        <Check className="w-4 h-4 text-white" />
+                      </div>
+                    )}
+                  </label>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="relative">
@@ -984,8 +986,12 @@ const saveCustomModel = (brand, model) => {
             </div>
 
             <Dropdown label={t('color') + ' *'} name="color" value={formData.color} options={colors} color={true} />
-            <Input label={t('engine')} placeholder={isSl ? 'npr. 2.0 TDI' : 'e.g. 2.0L TFSI'} value={formData.engine} onChange={(e) => handleChange('engine', e.target.value)} />
-            <Input label={t('power') + ' (HP)'} type="number" placeholder="200" value={formData.horsepower} onChange={(e) => handleChange('horsepower', parseInt(e.target.value))} />
+            {formData.vehicleCategory !== 'moto' && (
+              <>
+                <Input label={t('engine')} placeholder={isSl ? 'npr. 2.0 TDI' : 'e.g. 2.0L TFSI'} value={formData.engine} onChange={(e) => handleChange('engine', e.target.value)} />
+                <Input label={t('power') + ' (HP)'} type="number" placeholder="200" value={formData.horsepower} onChange={(e) => handleChange('horsepower', parseInt(e.target.value))} />
+              </>
+            )}
           </div>
         </div>
 
