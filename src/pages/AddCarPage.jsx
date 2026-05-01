@@ -928,7 +928,7 @@ const saveCustomModel = (brand, model) => {
             <Input label={t('mileagelabel')} type="number" placeholder="50000" value={formData.mileage} onChange={(e) => handleChange('mileage', parseInt(e.target.value))} />
             <Dropdown label={t('fuelTypelabel') + ' *'} name="fuelType" value={formData.fuelType} options={fuelTypes} />
             <Dropdown label={t('transmissionlabel') + ' *'} name="transmission" value={formData.transmission} options={transmissions} />
-            <Dropdown label={t('bodyTypelabel') + ' *'} name="bodyType" value={formData.bodyType} options={bodyTypes} />
+            <Dropdown label={t('color') + ' *'} name="color" value={formData.color} options={colors} color={true} />
 
             {/* Stanje vozila - Radio buttons */}
             <div className="md:col-span-2">
@@ -984,8 +984,7 @@ const saveCustomModel = (brand, model) => {
                 </div>
               )}
             </div>
-
-            <Dropdown label={t('color') + ' *'} name="color" value={formData.color} options={colors} color={true} />
+            
             {formData.vehicleCategory !== 'moto' && (
               <>
                 <Input label={t('engine')} placeholder={isSl ? 'npr. 2.0 TDI' : 'e.g. 2.0L TFSI'} value={formData.engine} onChange={(e) => handleChange('engine', e.target.value)} />
