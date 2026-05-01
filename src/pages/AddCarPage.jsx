@@ -10,7 +10,7 @@ import { useCars } from '@/lib/CarContext'
 import { packageDB, carDB } from '@/lib/database'
 import { supabase } from '@/lib/supabase'
 import { BrandLogo } from '@/components/ui/BrandLogo'
-import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, colors, vehicleConditionOptions, vehicleConditionSubOptions, carEquipmentCategories, DEFAULTAUTOSELECTFEATURES, vehicleCategories, vehicleSubCategories, subCategoryDetails, emissionClasses, vehicleAgeOptions, ownerCountOptions, months, getYears, LUXURYCARTHRESHOLD, FALLBACKBRANDS, FALLBACKMODELS, vehicleEquipmentMap, DEFAULTFEATURESPERCATEGORY, kamionSubCategoryEquipmentMap } from '@/lib/data'
+import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, colors, vehicleConditionOptions, vehicleConditionSubOptions, carEquipmentCategories, DEFAULTAUTOSELECTFEATURES, vehicleCategories, vehicleSubCategories, subCategoryDetails, emissionClasses, vehicleAgeOptions, ownerCountOptions, months, getYears, LUXURYCARTHRESHOLD, FALLBACKBRANDS, FALLBACKMODELS, vehicleEquipmentMap, DEFAULTFEATURESPERCATEGORY, kamionSubCategoryEquipmentMap, CATEGORY_BRANDS } from '@/lib/data'
 
 export function AddCarPage() {
   const navigate = useNavigate()
@@ -21,6 +21,7 @@ export function AddCarPage() {
   const isSl = language === 'sl'
 
   const [allBrands, setAllBrands] = useState(FALLBACKBRANDS || [])
+  const [categoryBrands, setCategoryBrands] = useState([])
   const [allCities, setAllCities] = useState([])
   const [brandModels, setBrandModels] = useState(FALLBACKMODELS || {})
   const [boostPackages, setBoostPackages] = useState({ private: [], business: [] })
@@ -87,13 +88,22 @@ export function AddCarPage() {
     fetchData()
   }, [])
 
+  // Update category-specific brands when vehicle category changes
+  useEffect(() => {
+    const brands = CATEGORY_BRANDS[formData.vehicleCategory] || CATEGORY_BRANDS.avto || []
+    setCategoryBrands(brands)
+  }, [formData.vehicleCategory])
+
   // Load package and car count data from localStorage (avoid hydration mismatch)
   useEffect(() => {
     const pkg = packageDB.getCurrentPackage()
     setUserPackage(pkg)
     setIsPremium(packageDB.isPremium())
+    setCurrentUserCarCount(carDB.getMyCarCount())
+  }, [])
 
-    // Load monthly car count
+  // Load monthly car count
+  useEffect(() => {
     if (userId) {
       const myCars = JSON.parse(localStorage.getItem('myListings') || '[]')
       const now = new Date()
@@ -832,7 +842,7 @@ const saveCustomModel = (brand, model) => {
                 className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
               >
                 <option value="">Izberi znamko...</option>
-                {allBrands.map(b => (
+                {categoryBrands.map(b => (
                   <option key={b} value={b}>{b}</option>
                 ))}
               </select>

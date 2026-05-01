@@ -1,4 +1,4 @@
-﻿﻿// Data helpers - fetches from Supabase only
+﻿// Data helpers - fetches from Supabase only
 
 // Supabase configuration
 
@@ -412,12 +412,48 @@ export const FALLBACKMODELS = {}
 // Luxury car threshold and fee
 
 export const LUXURYCARTHRESHOLD = 50000
-
 export const LUXURYFEE = 5
 
+// Category-specific brands
+export const CATEGORY_BRANDS = {
+  avto: [
+    'Audi', 'BMW', 'Mercedes-Benz', 'Porsche', 'Volkswagen',
+    'Opel', 'Smart', 'Ford', 'Fiat', 'Alfa Romeo', 'Lancia', 'Maserati',
+    'Peugeot', 'Citroen', 'Renault', 'DS', 'Dacia',
+    'Jaguar', 'Land Rover', 'Mini', 'Bentley', 'Rolls-Royce', 'Aston Martin', 'McLaren',
+    'Volvo', 'Saab', 'Skoda', 'Seat', 'Cupra',
+    'Toyota', 'Honda', 'Nissan', 'Mazda', 'Subaru', 'Mitsubishi', 'Suzuki', 'Lexus', 'Acura', 'Infiniti',
+    'Hyundai', 'Kia', 'Genesis', 'SsangYong',
+    'Chevrolet', 'Dodge', 'Jeep', 'Chrysler', 'Cadillac', 'Lincoln', 'GMC', 'Buick', 'Ram', 'Tesla', 'Rivian', 'Lucid',
+    'BYD', 'Chery', 'Geely', 'Great Wall', 'NIO', 'Xpeng', 'Li Auto',
+    'Tata', 'Mahindra', 'Maruti Suzuki',
+    'Polestar', 'Fisker', 'Lada',
+  ],
+  moto: [
+    'Honda', 'Yamaha', 'Kawasaki', 'Suzuki', 'BMW', 'Ducati', 'Harley-Davidson',
+    'KTM', 'Triumph', 'Aprilia', 'Moto Guzzi', 'MV Agusta', 'Benelli',
+    'Zontes', 'CFMoto', 'Royal Enfield', 'Bajaj', 'TVS',
+  ],
+  kamion: [
+    'MAN', 'Scania', 'Iveco', 'DAF', 'Volvo Trucks', 'Mercedes-Benz Trucks', 'Renault Trucks', 'Fuso', 'Isuzu', 'Hino',
+    'Anadolu Isuzu', 'BMC',
+  ],
+  kombi: [
+    'Volkswagen', 'Mercedes-Benz', 'Ford', 'Fiat', 'Renault', 'Peugeot', 'Citroen', 'Opel', 'Iveco', 'Nissan',
+    'Toyota', 'Hyundai',
+  ],
+  traktor: [
+    'John Deere', 'Massey Ferguson', 'Case IH', 'New Holland', 'Fendt', 'Kubota', 'Claas', 'Deutz-Fahr',
+    'Valtra', 'Steyr', 'JCB', 'McCormick', 'Landini', 'Zetor', 'SAME', 'Lamborghini Tr.', 'Agrale',
+    'Belarus', 'MTZ', 'YTO', 'Dongfeng', 'Mahindra Tr.', 'Farmtrac', 'Force Motors',
+  ],
+  avtodom: [
+    'Volkswagen', 'Mercedes-Benz', 'Ford', 'Fiat', 'Hymer', 'Burstner', 'Carthago', 'Trigano', 'Pilote', 'Hyundai',
+    'Karmann', 'Adria', 'Weinsberg', 'Rapido', 'Compassi',
+  ],
+}
 
-
-// Slavenian cities
+// Slavenian cities// Slavenian cities
 
 export const slovenianCities = [
   'Ljubljana', 'Maribor', 'Celje', 'Kranj', 'Koper', 'Nova Gorica',
