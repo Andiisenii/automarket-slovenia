@@ -246,7 +246,7 @@ export const vehicleConditionSubOptions = {
 
     { id: 'poplavljeno', label: 'vozilo je bilo poplavijeno' },
 
-    { id: 'dikalnik', label: 'dirkalno vozilo' },
+    { id: 'okvara_motorja', label: 'okvara motorja' },
 
   ],
 
@@ -420,31 +420,35 @@ export const LUXURYFEE = 5
 // Slavenian cities
 
 export const slovenianCities = [
-
   'Ljubljana', 'Maribor', 'Celje', 'Kranj', 'Koper', 'Nova Gorica',
-
-  'Krško', 'Novo Mesto', 'Ptuj', 'Trbovlje', 'Kamnik', 'Jesenice', 'Šentjuralec',
-
-  'Šentjurirovnica', 'Bled', 'Bohinj', 'Brežice', 'Cerklje ob Krki', 'Cerknica',
-
-  'Cerkno', 'Crnomelj', 'Dravograd', 'Gornja Radgona', 'Grosuplje', 'Hrastnik',
-
+  'Krško', 'Novo Mesto', 'Ptuj', 'Trbovlje', 'Kamnik', 'Jesenice', 'Šentjur',
+  'Škofja Loka', 'Bled', 'Bohinj', 'Brežice', 'Cerklje ob Krki', 'Cerknica',
+  'Cerkno', 'Črnomelj', 'Dravograd', 'Gornja Radgona', 'Grosuplje', 'Hrastnik',
   'Idrija', 'Ilirska Bistrica', 'Izola', 'Jurovski Dol', 'Kanal ob Soči',
-
   'Kočevje', 'Komen', 'Kozina', 'Kranjska Gora', 'Lendava', 'Litija', 'Logatec',
-
-  'Metlika', 'Mežica', 'Murska Sobota', 'Muta', 'Nazaret', 'Ormožž', 'Piran',
-
+  'Metlika', 'Mežica', 'Murska Sobota', 'Muta', ' Nazar', 'Ormož', 'Piran',
   'Postojna', 'Prevalje', 'Radeče', 'Radlje ob Dravi', 'Radovljica', 'Ravne na Koroškem',
-
   'Ribnica', 'Rogaška Slatina', 'Rogatec', 'Ruše', 'Sežana', 'Slovenska Bistrica',
-
-  'Slovenske Konjice', 'ž entjur', 'ž kofja Loka', 'ž marje pri Jelšah', 'Tolmin',
-
-  'Trebnje', 'Tržič', 'Turnišče', 'Velenje', 'Vinica', 'Vipava', 'Vitanje',
-
-  'Vodice', 'Vožec', 'Zagorje ob Savi', 'Zavrč', 'Zreče', 'Šentjurelezniki'
-
+  'Slovenske Konjice', 'Tolmin', 'Trebnje', 'Tržič', 'Turnišče', 'Velenje', 'Vinica',
+  'Vipava', 'Vitanje', 'Vodice', 'Velenje', 'Zagorje ob Savi', 'Zreče', 'Železniki',
+  'Ajdovščina', 'Ankaran', 'Benedikt', 'Borovnica', 'Bovec', 'Braslovče', 'Brda',
+  'Brezovica', 'Cankova', 'Destrnik', 'Divača', 'Dobje', 'Dobrna', 'Dobrova-Polhov Gradec',
+  'Dol pri Ljubljani', 'Dolenjske Toplice', 'Domžale', 'Duplek', 'Gorenja vas-Poljane',
+  'Gorišnica', 'Gorje', 'Gornji Grad', 'Gornji Petrovci', 'Grad', 'Hajdina', 'Hoče-Slivnica',
+  'Hodoš', 'Horjul', 'Hraše', 'Hrpelje-Kozina', 'Ivančna Gorica', 'Juršinci', 'Kabinet',
+  'Kobilje', 'Kidričevo', 'Komen', 'Komers', 'Kostel', 'Kozje', 'Križevci', 'Kron',
+  'Kungota', 'Kuzma', 'Laško', 'Lovrenc na Pohorju', 'Loška dolina', 'Loški Potok',
+  'Lukovica', 'Majšperk', 'Makole', ' Markovci', 'Medvode', 'Mengeš', 'Miklavž na Dravskem polju',
+  'Mirna', 'Mirna Peč', 'Mislinja', 'Mokronog-Trebelno', 'Moravče', 'Moravske Toplice',
+  'Mozelj', 'Murska Sobota', 'Naklo', 'Nazarine', 'Odranci', 'Oplotnica', 'Pesnica',
+  'Pivka', 'Podčetrtek', 'Podlehnik', 'Podvelka', 'Poljčane', 'Prebold', 'Preddvor',
+  'Prevalje', 'Puconci', 'Rače-Fram', 'Rakičan', 'Renč-Vogrsko', 'Rečica ob Savinji',
+  'Rečje', 'Semič', 'Sevnica', 'Sežana', 'Spir', 'Starše', 'Sveta Ana', 'Sveta Trojica v Slovenskih goricah',
+  'Sveti Jurij ob Scavnici', 'Sveti Andraž v Slovenskih goricah', 'Šempeter-Vrtojba', 'Šmarje pri Jelšah',
+  'Šmarješke Toplice', 'Šmartno ob Paki', 'Šmartno na Pohorju', 'Šoštanj', 'Štore',
+  'Trnovska vas', 'Trzin', 'Tržin', 'Velika Polana', 'Veržej', 'Videm', 'Vojnik',
+  'Vransko', 'Vrhnika', 'Zabrd', 'Zavrč', 'Zelenika', 'Zreče', 'Žalec', 'Žirovnica',
+  'Žetale', 'Žiri', 'Žubin', 'Žužemberk'
 ]
 
 
