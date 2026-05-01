@@ -711,7 +711,14 @@ const saveCustomModel = (brand, model) => {
                     }}
                     className="sr-only"
                   />
-                  <Car className={`w-7 h-7 mb-1 ${formData.vehicleCategory === cat.value ? 'text-primary-600' : 'text-gray-400'}`} />
+                  <span className="w-7 h-7 flex items-center justify-center text-base">
+                          {cat.value === 'avto' && '🚗'}
+                          {cat.value === 'moto' && '🏍️'}
+                          {cat.value === 'kamion' && '🚚'}
+                          {cat.value === 'kombi' && '🚐'}
+                          {cat.value === 'traktor' && '🚜'}
+                          {cat.value === 'avtodom' && <img src="/logos/avtodom.png" alt="AvtoDom" className="w-6 h-6 object-contain" />}
+                        </span>
                   <span className={`text-xs font-medium ${formData.vehicleCategory === cat.value ? 'text-primary-700' : 'text-gray-600'}`}>{cat.label}</span>
                 </label>
               ))}
