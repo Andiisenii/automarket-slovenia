@@ -196,25 +196,24 @@ export function CarDetailPage() {
     { icon: AlertTriangle, label: 'Stanje vozila', value: car.vehicleCondition || 'N/A' },
   ]
 
-  // Get selected features with names - safe array handling
+  // Get selected features with names - fully inline safe handling
   const rawFeatureIds = car?.featureIds
   let selectedFeatureIds = []
   if (rawFeatureIds) {
     if (Array.isArray(rawFeatureIds)) {
       selectedFeatureIds = rawFeatureIds
-    } else if (typeof rawFeatureIds === 'string') {
+    } else if (typeof rawFeatureIds === 'string' && rawFeatureIds.startsWith('[')) {
       try { selectedFeatureIds = JSON.parse(rawFeatureIds) } catch { selectedFeatureIds = [] }
     }
   }
   
-  // Build feature objects for display
-  const featuresToDisplay = selectedFeatureIds.map((id) => {
-    const strId = String(id)
-    return {
-      id: strId,
-      name: getFeatureById(strId) || `Oprema ${strId}`
-    }
-  })
+  // Build feature list for display - safe map
+  const featuresToDisplay = Array.isArray(selectedFeatureIds) 
+    ? selectedFeatureIds.map((id) => {
+        const strId = String(id)
+        return getFeatureById(strId) || `Oprema ${strId}`
+      })
+    : []
 
   const handleSendMessage = () => {
     if (!isAuthenticated) {
@@ -512,13 +511,13 @@ export function CarDetailPage() {
               <Card className="p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">Oprema vozila</h2>
                 <div className="flex flex-wrap gap-2">
-                  {featuresToDisplay.map((feature) => (
+                  {featuresToDisplay.map((featureName, idx) => (
                     <div
-                      key={feature.id || feature.name}
+                      key={`feature-${idx}`}
                       className="inline-flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-lg text-sm"
                     >
                       <Check className="w-4 h-4 text-green-600" />
-                      <span className="text-green-800">{feature.name}</span>
+                      <span className="text-green-800">{featureName}</span>
                     </div>
                   ))}
                 </div>
