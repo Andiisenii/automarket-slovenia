@@ -196,14 +196,25 @@ export function CarDetailPage() {
     { icon: AlertTriangle, label: 'Stanje vozila', value: car.vehicleCondition || 'N/A' },
   ]
 
-  // Get selected features with names
-  const selectedFeatureIds = parseFeatureIds(car.featureIds)
+  // Get selected features with names - safe array handling
+  const rawFeatureIds = car?.featureIds
+  let selectedFeatureIds = []
+  if (rawFeatureIds) {
+    if (Array.isArray(rawFeatureIds)) {
+      selectedFeatureIds = rawFeatureIds
+    } else if (typeof rawFeatureIds === 'string') {
+      try { selectedFeatureIds = JSON.parse(rawFeatureIds) } catch { selectedFeatureIds = [] }
+    }
+  }
   
   // Build feature objects for display
-  const featuresToDisplay = (selectedFeatureIds || []).map((id) => ({
-    id: String(id),
-    name: getFeatureById(String(id)) || `Oprema ${id}`
-  }))
+  const featuresToDisplay = selectedFeatureIds.map((id) => {
+    const strId = String(id)
+    return {
+      id: strId,
+      name: getFeatureById(strId) || `Oprema ${strId}`
+    }
+  })
 
   const handleSendMessage = () => {
     if (!isAuthenticated) {
