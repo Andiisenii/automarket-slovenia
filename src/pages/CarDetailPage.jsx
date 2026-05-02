@@ -23,7 +23,26 @@ const getFeatureById = (featureId) => {
     // Motorcycle equipment
     'Gume za moto', 'Zaščita pred vremenskimi vplovi', 'Odpravljač vetra',
   ]
-  return allEquipment[parseInt(featureId)] || `Oprema ${featureId}`
+  const idx = parseInt(featureId)
+  if (isNaN(idx) || idx < 0 || idx >= allEquipment.length) {
+    return String(featureId)
+  }
+  return allEquipment[idx]
+}
+
+// Helper to parse feature IDs that might be stored as JSON string
+const parseFeatureIds = (featureIds) => {
+  if (!featureIds) return []
+  if (Array.isArray(featureIds)) return featureIds
+  if (typeof featureIds === 'string') {
+    try {
+      const parsed = JSON.parse(featureIds)
+      return Array.isArray(parsed) ? parsed : []
+    } catch {
+      return []
+    }
+  }
+  return []
 }
 import {
   ArrowLeft, Heart, Share2, Eye, Calendar, Gauge, Fuel,
@@ -92,7 +111,7 @@ export function CarDetailPage() {
             monthlyBudget: carData.monthly_budget ?? carData.monthlyBudget ?? 0,
             downPaymentType: carData.down_payment_type || carData.downPaymentType || 'amount',
             downPaymentValue: carData.down_payment_value || carData.downPaymentValue || 0,
-            featureIds: carData.feature_ids || carData.featureIds || [],
+            featureIds: parseFeatureIds(carData.feature_ids),
             createdAt: carData.created_at || carData.createdAt,
             seller: {
               name: carData.seller_name || carData.seller?.name || 'Seller',
@@ -178,7 +197,7 @@ export function CarDetailPage() {
   ]
 
   // Get selected features with names
-  const selectedFeatureIds = car.featureIds || []
+  const selectedFeatureIds = parseFeatureIds(car.featureIds)
   const selectedFeatures = selectedFeatureIds.map(id => getFeatureById(id)).filter(Boolean)
 
   // Build feature objects for display
