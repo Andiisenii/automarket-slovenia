@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, Upload, X, Check, CreditCard, ChevronDown, Shield, Settings, Wifi, Car, Fuel, Star, ChevronUp, Sun, Award, XCircle, Zap } from 'lucide-react'
@@ -22,6 +22,8 @@ export function AddCarPage() {
 
   const [allBrands, setAllBrands] = useState(FALLBACKBRANDS || [])
   const [categoryBrands, setCategoryBrands] = useState([])
+  const [showCustomBrandInput, setShowCustomBrandInput] = useState(false)
+  const [customBrandName, setCustomBrandName] = useState('')
   const [allCities, setAllCities] = useState([])
   const [brandModels, setBrandModels] = useState(FALLBACKMODELS || {})
   const [boostPackages, setBoostPackages] = useState({ private: [], business: [] })
@@ -846,20 +848,66 @@ const saveCustomModel = (brand, model) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="relative">
               <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('brand')} *</label>
-              <select
-                value={formData.brand}
-                onChange={(e) => {
-                  const val = e.target.value
-                  handleChange('brand', val)
-                  setFormData(prev => ({ ...prev, model: '' }))
-                }}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
-              >
-                <option value="">Izberi znamko...</option>
-                {categoryBrands.map(b => (
-                  <option key={b} value={b}>{b}</option>
-                ))}
-              </select>
+              {showCustomBrandInput ? (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Vnesite znamko..."
+                    value={customBrandName}
+                    onChange={(e) => {
+                      setCustomBrandName(e.target.value)
+                      handleChange('brand', e.target.value)
+                    }}
+                    className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
+                    autoFocus
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (customBrandName.trim()) {
+                        handleChange('brand', customBrandName.trim())
+                        const saved = JSON.parse(localStorage.getItem('automarket_custom_brands') || '{}')
+                        saved[customBrandName.trim()] = []
+                        localStorage.setItem('automarket_custom_brands', JSON.stringify(saved))
+                      }
+                      setShowCustomBrandInput(false)
+                    }}
+                    className="px-4 py-3 bg-primary-500 text-white rounded-xl"
+                  >OK</button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowCustomBrandInput(false)
+                      setCustomBrandName('')
+                    }}
+                    className="px-4 py-3 bg-gray-200 text-gray-700 rounded-xl"
+                  >X</button>
+                </div>
+              ) : (
+                <select
+                  value={formData.brand}
+                  onChange={(e) => {
+                    const val = e.target.value
+                    if (val === '__other__') {
+                      setShowCustomBrandInput(true)
+                    } else {
+                      handleChange('brand', val)
+                      setFormData(prev => ({ ...prev, model: '' }))
+                    }
+                  }}
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
+                >
+                  <option value="">Izberi znamko...</option>
+                  {Object.entries(CATEGORY_BRANDS).map(([cat, brands]) => (
+                    <optgroup key={cat} label={vehicleCategories.find(v => v.value === cat)?.label || cat}>
+                      {brands.filter(b => categoryBrands.includes(b)).map(b => (
+                        <option key={b} value={b}>{b}</option>
+                      ))}
+                    </optgroup>
+                  ))}
+                  <option value="__other__">+ Drugo (Other)</option>
+                </select>
+              )}
             </div>
             <div className="relative">
               <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('model')}</label>
