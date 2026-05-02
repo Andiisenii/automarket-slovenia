@@ -194,22 +194,26 @@ const getGroupedModelsForBrand = (brand, brandModelsData, customModelsData) => {
 const getCustomModels = () => { try { return JSON.parse(localStorage.getItem('customCarModels') || '{}') } catch { return {} } }
 
 
-const saveCustomModel = (brand, model) => {
+const saveCustomModel = async (brand, model) => {
   if (!brand || !model) return
   
-  // Save custom brand (if not already saved)
-  const savedBrands = JSON.parse(localStorage.getItem('automarket_custom_brands') || '{}')
-  if (!savedBrands[brand]) {
-    savedBrands[brand] = []
-    localStorage.setItem('automarket_custom_brands', JSON.stringify(savedBrands))
-  }
-  
-  // Save custom model
+  // Save to localStorage
   const customModels = getCustomModels()
   if (!customModels[brand]) customModels[brand] = []
   if (!customModels[brand].includes(model)) {
     customModels[brand].push(model)
     localStorage.setItem('customCarModels', JSON.stringify(customModels))
+  }
+  
+  // Save to Supabase
+  try {
+    await supabase.from('custom_data').insert({
+      type: 'model',
+      brand_name: brand,
+      model_name: model
+    })
+  } catch (e) {
+    console.warn('Could not save custom model to Supabase:', e)
   }
 }
 
