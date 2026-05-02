@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, X, ChevronDown, Check, Plus, Car, Bike, Truck, Van } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
-import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, vehicleCategories, vehicleSubCategories, subCategoryDetails } from '@/lib/data'
+import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, vehicleCategories, vehicleSubCategories, subCategoryDetails, CATEGORY_BRANDS } from '@/lib/data'
 import { useCars } from '@/lib/CarContext'
 import { useLanguage } from '@/lib/LanguageContext'
 
@@ -75,6 +75,16 @@ export function SearchFilters({ onSearch, onClear }) {
     }
     fetchData()
   }, [])
+  
+  // Update brands when vehicle category changes
+  useEffect(() => {
+    const category = filters.vehicleCategory || 'avto'
+    const catBrands = CATEGORY_BRANDS[category] || CATEGORY_BRANDS.avto || []
+    // Also include custom brands from localStorage
+    const savedBrands = JSON.parse(localStorage.getItem('automarket_custom_brands') || '{}')
+    const combinedBrands = [...new Set([...catBrands, ...Object.keys(savedBrands)])]
+    setAllBrands(combinedBrands)
+  }, [filters.vehicleCategory])
   
   // Fetch models when brand changes
   useEffect(() => {

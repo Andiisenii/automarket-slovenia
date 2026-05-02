@@ -1,4 +1,4 @@
-﻿// Data helpers - fetches from Supabase only
+// Data helpers - fetches from Supabase only
 
 // Supabase configuration
 
@@ -651,11 +651,7 @@ export const vehicleSubCategories = {
 
       'Šotorska prikolica',
 
-      'E-kolo',
-
-      'E-skiro',
-
-    ]
+      ]
 
   },
 
@@ -1101,11 +1097,7 @@ export const subCategoryDetails = {
 
       'Šotorska prikolica',
 
-      'E-kolo',
-
-      'E-skiro',
-
-    ]
+      ]
 
   },
 
