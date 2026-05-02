@@ -24,6 +24,8 @@ export function AddCarPage() {
   const [categoryBrands, setCategoryBrands] = useState([])
   const [showCustomBrandInput, setShowCustomBrandInput] = useState(false)
   const [customBrandName, setCustomBrandName] = useState('')
+  const [showCustomModelInput, setShowCustomModelInput] = useState(false)
+  const [customModelName, setCustomModelName] = useState('')
   const [allCities, setAllCities] = useState([])
   const [brandModels, setBrandModels] = useState(FALLBACKMODELS || {})
   const [boostPackages, setBoostPackages] = useState({ private: [], business: [] })
@@ -907,21 +909,65 @@ const saveCustomModel = (brand, model) => {
             </div>
             <div className="relative">
               <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('model')}</label>
-              <select
-                value={formData.model}
-                onChange={(e) => setFormData(prev => ({ ...prev, model: e.target.value }))}
-                disabled={!formData.brand}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm disabled:bg-gray-100"
-              >
-                <option value="">{formData.brand ? (isSl ? 'Izberi model...' : 'Select model...') : (isSl ? 'Najprej izberite znamko' : 'Select brand first')}</option>
-                {formData.brand && getGroupedModelsForBrand(formData.brand, brandModels, getCustomModels()).map(group => (
-                  <optgroup key={group.category} label={group.category}>
-                    {group.models.map(m => (
-                      <option key={m} value={m}>{m}</option>
-                    ))}
-                  </optgroup>
-                ))}
-              </select>
+              {showCustomModelInput ? (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Vnesite model..."
+                    value={customModelName}
+                    onChange={(e) => {
+                      setCustomModelName(e.target.value)
+                      setFormData(prev => ({ ...prev, model: e.target.value }))
+                    }}
+                    className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
+                    autoFocus
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (customModelName.trim()) {
+                        saveCustomModel(formData.brand, customModelName.trim())
+                        setFormData(prev => ({ ...prev, model: customModelName.trim() }))
+                      }
+                      setShowCustomModelInput(false)
+                      setCustomModelName('')
+                    }}
+                    className="px-4 py-3 bg-primary-500 text-white rounded-xl"
+                  >OK</button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowCustomModelInput(false)
+                      setCustomModelName('')
+                    }}
+                    className="px-4 py-3 bg-gray-200 text-gray-700 rounded-xl"
+                  >X</button>
+                </div>
+              ) : (
+                <select
+                  value={formData.model}
+                  onChange={(e) => {
+                    const val = e.target.value
+                    if (val === '__other__') {
+                      setShowCustomModelInput(true)
+                    } else {
+                      setFormData(prev => ({ ...prev, model: val }))
+                    }
+                  }}
+                  disabled={!formData.brand}
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm disabled:bg-gray-100"
+                >
+                  <option value="">{formData.brand ? (isSl ? 'Izberi model...' : 'Select model...') : (isSl ? 'Najprej izberite znamko' : 'Select brand first')}</option>
+                  {formData.brand && getGroupedModelsForBrand(formData.brand, brandModels, getCustomModels()).map(group => (
+                    <optgroup key={group.category} label={group.category}>
+                      {group.models.map(m => (
+                        <option key={m} value={m}>{m}</option>
+                      ))}
+                    </optgroup>
+                  ))}
+                  <option value="__other__">+ Drugo (Other)</option>
+                </select>
+              )}
             </div>
             <div className="relative">
               <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('yearOfProduction')} *</label>
