@@ -90,9 +90,13 @@ export function AddCarPage() {
 
   // Update category-specific brands when vehicle category changes
   useEffect(() => {
-    const brands = CATEGORY_BRANDS[formData.vehicleCategory] || CATEGORY_BRANDS.avto || []
-    setCategoryBrands(brands)
-  }, [formData.vehicleCategory])
+    // Get category-specific brands + all Supabase brands + custom brands
+    const categoryBrandsList = CATEGORY_BRANDS[formData.vehicleCategory] || CATEGORY_BRANDS.avto || []
+    // Combine with all brands from Supabase and custom brands
+    const customBrands = JSON.parse(localStorage.getItem('automarket_custom_brands') || '{}')
+    const combined = [...new Set([...categoryBrandsList, ...allBrands, ...Object.keys(customBrands)])]
+    setCategoryBrands(combined)
+  }, [formData.vehicleCategory, allBrands])
 
   // Load package and car count data from localStorage (avoid hydration mismatch)
   useEffect(() => {
