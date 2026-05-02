@@ -126,7 +126,7 @@ export function CarDetailPage() {
               hasViber: carData.seller_has_viber ?? carData.seller?.hasViber ?? false,
             }
           }
-          console.log('Transformed car data:', transformedCar)
+          // console.log('Transformed car data:', transformedCar)
           setCar(transformedCar)
         } else {
           setError('Car not found')
@@ -198,14 +198,11 @@ export function CarDetailPage() {
 
   // Get selected features with names
   const selectedFeatureIds = parseFeatureIds(car.featureIds)
-  const selectedFeatures = selectedFeatureIds.map(id => getFeatureById(id)).filter(Boolean)
-
+  
   // Build feature objects for display
-  const featuresToDisplay = selectedFeatureIds.map((id, index) => ({
-    id: id,
-    name: getFeatureById(id) || `Oprema ${id}`,
-    name_sl: getFeatureById(id) || `Oprema ${id}`,
-    name_en: getFeatureById(id) || `Oprema ${id}`
+  const featuresToDisplay = (selectedFeatureIds || []).map((id) => ({
+    id: String(id),
+    name: getFeatureById(String(id)) || `Oprema ${id}`
   }))
 
   const handleSendMessage = () => {
