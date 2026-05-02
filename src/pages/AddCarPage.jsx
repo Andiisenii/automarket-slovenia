@@ -898,13 +898,36 @@ const saveCustomModel = (brand, model) => {
                   className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                 >
                   <option value="">Izberi znamko...</option>
-                  {Object.entries(CATEGORY_BRANDS).map(([cat, brands]) => (
-                    <optgroup key={cat} label={vehicleCategories.find(v => v.value === cat)?.label || cat}>
-                      {brands.filter(b => categoryBrands.includes(b)).map(b => (
-                        <option key={b} value={b}>{b}</option>
-                      ))}
-                    </optgroup>
-                  ))}
+                  <optgroup label="🚗 Avto">
+                    {[...new Set([...(CATEGORY_BRANDS.avto || []), ...categoryBrands, ...allBrands])].map(b => (
+                      <option key={b} value={b}>{b}</option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="🏍️ Motor">
+                    {(CATEGORY_BRANDS.moto || []).filter(b => !CATEGORY_BRANDS.avto?.includes(b)).map(b => (
+                      <option key={b} value={b}>{b}</option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="🚚 Kamion">
+                    {(CATEGORY_BRANDS.kamion || []).filter(b => !CATEGORY_BRANDS.avto?.includes(b)).map(b => (
+                      <option key={b} value={b}>{b}</option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="🚐 Kombi">
+                    {(CATEGORY_BRANDS.kombi || []).filter(b => !CATEGORY_BRANDS.avto?.includes(b)).map(b => (
+                      <option key={b} value={b}>{b}</option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="🚜 Traktor">
+                    {(CATEGORY_BRANDS.traktor || []).filter(b => !CATEGORY_BRANDS.avto?.includes(b)).map(b => (
+                      <option key={b} value={b}>{b}</option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="🚐 AvtoDom">
+                    {(CATEGORY_BRANDS.avtodom || []).filter(b => !CATEGORY_BRANDS.avto?.includes(b)).map(b => (
+                      <option key={b} value={b}>{b}</option>
+                    ))}
+                  </optgroup>
                   <option value="__other__">+ Drugo (Other)</option>
                 </select>
               )}
