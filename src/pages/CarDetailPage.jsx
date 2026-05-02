@@ -2,6 +2,29 @@ import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
+
+// Helper function to get feature name by ID
+const getFeatureById = (featureId) => {
+  const allEquipment = [
+    // Car equipment
+    'Zavorni sistem (ABS)', 'Elektronski program stabilnosti (ESP / DSC)', 'Elektronska blokada diferenciala', 'Centrarno zaklepanje', 'Avdio / Video oprema', 'Klima naprava (avtomatska)', 'Barvanje v notranjosti', 'Usnje',
+    'Xenon žaromati', 'LED žaromati', 'Zasenčena stekla', 'Pralnik žaromatov', 'Mehki vlečnik', 'Tovorni prostor', 'Dvižna rampa', 'Hladilni prostor',
+    'Zadnje dvižna vrata', 'Bočna drsna vrata', 'Stekrena streha', 'Pomična streha', 'Pregradna stena', 'Podaljšek kabine', 'Vlečna naprava',
+    'Esp + hill holder', 'Senzorji za mrtvi kot', 'Samodejno zaviranje', 'Aktivno zaviranje', 'Opozorilo pred trkom',
+    'Avdio sistem HIFI', 'DAB radio', 'Navigacijski sistem', 'Brezžična polnilna postaja', 'USB priključek', 'Bluetooth', 'Android Auto', 'Apple Carplay',
+    'Tempomat', 'Adaptivni tempomat', 'Omejevalnik hitrosti', 'Parkirni senzorji', 'Kamere 360', 'Pomoč pri speljevanju v križišču',
+    'Električna ročna zavora', 'Samodejno parkiranje', 'Panoramska streha', 'Sončna streha', 'Športni izpušni sistem',
+    'Pnevmatno vzmetenje', 'Pospeševalnik', 'Volan v obliki obroča', 'Prezračevanje sedežev', 'Ogrevani sedeži',
+    'Električno nastavljanje sedežev', 'Spominski sedeži', 'Vratljivi sedeži', 'Footrest', 'Massažni sedeži',
+    'Grelnik sedežev', 'Vetrobransko steklo', 'Ogrevan steklo', 'Praktična notranjost', 'Smartkey', 'Start-Stop sistem',
+    'Pomoč za vzdrževanje voznega pasu', 'Slepa točka opozorilo', 'Prenos podatkov prek aplikacij',
+    // Kamion equipment
+    'Diesel', 'Bencin', 'Električni', 'Hibridni', 'Plinski',
+    // Motorcycle equipment
+    'Gume za moto', 'Zaščita pred vremenskimi vplovi', 'Odpravljač vetra',
+  ]
+  return allEquipment[parseInt(featureId)] || `Oprema ${featureId}`
+}
 import {
   ArrowLeft, Heart, Share2, Eye, Calendar, Gauge, Fuel,
   Settings, Shield, Phone, MessageCircle,
