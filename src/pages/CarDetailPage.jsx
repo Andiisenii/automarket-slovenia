@@ -181,6 +181,14 @@ export function CarDetailPage() {
   const selectedFeatureIds = car.featureIds || []
   const selectedFeatures = selectedFeatureIds.map(id => getFeatureById(id)).filter(Boolean)
 
+  // Build feature objects for display
+  const featuresToDisplay = selectedFeatureIds.map((id, index) => ({
+    id: id,
+    name: getFeatureById(id) || `Oprema ${id}`,
+    name_sl: getFeatureById(id) || `Oprema ${id}`,
+    name_en: getFeatureById(id) || `Oprema ${id}`
+  }))
+
   const handleSendMessage = () => {
     if (!isAuthenticated) {
       navigate('/login?redirect=/cars/' + car.id)
@@ -462,25 +470,22 @@ export function CarDetailPage() {
             </Card>
 
             {/* Features / Equipment */}
-            {selectedFeatures.length > 0 && (
+            {featuresToDisplay.length > 0 && (
               <Card className="p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">Oprema vozila</h2>
                 <div className="flex flex-wrap gap-2">
-                  {selectedFeatures.map((feature) => (
+                  {featuresToDisplay.map((feature) => (
                     <div
-                      key={feature.id}
+                      key={feature.id || feature.name}
                       className="inline-flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-lg text-sm"
-                      title={feature.name_en}
                     >
                       <Check className="w-4 h-4 text-green-600" />
-                      <span className="text-green-800">
-                        {isSl ? feature.name_sl : feature.name_en}
-                      </span>
+                      <span className="text-green-800">{feature.name}</span>
                     </div>
                   ))}
                 </div>
                 <p className="text-sm text-gray-500 mt-3">
-                  Skupaj: {selectedFeatures.length} opreme
+                  Skupaj: {featuresToDisplay.length} opreme
                 </p>
               </Card>
             )}
@@ -613,7 +618,20 @@ export function CarDetailPage() {
 
             {/* Location Map */}
             <Card className="p-6">
-              <h3 className="font-semibold text-gray-900 mb-4">📍 Lokacija</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-gray-900">📍 {car.city || 'Lokacija'}</h3>
+                {car.city && (
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(car.city + ', Slovenia')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1.5 bg-blue-500 text-white text-xs rounded-lg flex items-center gap-1.5 hover:bg-blue-600 transition-colors"
+                  >
+                    <Navigation className="w-3.5 h-3.5" />
+                    Get Directions
+                  </a>
+                )}
+              </div>
               <div className="aspect-video bg-gray-100 rounded-xl flex items-center justify-center">
                 <div className="text-center">
                   <div className="text-4xl mb-2">🗺️</div>
