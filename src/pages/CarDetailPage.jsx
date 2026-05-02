@@ -376,6 +376,17 @@ export function CarDetailPage() {
                   <div className="text-3xl font-bold text-gray-900">
                     {formatPrice(Number(car.price))}
                   </div>
+                  {car.city && (
+                    <a
+                      href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(car.city + ', Slovenia')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-500 text-white text-xs rounded-lg hover:bg-blue-600 transition-colors"
+                    >
+                      <Navigation className="w-3.5 h-3.5" />
+                      Get Directions
+                    </a>
+                  )}
                   <div className="text-sm text-gray-500">
                     Estimated: {formatPrice(Number(car.price) * 1.1)} with VAT</div>{car.featured && <div className="text-xs text-orange-600 font-medium mt-1">? Featured</div>}{car.promoted && <div className="text-xs text-green-600 font-medium">? Promoted</div>}
 
