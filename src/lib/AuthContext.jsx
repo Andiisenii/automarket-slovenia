@@ -53,26 +53,30 @@ export function AuthProvider({ children }) {
         throw new Error('Neveljaven email ali geslo')
       }
       
-      // Create session
+      // Create session with full user data
       const token = 'auth_' + Date.now()
       
-      // Save session
-      localStorage.setItem('automarket_token', token)
-      localStorage.setItem('automarket_user', JSON.stringify({
+      // Save full user data to localStorage
+      const userData = {
         id: user.id,
         name: user.name,
         email: user.email,
         role: user.role,
-        user_type: user.user_type
-      }))
+        user_type: user.user_type,
+        phone: user.phone || '',
+        username: user.username || '',
+        profile_photo: user.profile_photo || '',
+        address: user.address || '',
+        city: user.city || '',
+        has_phone: user.has_phone,
+        has_whatsapp: user.has_whatsapp,
+        has_viber: user.has_viber,
+      }
       
-      setUser({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        user_type: user.user_type
-      })
+      localStorage.setItem('automarket_token', token)
+      localStorage.setItem('automarket_user', JSON.stringify(userData))
+      
+      setUser(userData)
       
       return user
       
@@ -115,24 +119,26 @@ export function AuthProvider({ children }) {
         throw new Error(error.message)
       }
       
-      // Auto login after register
+      // Auto login after register with full user data
       const token = 'auth_' + Date.now()
-      localStorage.setItem('automarket_token', token)
-      localStorage.setItem('automarket_user', JSON.stringify({
-        id: data.id,
-        name: data.name,
-        email: data.email,
-        role: data.role,
-        user_type: data.user_type
-      }))
       
-      setUser({
+      const userData = {
         id: data.id,
         name: data.name,
         email: data.email,
         role: data.role,
-        user_type: data.user_type
-      })
+        user_type: data.user_type,
+        phone: data.phone || '',
+        username: data.username || '',
+        profile_photo: data.profile_photo || '',
+        address: data.address || '',
+        city: data.city || '',
+      }
+      
+      localStorage.setItem('automarket_token', token)
+      localStorage.setItem('automarket_user', JSON.stringify(userData))
+      
+      setUser(userData)
       
       return data
       
