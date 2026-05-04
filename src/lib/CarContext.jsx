@@ -276,6 +276,8 @@ export function CarProvider({ children }) {
     const allData = {
       title: title,
       user_id: user.id,
+      // Images
+      images: carData.images || [],
       vehicle_category: carData.vehicleCategory || 'avto',
       vehicle_sub_category: carData.vehicleSubCategory || null,
       vehicle_sub_category_detail: carData.vehicleSubCategoryDetail || null,
