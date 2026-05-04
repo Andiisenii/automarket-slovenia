@@ -143,18 +143,32 @@ const BOOST_PLANS_PRIVATE = [
   },
 ]
 
-function SettingsTab({ user, updateProfile }) {
+function SettingsTab({ user, updateProfile, changePassword }) {
   const [settingsForm, setSettingsForm] = useState({
-    name: user?.name || '', username: user?.username || '', email: user?.email || '',
-    phone: user?.phone || '', address: user?.address || '', city: user?.city || '',
-    hasPhone: user?.has_phone !== 0, hasWhatsapp: user?.has_whatsapp === 1, hasViber: user?.has_viber === 1,
-    photo: user?.profile_photo || user?.photo || '',
+    name: user?.name || '',
+    phone: user?.phone || '',
+    userType: user?.user_type || 'private',
+    photo: user?.profile_photo || '',
   })
-  const [photoPreview, setPhotoPreview] = useState(user?.profile_photo || user?.photo || '')
+  const [photoPreview, setPhotoPreview] = useState(user?.profile_photo || '')
+  const [saving, setSaving] = useState(false)
+  
+  // Password change state
+  const [showPasswordForm, setShowPasswordForm] = useState(false)
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [passwordError, setPasswordError] = useState('')
+  const [passwordSuccess, setPasswordSuccess] = useState('')
   
   const handlePhotoChange = (e) => {
     const file = e.target.files[0]
     if (file) {
+      // Validate file size (max 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        alert('Datoteka je prevelika. Maksimalna velikost je 2MB.')
+        return
+      }
       const reader = new FileReader()
       reader.onloadend = () => {
         setPhotoPreview(reader.result)
@@ -165,27 +179,72 @@ function SettingsTab({ user, updateProfile }) {
   }
   
   const handleSaveSettings = async () => { 
-    // Prepare data for API - include contact options
-    const profileData = {
-      name: settingsForm.name,
-      username: settingsForm.username,
-      phone: settingsForm.phone,
-      profile_photo: settingsForm.photo,
-      hasPhone: settingsForm.hasPhone ? 1 : 0,
-      hasWhatsapp: settingsForm.hasWhatsapp ? 1 : 0,
-      hasViber: settingsForm.hasViber ? 1 : 0,
+    if (!settingsForm.name.trim()) {
+      alert('Ime je obvezno polje')
+      return
     }
     
-    console.log('Saving profile:', profileData)
+    setSaving(true)
+    try {
+      const profileData = {
+        name: settingsForm.name,
+        phone: settingsForm.phone,
+        profile_photo: settingsForm.photo || null,
+      }
+      
+      const result = await updateProfile(profileData)
+      
+      if (result && result.success) {
+        alert('✅ Nastavitve shranjene!')
+      } else {
+        alert('❌ Napaka pri shranjevanju')
+      }
+    } catch (e) {
+      alert('❌ ' + e.message)
+    } finally {
+      setSaving(false)
+    }
+  }
+  
+  const handlePasswordChange = async (e) => {
+    e.preventDefault()
+    setPasswordError('')
+    setPasswordSuccess('')
     
-    const result = await updateProfile(profileData)
+    if (!currentPassword) {
+      setPasswordError('Trenutno geslo je obvezno')
+      return
+    }
     
-    console.log('Save result:', result)
+    if (newPassword.length < 6) {
+      setPasswordError('Novo geslo mora imeti vsaj 6 znakov')
+      return
+    }
     
-    if (result && (result.user || result.success)) {
-      alert('✅ Nastavitve shranjene!')
-    } else {
-      alert('❌ Napaka pri shranjevanju')
+    if (!/[0-9]/.test(newPassword)) {
+      setPasswordError('Novo geslo mora vsebovati vsaj eno stevilo')
+      return
+    }
+    
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(newPassword)) {
+      setPasswordError('Novo geslo mora vsebovati vsaj en specialen znak')
+      return
+    }
+    
+    if (newPassword !== confirmPassword) {
+      setPasswordError('Gesli se ne ujemata')
+      return
+    }
+    
+    try {
+      await changePassword(currentPassword, newPassword)
+      setPasswordSuccess('✅ Geslo je bilo spremenjeno!')
+      setCurrentPassword('')
+      setNewPassword('')
+      setConfirmPassword('')
+      setShowPasswordForm(false)
+    } catch (e) {
+      setPasswordError(e.message || 'Napaka pri spremembi gesla')
     }
   }
   
@@ -209,55 +268,119 @@ function SettingsTab({ user, updateProfile }) {
             <p className="text-xs text-gray-500 mt-1">JPG, PNG ali GIF. Max 2MB.</p>
           </div>
         </div>
+        
+        {/* Basic Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Ime in priimek</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Ime in priimek *</label>
             <input type="text" value={settingsForm.name} onChange={(e) => setSettingsForm({...settingsForm, name: e.target.value})}
               className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Uporabniško ime</label>
-            <input type="text" value={settingsForm.username} onChange={(e) => setSettingsForm({...settingsForm, username: e.target.value})}
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
-          </div>
-          <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input type="email" value={settingsForm.email} onChange={(e) => setSettingsForm({...settingsForm, email: e.target.value})}
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
-            <input type="text" value={settingsForm.username} onChange={(e) => setSettingsForm({...settingsForm, username: e.target.value})}
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
+            <input type="email" value={user?.email || ''} disabled
+              className="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl text-gray-500 cursor-not-allowed" />
+            <p className="text-xs text-gray-400 mt-1">Email ni mogoče spremeniti</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Telefon</label>
             <input type="tel" value={settingsForm.phone} onChange={(e) => setSettingsForm({...settingsForm, phone: e.target.value})}
+              placeholder="+386 XX XXX XXX"
               className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
           </div>
         </div>
+        
+        {/* User Type */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Možnosti kontakta</label>
-          <div className="flex flex-wrap gap-4">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={settingsForm.hasPhone} onChange={(e) => setSettingsForm({...settingsForm, hasPhone: e.target.checked})}
-                className="w-4 h-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500" />
-              <span>Telefonski klici</span>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Tip prodajalca</label>
+          <div className="flex gap-4">
+            <label className={`flex-1 flex items-center justify-center gap-2 p-4 border-2 rounded-xl cursor-pointer transition-all ${
+              settingsForm.userType === 'private' 
+                ? 'border-orange-500 bg-orange-50' 
+                : 'border-gray-200 hover:border-gray-300'
+            }`}>
+              <input type="radio" name="userType" value="private" checked={settingsForm.userType === 'private'}
+                onChange={(e) => setSettingsForm({...settingsForm, userType: e.target.value})}
+                className="sr-only" />
+              <span className="text-2xl">👤</span>
+              <div>
+                <div className="font-medium">Zasebni prodajalec</div>
+                <div className="text-xs text-gray-500">Prodaja ose nakup vozila kot posameznik</div>
+              </div>
             </label>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={settingsForm.hasWhatsapp} onChange={(e) => setSettingsForm({...settingsForm, hasWhatsapp: e.target.checked})}
-                className="w-4 h-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500" />
-              <span>WhatsApp</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={settingsForm.hasViber} onChange={(e) => setSettingsForm({...settingsForm, hasViber: e.target.checked})}
-                className="w-4 h-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500" />
-              <span>Viber</span>
+            <label className={`flex-1 flex items-center justify-center gap-2 p-4 border-2 rounded-xl cursor-pointer transition-all ${
+              settingsForm.userType === 'business' 
+                ? 'border-orange-500 bg-orange-50' 
+                : 'border-gray-200 hover:border-gray-300'
+            }`}>
+              <input type="radio" name="userType" value="business" checked={settingsForm.userType === 'business'}
+                onChange={(e) => setSettingsForm({...settingsForm, userType: e.target.value})}
+                className="sr-only" />
+              <span className="text-2xl">🏢</span>
+              <div>
+                <div className="font-medium">Podjetje</div>
+                <div className="text-xs text-gray-500">Prodaja vozil kot podjetje</div>
+              </div>
             </label>
           </div>
         </div>
+        
+        {/* Save Button */}
         <div className="flex justify-end">
-          <Button onClick={handleSaveSettings} className="bg-orange-500 hover:bg-orange-600">Shrani spremembe</Button>
+          <Button onClick={handleSaveSettings} disabled={saving} className="bg-orange-500 hover:bg-orange-600">
+            {saving ? 'Shranjujem...' : 'Shrani spremembe'}
+          </Button>
+        </div>
+        
+        {/* Password Change Section */}
+        <div className="border-t pt-6">
+          <button type="button" onClick={() => setShowPasswordForm(!showPasswordForm)}
+            className="flex items-center gap-2 text-orange-600 hover:text-orange-700 font-medium">
+            <span>🔒</span>
+            <span>{showPasswordForm ? 'Skrij obrazec za geslo' : 'Spremeni geslo'}</span>
+          </button>
+          
+          {showPasswordForm && (
+            <form onSubmit={handlePasswordChange} className="mt-4 p-4 bg-gray-50 rounded-xl space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Trenutno geslo</label>
+                <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)}
+                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Novo geslo</label>
+                <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Min. 6 znakov, vsaj ena stevila in en specialen znak"
+                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Potrdi novo geslo</label>
+                <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
+              </div>
+              
+              {passwordError && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                  ❌ {passwordError}
+                </div>
+              )}
+              
+              {passwordSuccess && (
+                <div className="p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
+                  {passwordSuccess}
+                </div>
+              )}
+              
+              <div className="flex justify-end gap-2">
+                <Button type="button" variant="secondary" onClick={() => setShowPasswordForm(false)}>
+                  Preklici
+                </Button>
+                <Button type="submit" className="bg-orange-500 hover:bg-orange-600">
+                  Spremeni geslo
+                </Button>
+              </div>
+            </form>
+          )}
         </div>
       </div>
     </Card>
@@ -266,7 +389,7 @@ function SettingsTab({ user, updateProfile }) {
 
 export function DashboardPage() {
   const navigate = useNavigate()
-  const { user, logout, updateProfile } = useAuth()
+  const { user, logout, updateProfile, changePassword } = useAuth()
   const { myListings, deleteCar, updateCar, refreshCars } = useCars()
   const { messages } = useMessages()
   const { language, setLanguage } = useLanguage()
@@ -1079,7 +1202,7 @@ export function DashboardPage() {
         )}
         
         {/* Settings Tab */}
-        {activeTab === 'settings' && <SettingsTab user={user} updateProfile={updateProfile} />}
+        {activeTab === 'settings' && <SettingsTab user={user} updateProfile={updateProfile} changePassword={changePassword} />}
       </div>
       
       {/* Sold Modal */}

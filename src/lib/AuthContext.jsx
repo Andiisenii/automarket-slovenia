@@ -159,16 +159,24 @@ export function AuthProvider({ children }) {
     }
     
     try {
+      // Build update object with only existing columns
+      const updateData = {
+        name: data.name || user.name,
+      }
+      
+      // Only include phone if column exists (optional field)
+      if (data.phone !== undefined) {
+        updateData.phone = data.phone || null
+      }
+      
+      // Only include profile_photo if column exists (optional field)
+      if (data.profile_photo !== undefined) {
+        updateData.profile_photo = data.profile_photo || null
+      }
+      
       const { data: updatedUser, error } = await supabase
         .from('users')
-        .update({
-          name: data.name || user.name,
-          phone: data.phone || null,
-          profile_photo: data.profile_photo || null,
-          has_phone: data.hasPhone ? 1 : 0,
-          has_whatsapp: data.hasWhatsapp ? 1 : 0,
-          has_viber: data.hasViber ? 1 : 0,
-        })
+        .update(updateData)
         .eq('id', user.id)
         .select()
         .single()
@@ -196,6 +204,62 @@ export function AuthProvider({ children }) {
     }
   }
 
+  // Change password
+  const changePassword = async (currentPassword, newPassword) => {
+    if (!user?.id) {
+      throw new Error('Morate biti prijavljeni')
+    }
+    
+    // Validate new password
+    if (!newPassword || newPassword.length < 6) {
+      throw new Error('Geslo mora imeti vsaj 6 znakov')
+    }
+    
+    if (!/[0-9]/.test(newPassword)) {
+      throw new Error('Geslo mora vsebovati vsaj eno stevilo')
+    }
+    
+    try {
+      // Get current user data to verify old password
+      const { data: currentUser, error: fetchError } = await supabase
+        .from('users')
+        .select('password')
+        .eq('id', user.id)
+        .single()
+      
+      if (fetchError || !currentUser) {
+        throw new Error('Napaka pri nalaganju podatkov')
+      }
+      
+      // Verify current password
+      const isValid = await bcrypt.compare(currentPassword, currentUser.password)
+      if (!isValid) {
+        throw new Error('Trenutno geslo ni pravilno')
+      }
+      
+      // Hash new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10)
+      
+      // Update password
+      const { data: updatedUser, error } = await supabase
+        .from('users')
+        .update({ password: hashedPassword })
+        .eq('id', user.id)
+        .select()
+        .single()
+      
+      if (error) {
+        console.error('Password update error:', error)
+        throw new Error(error.message || 'Napaka pri posodabljanju gesla')
+      }
+      
+      return { success: true }
+    } catch (e) {
+      console.error('Change password error:', e)
+      throw e
+    }
+  }
+
   const value = {
     user,
     loading,
@@ -204,6 +268,7 @@ export function AuthProvider({ children }) {
     register,
     logout,
     updateProfile,
+    changePassword,
     isAuthenticated: !!user,
     isBusiness: user?.user_type === 'business',
     isPremium: false,
