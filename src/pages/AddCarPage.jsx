@@ -603,9 +603,15 @@ const saveCustomModel = async (brand, model) => {
         downPaymentType: hasFinancing && downPaymentValue ? downPaymentType : null,
         downPaymentValue: hasFinancing && downPaymentValue ? downPaymentValue : null,
         seller: {
-          name: user?.name || 'Anonymous', rating: 5.0, reviews: 0,
-          phone: user?.phone || '+386 00 000 000', verified: true,
-          userType: isBusiness ? 'business' : 'private', id: user?.id, photo: user?.photo || null,
+          name: user?.name || 'Anonymous',
+          rating: 5.0,
+          reviews: 0,
+          phone: user?.phone || '+386 00 000 000',
+          username: user?.username || '',
+          profile_photo: user?.profile_photo || '',
+          verified: true,
+          userType: isBusiness ? 'business' : 'private',
+          id: user?.id,
         },
         views: 0, createdAt: new Date().toISOString().split('T')[0], status: 'active',
       }

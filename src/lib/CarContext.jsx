@@ -203,6 +203,8 @@ export function CarProvider({ children }) {
       seller: {
         name: dbCar.seller_name,
         phone: dbCar.seller_phone,
+        username: dbCar.seller_username,
+        profile_photo: dbCar.seller_profile_photo,
         userType: dbCar.seller_user_type,
         verified: dbCar.seller_verified,
         id: dbCar.user_id,
@@ -346,6 +348,8 @@ export function CarProvider({ children }) {
       // Seller
       seller_name: carData.seller?.name || null,
       seller_phone: carData.seller?.phone || null,
+      seller_username: carData.seller?.username || null,
+      seller_profile_photo: carData.seller?.profile_photo || null,
       seller_user_type: carData.seller?.userType || null,
       seller_verified: carData.seller?.verified || false,
       // Status

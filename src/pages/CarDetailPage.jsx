@@ -139,6 +139,8 @@ export function CarDetailPage() {
             seller: {
               name: dbCar.seller_name || 'Seller',
               phone: dbCar.seller_phone || '',
+              username: dbCar.seller_username || '',
+              profile_photo: dbCar.seller_profile_photo || '',
               verified: dbCar.seller_verified || false,
               userType: dbCar.seller_user_type || 'private',
               hasPhone: dbCar.seller_has_phone ?? true,
@@ -939,9 +941,17 @@ export function CarDetailPage() {
             {/* Seller Card */}
             <Card className="p-6 sticky top-4 z-50">
               <div className="flex items-center gap-4 mb-6">
-                <div className="w-14 h-14 bg-primary-100 rounded-xl flex items-center justify-center text-xl font-bold text-primary-600">
-                  {car.seller?.name?.charAt(0) || 'S'}
-                </div>
+                {car.seller?.profile_photo ? (
+                  <img
+                    src={car.seller.profile_photo}
+                    alt={car.seller.name}
+                    className="w-14 h-14 rounded-xl object-cover"
+                  />
+                ) : (
+                  <div className="w-14 h-14 bg-primary-100 rounded-xl flex items-center justify-center text-xl font-bold text-primary-600">
+                    {car.seller?.name?.charAt(0) || 'S'}
+                  </div>
+                )}
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="font-semibold text-gray-900">{car.seller?.name || 'Seller'}</h3>
@@ -949,6 +959,9 @@ export function CarDetailPage() {
                       <Check className="w-4 h-4 text-primary-600" />
                     )}
                   </div>
+                  {car.seller?.username && (
+                    <div className="text-sm text-gray-500">@{car.seller.username}</div>
+                  )}
                   <div className="flex items-center gap-1 text-sm">
                     <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
                     <span className="font-medium">{car.seller?.rating || '5.0'}</span>
