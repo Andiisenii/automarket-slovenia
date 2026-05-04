@@ -139,10 +139,7 @@ export function CarDetailPage() {
             seller: {
               name: dbCar.seller_name || 'Seller',
               phone: dbCar.seller_phone || '',
-              photo: dbCar.seller_photo || '',
               verified: dbCar.seller_verified || false,
-              rating: dbCar.seller_rating || '5.0',
-              reviews: dbCar.seller_reviews || 0,
               userType: dbCar.seller_user_type || 'private',
               hasPhone: dbCar.seller_has_phone ?? true,
               hasWhatsapp: dbCar.seller_has_whatsapp ?? false,
@@ -942,17 +939,9 @@ export function CarDetailPage() {
             {/* Seller Card */}
             <Card className="p-6 sticky top-4 z-50">
               <div className="flex items-center gap-4 mb-6">
-                {car.seller?.photo ? (
-                  <img
-                    src={car.seller.photo}
-                    alt={car.seller.name}
-                    className="w-14 h-14 rounded-xl object-cover"
-                  />
-                ) : (
-                  <div className="w-14 h-14 bg-primary-100 rounded-xl flex items-center justify-center text-xl font-bold text-primary-600">
-                    {car.seller?.name?.charAt(0) || 'S'}
-                  </div>
-                )}
+                <div className="w-14 h-14 bg-primary-100 rounded-xl flex items-center justify-center text-xl font-bold text-primary-600">
+                  {car.seller?.name?.charAt(0) || 'S'}
+                </div>
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="font-semibold text-gray-900">{car.seller?.name || 'Seller'}</h3>

@@ -147,10 +147,8 @@ function SettingsTab({ user, updateProfile, changePassword }) {
   const [settingsForm, setSettingsForm] = useState({
     name: user?.name || '',
     phone: user?.phone || '',
-    username: user?.username || '',
     address: user?.address || '',
     city: user?.city || '',
-    userType: user?.user_type || 'private',
     hasPhone: user?.has_phone !== 0,
     hasWhatsapp: user?.has_whatsapp === 1,
     hasViber: user?.has_viber === 1,
@@ -195,10 +193,8 @@ function SettingsTab({ user, updateProfile, changePassword }) {
       const profileData = {
         name: settingsForm.name,
         phone: settingsForm.phone,
-        username: settingsForm.username,
         address: settingsForm.address,
         city: settingsForm.city,
-        userType: settingsForm.userType,
         hasPhone: settingsForm.hasPhone,
         hasWhatsapp: settingsForm.hasWhatsapp,
         hasViber: settingsForm.hasViber,
@@ -290,12 +286,6 @@ function SettingsTab({ user, updateProfile, changePassword }) {
               className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Uporabniško ime</label>
-            <input type="text" value={settingsForm.username} onChange={(e) => setSettingsForm({...settingsForm, username: e.target.value})}
-              placeholder="@username"
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
-          </div>
-          <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
             <input type="email" value={user?.email || ''} disabled
               className="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl text-gray-500 cursor-not-allowed" />
@@ -339,41 +329,6 @@ function SettingsTab({ user, updateProfile, changePassword }) {
               <input type="checkbox" checked={settingsForm.hasViber} onChange={(e) => setSettingsForm({...settingsForm, hasViber: e.target.checked})}
                 className="w-4 h-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500" />
               <span>📱 Viber</span>
-            </label>
-          </div>
-        </div>
-        
-        {/* User Type */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Tip prodajalca</label>
-          <div className="flex gap-4">
-            <label className={`flex-1 flex items-center justify-center gap-2 p-4 border-2 rounded-xl cursor-pointer transition-all ${
-              settingsForm.userType === 'private' 
-                ? 'border-orange-500 bg-orange-50' 
-                : 'border-gray-200 hover:border-gray-300'
-            }`}>
-              <input type="radio" name="userType" value="private" checked={settingsForm.userType === 'private'}
-                onChange={(e) => setSettingsForm({...settingsForm, userType: e.target.value})}
-                className="sr-only" />
-              <span className="text-2xl">👤</span>
-              <div>
-                <div className="font-medium">Zasebni prodajalec</div>
-                <div className="text-xs text-gray-500">Prodaja ose nakup vozila kot posameznik</div>
-              </div>
-            </label>
-            <label className={`flex-1 flex items-center justify-center gap-2 p-4 border-2 rounded-xl cursor-pointer transition-all ${
-              settingsForm.userType === 'business' 
-                ? 'border-orange-500 bg-orange-50' 
-                : 'border-gray-200 hover:border-gray-300'
-            }`}>
-              <input type="radio" name="userType" value="business" checked={settingsForm.userType === 'business'}
-                onChange={(e) => setSettingsForm({...settingsForm, userType: e.target.value})}
-                className="sr-only" />
-              <span className="text-2xl">🏢</span>
-              <div>
-                <div className="font-medium">Podjetje</div>
-                <div className="text-xs text-gray-500">Prodaja vozil kot podjetje</div>
-              </div>
             </label>
           </div>
         </div>
