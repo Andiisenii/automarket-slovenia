@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, Upload, X, Check, CreditCard, ChevronDown, Shield, Settings, Wifi, Car, Fuel, Star, ChevronUp, Sun, Award, XCircle, Zap } from 'lucide-react'
+import { ArrowLeft, Upload, X, Check, CreditCard, ChevronDown, Shield, Settings, Wifi, Car, Fuel, Star, ChevronUp, Sun, Award, XCircle, Zap, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { useAuth } from '@/lib/AuthContext'
 import { useLanguage } from '@/lib/LanguageContext'
 import { useCars } from '@/lib/CarContext'
 import { packageDB, carDB } from '@/lib/database'
-import { supabase } from '@/lib/supabase'
+import { supabase, uploadImagesToStorage, fileToBase64 } from '@/lib/supabase'
 import { BrandLogo } from '@/components/ui/BrandLogo'
 import { getAllBrands, getModelsForBrand, getAllCities, fuelTypes, transmissions, bodyTypes, colors, vehicleConditionOptions, vehicleConditionSubOptions, carEquipmentCategories, DEFAULTAUTOSELECTFEATURES, vehicleCategories, vehicleSubCategories, subCategoryDetails, emissionClasses, vehicleAgeOptions, ownerCountOptions, months, getYears, LUXURYCARTHRESHOLD, FALLBACKBRANDS, FALLBACKMODELS, vehicleEquipmentMap, DEFAULTFEATURESPERCATEGORY, kamionSubCategoryEquipmentMap, CATEGORY_BRANDS } from '@/lib/data'
 
@@ -307,7 +307,15 @@ const saveCustomModel = async (brand, model) => {
         // UTV
         utvEngineCapacity: editCar.utvEngineCapacity || '', utvEnginePowerKm: editCar.utvEnginePowerKm || '', utvCylinderCount: editCar.utvCylinderCount || '', utvEngineStroke: editCar.utvEngineStroke || '', utvDiffLock: editCar.utvDiffLock || '', utvStartType: editCar.utvStartType || '',
       })
-      setImages(editCar.images || [])
+      // Load existing images for editing
+      if (editCar.images && editCar.images.length > 0) {
+        const existingImages = editCar.images.map((url, index) => ({
+          file: null, // No file object for existing images
+          preview: url,
+          isExisting: true
+        }))
+        setImageFiles(existingImages)
+      }
       if (editCar.hasFinancing) {
         setHasFinancing(true)
         setMonthlyBudget(editCar.monthlyBudget || '')
@@ -413,16 +421,28 @@ const saveCustomModel = async (brand, model) => {
   const toggleDropdown = (name) => { setOpenDropdown(openDropdown === name ? null : name) }
   const selectOption = (field, value) => { setFormData(prev => ({ ...prev, [field]: value })); setOpenDropdown(null) }
 
+  // Store File objects for upload to storage
+  const [imageFiles, setImageFiles] = useState([])
+  const [isUploading, setIsUploading] = useState(false)
+
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files)
-    files.forEach(file => {
-      const reader = new FileReader()
-      reader.onload = (e) => { setImages(prev => [...prev, e.target.result]) }
-      reader.readAsDataURL(file)
-    })
+    // Create preview URLs for display
+    const newPreviews = files.map(file => ({
+      file: file,
+      preview: URL.createObjectURL(file)
+    }))
+    setImageFiles(prev => [...prev, ...newPreviews])
   }
 
-  const removeImage = (index) => { setImages(prev => prev.filter((_, i) => i !== index)) }
+  const removeImage = (index) => {
+    setImageFiles(prev => {
+      const filtered = prev.filter((_, i) => i !== index)
+      // Revoke preview URLs to prevent memory leaks
+      prev[index]?.preview && URL.revokeObjectURL(prev[index].preview)
+      return filtered
+    })
+  }
 
   const validateForm = () => {
     const newErrors = {}
@@ -473,17 +493,74 @@ const saveCustomModel = async (brand, model) => {
 
   const canPostCar = canPost()
 
+  // Prepare images for upload - upload new files to storage or use existing URLs
+  const prepareImages = async (imageFiles, tempId) => {
+    if (!imageFiles || imageFiles.length === 0) {
+      return ['https://images.unsplash.com/photo-1617788138017-80ad40651399?w=800']
+    }
+    
+    // Separate existing URLs from new files
+    const existingUrls = imageFiles.filter(f => f.isExisting).map(f => f.preview)
+    const newFiles = imageFiles.filter(f => !f.isExisting && f.file)
+    
+    // If only existing images, return them
+    if (newFiles.length === 0) {
+      return existingUrls.length > 0 ? existingUrls : ['https://images.unsplash.com/photo-1617788138017-80ad40651399?w=800']
+    }
+    
+    try {
+      // Try Supabase Storage first for new files
+      const fileObjects = newFiles.map(f => f.file)
+      const uploadedUrls = await uploadImagesToStorage(fileObjects, tempId)
+      
+      // Combine existing URLs with new uploads in order
+      const allUrls = []
+      let newIndex = 0
+      for (let i = 0; i < imageFiles.length; i++) {
+        if (imageFiles[i].isExisting) {
+          allUrls.push(imageFiles[i].preview)
+        } else {
+          allUrls.push(uploadedUrls[newIndex++])
+        }
+      }
+      
+      return allUrls
+    } catch (error) {
+      console.warn('Storage upload failed, using base64 fallback:', error)
+      // Fallback to base64 if storage fails
+      const base64Images = await Promise.all(
+        imageFiles.map(async (f) => {
+          if (f.isExisting) return f.preview
+          const file = f.file
+          return await fileToBase64(file)
+        })
+      )
+      return base64Images.length > 0 ? base64Images : ['https://images.unsplash.com/photo-1617788138017-80ad40651399?w=800']
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!validateForm()) return
     if (formData.brand && formData.model) { saveCustomModel(formData.brand, formData.model) }
 
-    const defaultImages = images.length > 0 ? images : ['https://images.unsplash.com/photo-1617788138017-80ad40651399?w=800']
+    setIsUploading(true)
+    
+    // Generate temp ID for image uploads
+    const tempId = `car_${Date.now()}`
+    
+    // Prepare images (upload to storage or fallback to base64)
+    let finalImages = ['https://images.unsplash.com/photo-1617788138017-80ad40651399?w=800']
+    try {
+      finalImages = await prepareImages(imageFiles, tempId)
+    } catch (imgError) {
+      console.warn('Image preparation failed, using default:', imgError)
+    }
 
     if (isEditMode) {
       const carData = {
         ...formData,
-        images: defaultImages,
+        images: finalImages,
         fueltype: formData.fuelType,
         bodytype: formData.bodyType,
         hasFinancing: hasFinancing,
@@ -501,6 +578,7 @@ const saveCustomModel = async (brand, model) => {
         console.warn('Backend update failed, using local data:', e)
       }
       
+      setIsUploading(false)
       alert('Car updated successfully!')
       navigate('/dashboard')
       return
@@ -511,7 +589,7 @@ const saveCustomModel = async (brand, model) => {
       const isLuxuryCar = !isBusiness && carPrice > LUXURYCARTHRESHOLD
       const carData = {
         ...formData,
-        images: defaultImages,
+        images: finalImages,
         fueltype: formData.fuelType,
         bodytype: formData.bodyType,
         featured: isPremium || isBusiness,
@@ -541,6 +619,7 @@ const saveCustomModel = async (brand, model) => {
         console.warn('Backend save failed, using local data:', e)
       }
       
+      setIsUploading(false)
       alert('Vozilo objavljeno brezplacno!')
       navigate('/dashboard')
       return
@@ -548,7 +627,7 @@ const saveCustomModel = async (brand, model) => {
 
     const carDataForPayment = {
       ...formData,
-      images: defaultImages,
+      images: finalImages,
       fueltype: formData.fuelType,
       bodytype: formData.bodyType,
       hasFinancing: hasFinancing,
@@ -1791,21 +1870,28 @@ const saveCustomModel = async (brand, model) => {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-6">{t('photosLabel')}</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-4 max-h-[400px] overflow-y-auto">
-            {images.map((img, index) => (
+            {imageFiles.map((img, index) => (
               <div key={index} className="relative aspect-square rounded-xl overflow-hidden bg-gray-100">
-                <img src={img} alt={"Car " + (index + 1)} className="w-full h-full object-cover" />
+                <img src={img.preview} alt={"Car " + (index + 1)} className="w-full h-full object-cover" />
                 <button type="button" onClick={() => removeImage(index)} className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600" >
                   <X className="w-4 h-4" />
                 </button>
+                {index === 0 && (
+                  <span className="absolute bottom-1 left-1 px-2 py-0.5 bg-primary-500 text-white text-xs rounded-full">Glavna</span>
+                )}
               </div>
             ))}
             <label className="aspect-square rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:border-primary-500 transition-colors">
-              <Upload className="w-8 h-8 text-gray-400 mb-2" />
+              {isUploading ? (
+                <Loader2 className="w-8 h-8 text-gray-400 mb-2 animate-spin" />
+              ) : (
+                <Upload className="w-8 h-8 text-gray-400 mb-2" />
+              )}
               <span className="text-sm text-gray-500">{t('addPhotos')}</span>
-              <input type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" />
+              <input type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" disabled={isUploading} />
             </label>
           </div>
-          <p className="text-sm text-gray-500">Upload as many photos as you want.</p>
+          <p className="text-sm text-gray-500">Upload as many photos as you want. Prva slika bo glavna.</p>
           {isPremium && <p className="text-sm text-green-600 font-medium mt-2">âœ" Premium: HD photos + 360° enabled</p>}
         </div>
 
