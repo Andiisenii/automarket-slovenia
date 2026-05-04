@@ -159,19 +159,18 @@ export function AuthProvider({ children }) {
     }
     
     try {
-      // Build update object with only existing columns
+      // Build update object with all columns
       const updateData = {
         name: data.name || user.name,
-      }
-      
-      // Only include phone if column exists (optional field)
-      if (data.phone !== undefined) {
-        updateData.phone = data.phone || null
-      }
-      
-      // Only include profile_photo if column exists (optional field)
-      if (data.profile_photo !== undefined) {
-        updateData.profile_photo = data.profile_photo || null
+        phone: data.phone || null,
+        profile_photo: data.profile_photo || null,
+        has_phone: data.hasPhone ? 1 : 0,
+        has_whatsapp: data.hasWhatsapp ? 1 : 0,
+        has_viber: data.hasViber ? 1 : 0,
+        address: data.address || null,
+        city: data.city || null,
+        username: data.username || null,
+        user_type: data.userType || user.user_type,
       }
       
       const { data: updatedUser, error } = await supabase
@@ -189,9 +188,19 @@ export function AuthProvider({ children }) {
       // Update local state and storage
       const newUserData = {
         ...user,
+        id: user.id,
+        email: user.email,
         name: updatedUser.name,
         phone: updatedUser.phone,
         profile_photo: updatedUser.profile_photo,
+        has_phone: updatedUser.has_phone,
+        has_whatsapp: updatedUser.has_whatsapp,
+        has_viber: updatedUser.has_viber,
+        address: updatedUser.address,
+        city: updatedUser.city,
+        username: updatedUser.username,
+        user_type: updatedUser.user_type,
+        role: user.role,
       }
       
       localStorage.setItem('automarket_user', JSON.stringify(newUserData))

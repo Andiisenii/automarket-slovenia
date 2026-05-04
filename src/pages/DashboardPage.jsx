@@ -147,10 +147,16 @@ function SettingsTab({ user, updateProfile, changePassword }) {
   const [settingsForm, setSettingsForm] = useState({
     name: user?.name || '',
     phone: user?.phone || '',
+    username: user?.username || '',
+    address: user?.address || '',
+    city: user?.city || '',
     userType: user?.user_type || 'private',
+    hasPhone: user?.has_phone !== 0,
+    hasWhatsapp: user?.has_whatsapp === 1,
+    hasViber: user?.has_viber === 1,
     photo: user?.profile_photo || '',
   })
-  const [photoPreview, setPhotoPreview] = useState(user?.profile_photo || '')
+  const [photoPreview, setPhotoPreview] = useState(user?.profile_photo || '' || user?.photo || '')
   const [saving, setSaving] = useState(false)
   
   // Password change state
@@ -189,6 +195,13 @@ function SettingsTab({ user, updateProfile, changePassword }) {
       const profileData = {
         name: settingsForm.name,
         phone: settingsForm.phone,
+        username: settingsForm.username,
+        address: settingsForm.address,
+        city: settingsForm.city,
+        userType: settingsForm.userType,
+        hasPhone: settingsForm.hasPhone,
+        hasWhatsapp: settingsForm.hasWhatsapp,
+        hasViber: settingsForm.hasViber,
         profile_photo: settingsForm.photo || null,
       }
       
@@ -277,6 +290,12 @@ function SettingsTab({ user, updateProfile, changePassword }) {
               className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
           </div>
           <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Uporabniško ime</label>
+            <input type="text" value={settingsForm.username} onChange={(e) => setSettingsForm({...settingsForm, username: e.target.value})}
+              placeholder="@username"
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
+          </div>
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
             <input type="email" value={user?.email || ''} disabled
               className="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl text-gray-500 cursor-not-allowed" />
@@ -287,6 +306,40 @@ function SettingsTab({ user, updateProfile, changePassword }) {
             <input type="tel" value={settingsForm.phone} onChange={(e) => setSettingsForm({...settingsForm, phone: e.target.value})}
               placeholder="+386 XX XXX XXX"
               className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Naslov</label>
+            <input type="text" value={settingsForm.address} onChange={(e) => setSettingsForm({...settingsForm, address: e.target.value})}
+              placeholder="Ulica in hisna stevilka"
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Kraj</label>
+            <input type="text" value={settingsForm.city} onChange={(e) => setSettingsForm({...settingsForm, city: e.target.value})}
+              placeholder="Ljubljana"
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
+          </div>
+        </div>
+        
+        {/* Contact Options */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Možnosti kontakta</label>
+          <div className="flex flex-wrap gap-4">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" checked={settingsForm.hasPhone} onChange={(e) => setSettingsForm({...settingsForm, hasPhone: e.target.checked})}
+                className="w-4 h-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500" />
+              <span>📞 Telefonski klic</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" checked={settingsForm.hasWhatsapp} onChange={(e) => setSettingsForm({...settingsForm, hasWhatsapp: e.target.checked})}
+                className="w-4 h-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500" />
+              <span>💬 WhatsApp</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" checked={settingsForm.hasViber} onChange={(e) => setSettingsForm({...settingsForm, hasViber: e.target.checked})}
+                className="w-4 h-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500" />
+              <span>📱 Viber</span>
+            </label>
           </div>
         </div>
         
