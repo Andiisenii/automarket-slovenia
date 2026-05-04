@@ -152,6 +152,50 @@ export function AuthProvider({ children }) {
     setUser(null)
   }
 
+  // Update user profile
+  const updateProfile = async (data) => {
+    if (!user?.id) {
+      throw new Error('Morate biti prijavljeni')
+    }
+    
+    try {
+      const { data: updatedUser, error } = await supabase
+        .from('users')
+        .update({
+          name: data.name || user.name,
+          phone: data.phone || null,
+          profile_photo: data.profile_photo || null,
+          has_phone: data.hasPhone ? 1 : 0,
+          has_whatsapp: data.hasWhatsapp ? 1 : 0,
+          has_viber: data.hasViber ? 1 : 0,
+        })
+        .eq('id', user.id)
+        .select()
+        .single()
+      
+      if (error) {
+        console.error('Profile update error:', error)
+        throw new Error(error.message || 'Napaka pri posodabljanju profila')
+      }
+      
+      // Update local state and storage
+      const newUserData = {
+        ...user,
+        name: updatedUser.name,
+        phone: updatedUser.phone,
+        profile_photo: updatedUser.profile_photo,
+      }
+      
+      localStorage.setItem('automarket_user', JSON.stringify(newUserData))
+      setUser(newUserData)
+      
+      return { success: true, user: updatedUser }
+    } catch (e) {
+      console.error('Update profile error:', e)
+      throw e
+    }
+  }
+
   const value = {
     user,
     loading,
@@ -159,6 +203,7 @@ export function AuthProvider({ children }) {
     login,
     register,
     logout,
+    updateProfile,
     isAuthenticated: !!user,
     isBusiness: user?.user_type === 'business',
     isPremium: false,
