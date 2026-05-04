@@ -3,8 +3,15 @@ import { useParams, Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 
-// Helper function to get feature name by ID
-const getFeatureById = (featureId) => {
+// Helper function to get feature name - handles both string names and numeric indices
+const getFeatureName = (featureId) => {
+  // Features are stored as string names directly in this app
+  // So if it's a string, return it as-is
+  if (typeof featureId === 'string') {
+    return featureId
+  }
+  
+  // If it's a number, try to look it up (for legacy data)
   const allEquipment = [
     // Car equipment
     'Zavorni sistem (ABS)', 'Elektronski program stabilnosti (ESP / DSC)', 'Elektronska blokada diferenciala', 'Centrarno zaklepanje', 'Avdio / Video oprema', 'Klima naprava (avtomatska)', 'Barvanje v notranjosti', 'Usnje',
@@ -16,7 +23,7 @@ const getFeatureById = (featureId) => {
     'Električna ročna zavora', 'Samodejno parkiranje', 'Panoramska streha', 'Sončna streha', 'Športni izpušni sistem',
     'Pnevmatno vzmetenje', 'Pospeševalnik', 'Volan v obliki obroča', 'Prezračevanje sedežev', 'Ogrevani sedeži',
     'Električno nastavljanje sedežev', 'Spominski sedeži', 'Vratljivi sedeži', 'Footrest', 'Massažni sedeži',
-    'Grelnik sedežev', 'Vetrobransko steklo', 'Ogrevan steklo', 'Praktična notranjost', 'Smartkey', 'Start-Stop sistem',
+    'Grelnik sedežev', 'Vetrobransko steklo', 'Ogrevano steklo', 'Praktična notranjost', 'Smartkey', 'Start-Stop sistem',
     'Pomoč za vzdrževanje voznega pasu', 'Slepa točka opozorilo', 'Prenos podatkov prek aplikacij',
     // Kamion equipment
     'Diesel', 'Bencin', 'Električni', 'Hibridni', 'Plinski',
@@ -44,13 +51,30 @@ const parseFeatureIds = (featureIds) => {
   }
   return []
 }
+
+// Helper to parse vehicleConditionSub
+const parseVehicleConditionSub = (conditionSub) => {
+  if (!conditionSub) return []
+  if (Array.isArray(conditionSub)) return conditionSub
+  if (typeof conditionSub === 'string') {
+    try {
+      const parsed = JSON.parse(conditionSub)
+      return Array.isArray(parsed) ? parsed : []
+    } catch {
+      return []
+    }
+  }
+  return []
+}
+
 import {
   ArrowLeft, Heart, Share2, Eye, Calendar, Gauge, Fuel,
   Settings, Shield, Phone, MessageCircle,
   Star, Check, Clock, AlertCircle, X, Send, Phone as PhoneIcon, MessageSquare, CreditCard,
-  Wifi, Car, Wind, Leaf, Users, AlertTriangle
+  Wifi, Car, Wind, Leaf, Users, AlertTriangle, Navigation, Zap, Wrench, GaugeCircle, Timer, CalendarDays, Key, FileCheck, Activity,
+  Box, Truck, Scale, Ruler, Package
 } from 'lucide-react'
-import { fuelTypes, transmissions, bodyTypes, doorCounts, colors, garancijaOptions, registracijaOptions } from '@/lib/data'
+import { fuelTypes, transmissions, bodyTypes, doorCounts, colors, garancijaOptions, registracijaOptions, vehicleCategories } from '@/lib/data'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
@@ -96,49 +120,90 @@ export function CarDetailPage() {
 
         if (dbCar) {
           // Transform from snake_case to camelCase
-          const carData = dbCar
           const transformedCar = {
-            ...carData,
-            title: carData.title || `${carData.brand} ${carData.model}`.trim(),
-            fuelType: carData.fuel_type || carData.fuelType || '',
-            bodyType: carData.body_type || carData.bodyType || '',
-            transmission: carData.transmission || carData.transmission || '',
-            engine: carData.engine || carData.engine || '',
-            horsepower: carData.horsepower || carData.horsepower || 0,
-            color: carData.color || carData.color || '',
-            vehicleCondition: carData.vehicle_condition || carData.vehicleCondition || '',
-            hasFinancing: carData.has_financing ?? carData.hasFinancing ?? false,
-            monthlyBudget: carData.monthly_budget ?? carData.monthlyBudget ?? 0,
-            downPaymentType: carData.down_payment_type || carData.downPaymentType || 'amount',
-            downPaymentValue: carData.down_payment_value || carData.downPaymentValue || 0,
-            featureIds: parseFeatureIds(carData.feature_ids),
-            createdAt: carData.created_at || carData.createdAt,
+            ...dbCar,
+            title: dbCar.title || `${dbCar.brand} ${dbCar.model}`.trim(),
+            fuelType: dbCar.fuel_type || dbCar.fuelType || '',
+            bodyType: dbCar.body_type || dbCar.bodyType || '',
+            transmission: dbCar.transmission || '',
+            engine: dbCar.engine || '',
+            horsepower: dbCar.horsepower || 0,
+            color: dbCar.color || '',
+            vehicleCondition: dbCar.vehicle_condition || '',
+            vehicleConditionSub: parseVehicleConditionSub(dbCar.vehicle_condition_sub),
+            featureIds: parseFeatureIds(dbCar.feature_ids),
+            createdAt: dbCar.created_at || dbCar.createdAt,
+            vehicleCategory: dbCar.vehicle_category || 'avto',
+            vehicleSubCategory: dbCar.vehicle_sub_category || '',
+            vehicleSubCategoryDetail: dbCar.vehicle_sub_category_detail || '',
             seller: {
-              name: carData.seller_name || carData.seller?.name || 'Seller',
-              phone: carData.seller_phone || carData.seller?.phone || '',
-              photo: carData.seller_photo || carData.seller?.photo || '',
-              verified: carData.seller_verified || carData.seller?.verified || false,
-              rating: carData.seller_rating || carData.seller?.rating || '5.0',
-              reviews: carData.seller_reviews || carData.seller?.reviews || 0,
-              userType: carData.seller_type || carData.seller?.userType || 'private',
-              hasPhone: carData.seller_has_phone ?? carData.seller?.hasPhone ?? true,
-              hasWhatsapp: carData.seller_has_whatsapp ?? carData.seller?.hasWhatsapp ?? false,
-              hasViber: carData.seller_has_viber ?? carData.seller?.hasViber ?? false,
-            }
+              name: dbCar.seller_name || 'Seller',
+              phone: dbCar.seller_phone || '',
+              photo: dbCar.seller_photo || '',
+              verified: dbCar.seller_verified || false,
+              rating: dbCar.seller_rating || '5.0',
+              reviews: dbCar.seller_reviews || 0,
+              userType: dbCar.seller_user_type || 'private',
+              hasPhone: dbCar.seller_has_phone ?? true,
+              hasWhatsapp: dbCar.seller_has_whatsapp ?? false,
+              hasViber: dbCar.seller_has_viber ?? false,
+            },
+            // Fuel
+            fuelConsumption: dbCar.fuel_consumption || '',
+            emissionClass: dbCar.emission_class || '',
+            co2Emissions: dbCar.co2_emissions || '',
+            // Age & ownership
+            vehicleAge: dbCar.vehicle_age || '',
+            hasWarranty: dbCar.has_warranty || false,
+            hasGuarantee: dbCar.has_guarantee || false,
+            hasOldtimerCert: dbCar.has_oldtimer_cert || false,
+            // Registration
+            firstRegMonth: dbCar.first_reg_month || '',
+            firstRegYear: dbCar.first_reg_year || '',
+            technicalValidUntil: dbCar.technical_valid_until || '',
+            ownerCount: dbCar.owner_count || '',
+            // Motor specific
+            engineCapacity: dbCar.engine_capacity || '',
+            enginePowerKw: dbCar.engine_power_kw || '',
+            cylinderCount: dbCar.cylinder_count || '',
+            engineStroke: dbCar.engine_stroke || '',
+            diffLock: dbCar.diff_lock || '',
+            startType: dbCar.start_type || '',
+            // Kamion specific
+            airbagCountKamion: dbCar.airbag_count_kamion || '',
+            nosilnost: dbCar.nosilnost || '',
+            tovorniProstor: dbCar.tovorni_prostor || '',
+            zadnjaVrata: parseFeatureIds(dbCar.zadnja_vrata),
+            stranskaVrata: parseFeatureIds(dbCar.stranska_vrata),
+            barvaOblazinjenja: dbCar.barva_oblazinjenja || '',
+            oblazinjenje: dbCar.oblazinjenje || '',
+            strehaVozila: parseFeatureIds(dbCar.streha_vozila),
+            vin: dbCar.vin || '',
+            // Tovorna prikolica
+            dolzina: dbCar.dolzina || '',
+            sirina: dbCar.sirina || '',
+            stevOsi: dbCar.stev_osi || '',
+            dovoljenaSkupnaTezza: dbCar.dovoljena_skupna_tezza || '',
+            volumen: dbCar.volumen || '',
+            // UTV
+            utvEngineCapacity: dbCar.utv_engine_capacity || '',
+            utvEnginePowerKm: dbCar.utv_engine_power_km || '',
+            utvCylinderCount: dbCar.utv_cylinder_count || '',
+            utvEngineStroke: dbCar.utv_engine_stroke || '',
+            utvDiffLock: dbCar.utv_diff_lock || '',
+            utvStartType: dbCar.utv_start_type || '',
           }
-          // console.log('Transformed car data:', transformedCar)
           setCar(transformedCar)
         } else {
           setError('Car not found')
         }
       } catch (err) {
         console.error('Error fetching car:', err)
-        // Fallback to context
         const contextCar = getCarById(parseInt(id))
         if (contextCar) {
           setCar(contextCar)
         } else {
-          setError('Failed to load car from Supabase: ' + err.message)
+          setError('Failed to load car: ' + err.message)
         }
       }
 
@@ -184,35 +249,89 @@ export function CarDetailPage() {
   }
 
   const isFav = checkFavorite(car.id)
+  
+  // Get vehicle category label
+  const getVehicleCategoryLabel = () => {
+    const cat = vehicleCategories.find(c => c.value === car.vehicleCategory)
+    return cat ? cat.label : (car.vehicleCategory || 'Avto')
+  }
+
+  // Build specs based on vehicle category
   const specs = [
     { icon: Calendar, label: t('year'), value: car.year },
-    { icon: Gauge, label: t('mileage'), value: `${formatNumber(Number(car.mileage))} km` },
+    { icon: Gauge, label: t('mileage'), value: car.mileage ? `${formatNumber(Number(car.mileage))} km` : 'N/A' },
     { icon: Fuel, label: t('fuelType'), value: car.fuelType || 'N/A' },
     { icon: Settings, label: t('transmission'), value: car.transmission || 'N/A' },
     { icon: Shield, label: t('engine'), value: car.engine || 'N/A' },
-    { icon: Shield, label: t('power'), value: car.horsepower ? `${car.horsepower} HP` : 'N/A' },
-    { icon: Shield, label: t('color'), value: car.color || 'N/A' },
-    { icon: Shield, label: t('bodyType'), value: car.bodyType || 'N/A' },
-    { icon: AlertTriangle, label: 'Stanje vozila', value: car.vehicleCondition || 'N/A' },
+    { icon: Zap, label: t('power'), value: car.horsepower ? `${car.horsepower} HP` : 'N/A' },
+    { icon: Car, label: t('color'), value: car.color || 'N/A' },
+    { icon: Car, label: t('bodyType'), value: car.bodyType || 'N/A' },
+    { icon: AlertTriangle, label: 'Stanje', value: car.vehicleCondition || 'N/A' },
   ]
 
-  // Get selected features with names - fully inline safe handling
+  // Add category-specific specs
+  if (car.vehicleCategory === 'moto') {
+    specs.push(
+      { icon: GaugeCircle, label: 'Prostornina', value: car.engineCapacity ? `${car.engineCapacity} ccm` : 'N/A' },
+      { icon: Zap, label: 'Moč (kW)', value: car.enginePowerKw ? `${car.enginePowerKw} kW` : 'N/A' },
+      { icon: Settings, label: 'Valjov', value: car.cylinderCount || 'N/A' },
+      { icon: Activity, label: 'Takt', value: car.engineStroke || 'N/A' },
+      { icon: Settings, label: 'Blokada', value: car.diffLock || 'N/A' },
+      { icon: Key, label: 'Zagon', value: car.startType || 'N/A' }
+    )
+  }
+
+  if (car.vehicleCategory === 'kamion') {
+    specs.push(
+      { icon: Users, label: 'Airbagov', value: car.airbagCountKamion || 'N/A' },
+      { icon: Weight, label: 'Nosilnost', value: car.nosilnost ? `${formatNumber(Number(car.nosilnost))} kg` : 'N/A' },
+      { icon: Box, label: 'Tovorni prostor', value: car.tovorniProstor ? `${car.tovorniProstor} m³` : 'N/A' },
+      { icon: Key, label: 'VIN', value: car.vin || 'N/A' }
+    )
+    
+    if (car.vehicleSubCategory === 'Tovorneprikolice') {
+      specs.push(
+        { icon: Ruler, label: 'Dolžina', value: car.dolzina ? `${car.dolzina} m` : 'N/A' },
+        { icon: Ruler, label: 'Širina', value: car.sirina ? `${car.sirina} m` : 'N/A' },
+        { icon: Settings, label: 'Osi', value: car.stevOsi || 'N/A' },
+        { icon: Weight, label: 'Skupna teža', value: car.dovoljenaSkupnaTezza ? `${formatNumber(Number(car.dovoljenaSkupnaTezza))} kg` : 'N/A' },
+        { icon: Box, label: 'Volumen', value: car.volumen ? `${car.volumen} m³` : 'N/A' }
+      )
+    }
+    
+    if (car.vehicleSubCategory === 'UTV Vozila') {
+      specs.push(
+        { icon: GaugeCircle, label: 'Prostornina', value: car.utvEngineCapacity ? `${car.utvEngineCapacity} ccm` : 'N/A' },
+        { icon: Zap, label: 'Moč (KM)', value: car.utvEnginePowerKm || 'N/A' },
+        { icon: Settings, label: 'Valjov', value: car.utvCylinderCount || 'N/A' },
+        { icon: Activity, label: 'Takt', value: car.utvEngineStroke || 'N/A' },
+        { icon: Settings, label: 'Blokada', value: car.utvDiffLock || 'N/A' },
+        { icon: Key, label: 'Zagon', value: car.utvStartType || 'N/A' }
+      )
+    }
+  }
+
+  // Get selected features with names
   const rawFeatureIds = car?.featureIds
   let selectedFeatureIds = []
   if (rawFeatureIds) {
     if (Array.isArray(rawFeatureIds)) {
       selectedFeatureIds = rawFeatureIds
-    } else if (typeof rawFeatureIds === 'string' && rawFeatureIds.startsWith('[')) {
-      try { selectedFeatureIds = JSON.parse(rawFeatureIds) } catch { selectedFeatureIds = [] }
+    } else if (typeof rawFeatureIds === 'string') {
+      try { 
+        const parsed = JSON.parse(rawFeatureIds)
+        selectedFeatureIds = Array.isArray(parsed) ? parsed : []
+      } catch { 
+        selectedFeatureIds = [] 
+      }
     }
   }
   
-  // Build feature list for display - safe map
+  // Build feature list for display - now using getFeatureName which handles strings directly
   const featuresToDisplay = Array.isArray(selectedFeatureIds) 
     ? selectedFeatureIds.map((id) => {
-        const strId = String(id)
-        return getFeatureById(strId) || `Oprema ${strId}`
-      })
+        return getFeatureName(id)
+      }).filter(Boolean)
     : []
 
   const handleSendMessage = () => {
@@ -382,7 +501,7 @@ export function CarDetailPage() {
 
               <div className="flex items-center gap-2 text-gray-500">
                 <Eye className="w-5 h-5" />
-                <span className="text-sm">{formatNumber(car.views)} views</span>
+                <span className="text-sm">{formatNumber(car.views || 0)} views</span>
               </div>
             </div>
 
@@ -414,7 +533,9 @@ export function CarDetailPage() {
                     </a>
                   )}
                   <div className="text-sm text-gray-500">
-                    Estimated: {formatPrice(Number(car.price) * 1.1)} with VAT</div>{car.featured && <div className="text-xs text-orange-600 font-medium mt-1">? Featured</div>}{car.promoted && <div className="text-xs text-green-600 font-medium">? Promoted</div>}
+                    Estimated: {formatPrice(Number(car.price) * 1.1)} with VAT</div>
+                  {car.featured && <div className="text-xs text-orange-600 font-medium mt-1">★ Featured</div>}
+                  {car.promoted && <div className="text-xs text-green-600 font-medium">★ Promoted</div>}
 
                   {/* Financing Info */}
                   {car.hasFinancing && (
@@ -445,9 +566,15 @@ export function CarDetailPage() {
 
               {/* Badges */}
               <div className="flex flex-wrap gap-2">
+                {/* Vehicle Category Badge */}
+                <Badge variant="info">{getVehicleCategoryLabel()}</Badge>
+                {car.vehicleSubCategory && (
+                  <Badge variant="secondary">{car.vehicleSubCategory}</Badge>
+                )}
+                {car.vehicleSubCategoryDetail && (
+                  <Badge variant="outline">{car.vehicleSubCategoryDetail}</Badge>
+                )}
                 {car.featured && <Badge variant="warning">Featured</Badge>}
-
-                {/* Promotion Badges - specific to THIS car */}
                 {Number(car.promoted) === 1 && (car.boostPackage || car.boost_package) === 'akcija' && (
                   <Badge className="bg-orange-500 text-white">🔥 AKCIJA</Badge>
                 )}
@@ -457,17 +584,6 @@ export function CarDetailPage() {
                 {Number(car.promoted) === 1 && (car.boostPackage || car.boost_package) === 'skok' && (
                   <Badge className="bg-blue-500 text-white">🚀 SKOK NA VRH</Badge>
                 )}
-                {Number(car.promoted) === 1 && (car.boostPackage || car.boost_package) === 'akcija_p' && (
-                  <Badge className="bg-orange-500 text-white">🔥 AKCIJA</Badge>
-                )}
-                {Number(car.promoted) === 1 && (car.boostPackage || car.boost_package) === 'top_p' && (
-                  <Badge className="bg-green-500 text-white">⭐ TOP</Badge>
-                )}
-                {Number(car.promoted) === 1 && (car.boostPackage || car.boost_package) === 'skok_p' && (
-                  <Badge className="bg-blue-500 text-white">🚀 SKOK NA VRH</Badge>
-                )}
-
-                
                 <Badge variant="success">Active</Badge>
                 <Badge variant="primary">{car.bodyType}</Badge>
               </div>
@@ -493,9 +609,9 @@ export function CarDetailPage() {
             {/* Specifications */}
             <Card className="p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Specifications</h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {specs.map((spec) => (
-                  <div key={spec.label} className="p-4 bg-gray-50 rounded-xl">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {specs.map((spec, idx) => (
+                  <div key={`${spec.label}-${idx}`} className="p-4 bg-gray-50 rounded-xl">
                     <div className="flex items-center gap-2 text-gray-500 mb-1">
                       <spec.icon className="w-4 h-4" />
                       <span className="text-xs">{spec.label}</span>
@@ -506,10 +622,303 @@ export function CarDetailPage() {
               </div>
             </Card>
 
+            {/* Fuel Consumption & Emissions */}
+            {(car.fuelConsumption || car.emissionClass || car.co2Emissions) && (
+              <Card className="p-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <Leaf className="w-5 h-5 text-green-600" />
+                  Poraba goriva in emisije (NEDC)
+                </h2>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {car.fuelConsumption && (
+                    <div className="p-4 bg-green-50 rounded-xl">
+                      <div className="text-xs text-gray-500 mb-1">Kombinirana poraba</div>
+                      <div className="font-bold text-green-800">{car.fuelConsumption} l/100km</div>
+                    </div>
+                  )}
+                  {car.emissionClass && (
+                    <div className="p-4 bg-green-50 rounded-xl">
+                      <div className="text-xs text-gray-500 mb-1">Emisijski razred</div>
+                      <div className="font-bold text-green-800">{car.emissionClass}</div>
+                    </div>
+                  )}
+                  {car.co2Emissions && (
+                    <div className="p-4 bg-green-50 rounded-xl">
+                      <div className="text-xs text-gray-500 mb-1">CO2 emisija</div>
+                      <div className="font-bold text-green-800">{car.co2Emissions} g/km</div>
+                    </div>
+                  )}
+                </div>
+              </Card>
+            )}
+
+            {/* Vehicle Age, Ownership & Registration */}
+            <Card className="p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <CalendarDays className="w-5 h-5 text-blue-600" />
+                Starost in lastništvo
+              </h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {car.vehicleAge && (
+                  <div className="p-4 bg-blue-50 rounded-xl">
+                    <div className="text-xs text-gray-500 mb-1">Starost vozila</div>
+                    <div className="font-semibold text-gray-900">{car.vehicleAge}</div>
+                  </div>
+                )}
+                {car.ownerCount && (
+                  <div className="p-4 bg-blue-50 rounded-xl">
+                    <div className="text-xs text-gray-500 mb-1">Število lastnikov</div>
+                    <div className="font-semibold text-gray-900">{car.ownerCount}</div>
+                  </div>
+                )}
+                {(car.firstRegMonth || car.firstRegYear) && (
+                  <div className="p-4 bg-blue-50 rounded-xl">
+                    <div className="text-xs text-gray-500 mb-1">Prva registracija</div>
+                    <div className="font-semibold text-gray-900">{car.firstRegMonth} {car.firstRegYear}</div>
+                  </div>
+                )}
+                {car.technicalValidUntil && (
+                  <div className="p-4 bg-blue-50 rounded-xl">
+                    <div className="text-xs text-gray-500 mb-1">Tehnični pregled</div>
+                    <div className="font-semibold text-gray-900">{car.technicalValidUntil}</div>
+                  </div>
+                )}
+              </div>
+              
+              {/* Warranty/Certificates */}
+              {(car.hasWarranty || car.hasGuarantee || car.hasOldtimerCert) && (
+                <div className="flex flex-wrap gap-2 mt-4">
+                  {car.hasWarranty && (
+                    <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-100 text-green-800 text-sm rounded-full">
+                      <FileCheck className="w-4 h-4" />
+                      Garancija
+                    </span>
+                  )}
+                  {car.hasGuarantee && (
+                    <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-100 text-green-800 text-sm rounded-full">
+                      <Shield className="w-4 h-4" />
+                      Jamstvo
+                    </span>
+                  )}
+                  {car.hasOldtimerCert && (
+                    <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-purple-100 text-purple-800 text-sm rounded-full">
+                      <Star className="w-4 h-4" />
+                      Oldtimer certifikat
+                    </span>
+                  )}
+                </div>
+              )}
+            </Card>
+
+            {/* Kamion specific details */}
+            {car.vehicleCategory === 'kamion' && (
+              <>
+                {/* Kamion general info */}
+                <Card className="p-6">
+                  <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <Truck className="w-5 h-5 text-orange-600" />
+                    Podatki za dostavno vozilo
+                  </h2>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {car.airbagCountKamion && (
+                      <div className="p-4 bg-orange-50 rounded-xl">
+                        <div className="text-xs text-gray-500 mb-1">Število airbagov</div>
+                        <div className="font-bold text-gray-900">{car.airbagCountKamion}</div>
+                      </div>
+                    )}
+                    {car.nosilnost && (
+                      <div className="p-4 bg-orange-50 rounded-xl">
+                        <div className="text-xs text-gray-500 mb-1">Nosilnost</div>
+                        <div className="font-bold text-gray-900">{formatNumber(Number(car.nosilnost))} kg</div>
+                      </div>
+                    )}
+                    {car.tovorniProstor && (
+                      <div className="p-4 bg-orange-50 rounded-xl">
+                        <div className="text-xs text-gray-500 mb-1">Tovorni prostor</div>
+                        <div className="font-bold text-gray-900">{car.tovorniProstor} m³</div>
+                      </div>
+                    )}
+                    {car.vin && (
+                      <div className="p-4 bg-orange-50 rounded-xl">
+                        <div className="text-xs text-gray-500 mb-1">VIN / štev. šasije</div>
+                        <div className="font-bold text-gray-900 font-mono text-sm">{car.vin}</div>
+                      </div>
+                    )}
+                    {car.barvaOblazinjenja && (
+                      <div className="p-4 bg-orange-50 rounded-xl">
+                        <div className="text-xs text-gray-500 mb-1">Barva oblazinjenja</div>
+                        <div className="font-bold text-gray-900">{car.barvaOblazinjenja}</div>
+                      </div>
+                    )}
+                    {car.oblazinjenje && (
+                      <div className="p-4 bg-orange-50 rounded-xl">
+                        <div className="text-xs text-gray-500 mb-1">Oblazinjenje</div>
+                        <div className="font-bold text-gray-900">{car.oblazinjenje}</div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Multi-checkbox fields */}
+                  {car.zadnjaVrata?.length > 0 && (
+                    <div className="mt-4">
+                      <div className="text-xs text-gray-500 mb-2">Zadnja vrata</div>
+                      <div className="flex flex-wrap gap-2">
+                        {car.zadnjaVrata.map((v, idx) => (
+                          <span key={idx} className="px-3 py-1.5 bg-orange-100 text-orange-800 text-sm rounded-full">
+                            {v}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {car.stranskaVrata?.length > 0 && (
+                    <div className="mt-4">
+                      <div className="text-xs text-gray-500 mb-2">Stranska vrata</div>
+                      <div className="flex flex-wrap gap-2">
+                        {car.stranskaVrata.map((v, idx) => (
+                          <span key={idx} className="px-3 py-1.5 bg-orange-100 text-orange-800 text-sm rounded-full">
+                            {v}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {car.strehaVozila?.length > 0 && (
+                    <div className="mt-4">
+                      <div className="text-xs text-gray-500 mb-2">Streha vozila</div>
+                      <div className="flex flex-wrap gap-2">
+                        {car.strehaVozila.map((v, idx) => (
+                          <span key={idx} className="px-3 py-1.5 bg-orange-100 text-orange-800 text-sm rounded-full">
+                            {v}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </Card>
+
+                {/* Tovorna prikolica specific */}
+                {car.vehicleSubCategory === 'Tovorneprikolice' && (
+                  <Card className="p-6">
+                    <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                      <Box className="w-5 h-5 text-purple-600" />
+                      Karakteristike tovorne prikolice
+                    </h2>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {car.dolzina && (
+                        <div className="p-4 bg-purple-50 rounded-xl">
+                          <div className="text-xs text-gray-500 mb-1">Dolžina</div>
+                          <div className="font-bold text-gray-900">{car.dolzina} m</div>
+                        </div>
+                      )}
+                      {car.sirina && (
+                        <div className="p-4 bg-purple-50 rounded-xl">
+                          <div className="text-xs text-gray-500 mb-1">Širina</div>
+                          <div className="font-bold text-gray-900">{car.sirina} m</div>
+                        </div>
+                      )}
+                      {car.stevOsi && (
+                        <div className="p-4 bg-purple-50 rounded-xl">
+                          <div className="text-xs text-gray-500 mb-1">Štev. osi</div>
+                          <div className="font-bold text-gray-900">{car.stevOsi}</div>
+                        </div>
+                      )}
+                      {car.nosilnost && (
+                        <div className="p-4 bg-purple-50 rounded-xl">
+                          <div className="text-xs text-gray-500 mb-1">Nosilnost</div>
+                          <div className="font-bold text-gray-900">{formatNumber(Number(car.nosilnost))} kg</div>
+                        </div>
+                      )}
+                      {car.dovoljenaSkupnaTezza && (
+                        <div className="p-4 bg-purple-50 rounded-xl">
+                          <div className="text-xs text-gray-500 mb-1">Dov. skupna teža</div>
+                          <div className="font-bold text-gray-900">{formatNumber(Number(car.dovoljenaSkupnaTezza))} kg</div>
+                        </div>
+                      )}
+                      {car.volumen && (
+                        <div className="p-4 bg-purple-50 rounded-xl">
+                          <div className="text-xs text-gray-500 mb-1">Volumen</div>
+                          <div className="font-bold text-gray-900">{car.volumen} m³</div>
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+                )}
+
+                {/* UTV specific */}
+                {car.vehicleSubCategory === 'UTV Vozila' && (
+                  <Card className="p-6">
+                    <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                      <Settings className="w-5 h-5 text-green-600" />
+                      Tehnične karakteristike UTV
+                    </h2>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {car.utvEngineCapacity && (
+                        <div className="p-4 bg-green-50 rounded-xl">
+                          <div className="text-xs text-gray-500 mb-1">Prostornina</div>
+                          <div className="font-bold text-gray-900">{car.utvEngineCapacity} ccm</div>
+                        </div>
+                      )}
+                      {car.utvEnginePowerKm && (
+                        <div className="p-4 bg-green-50 rounded-xl">
+                          <div className="text-xs text-gray-500 mb-1">Moč (KM)</div>
+                          <div className="font-bold text-gray-900">{car.utvEnginePowerKm} KM</div>
+                        </div>
+                      )}
+                      {car.utvCylinderCount && (
+                        <div className="p-4 bg-green-50 rounded-xl">
+                          <div className="text-xs text-gray-500 mb-1">Število valjev</div>
+                          <div className="font-bold text-gray-900">{car.utvCylinderCount}</div>
+                        </div>
+                      )}
+                      {car.utvEngineStroke && (
+                        <div className="p-4 bg-green-50 rounded-xl">
+                          <div className="text-xs text-gray-500 mb-1">Takt motorja</div>
+                          <div className="font-bold text-gray-900">{car.utvEngineStroke}</div>
+                        </div>
+                      )}
+                      {car.utvDiffLock && (
+                        <div className="p-4 bg-green-50 rounded-xl">
+                          <div className="text-xs text-gray-500 mb-1">Blokada</div>
+                          <div className="font-bold text-gray-900">{car.utvDiffLock}</div>
+                        </div>
+                      )}
+                      {car.utvStartType && (
+                        <div className="p-4 bg-green-50 rounded-xl">
+                          <div className="text-xs text-gray-500 mb-1">Zagon</div>
+                          <div className="font-bold text-gray-900">{car.utvStartType}</div>
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+                )}
+              </>
+            )}
+
+            {/* Vehicle Condition Sub-options */}
+            {car.vehicleConditionSub?.length > 0 && (
+              <Card className="p-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Stanje vozila - podrobnosti</h2>
+                <div className="flex flex-wrap gap-2">
+                  {car.vehicleConditionSub.map((sub, idx) => (
+                    <span key={idx} className="inline-flex items-center gap-1 px-3 py-2 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-lg">
+                      <Check className="w-4 h-4" />
+                      {sub}
+                    </span>
+                  ))}
+                </div>
+              </Card>
+            )}
+
             {/* Features / Equipment */}
             {featuresToDisplay.length > 0 && (
               <Card className="p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Oprema vozila</h2>
+                <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <Wrench className="w-5 h-5 text-green-600" />
+                  Oprema vozila
+                </h2>
                 <div className="flex flex-wrap gap-2">
                   {featuresToDisplay.map((featureName, idx) => (
                     <div
@@ -765,3 +1174,5 @@ export function CarDetailPage() {
     </div>
   )
 }
+
+
