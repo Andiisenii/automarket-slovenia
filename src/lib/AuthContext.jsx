@@ -170,13 +170,18 @@ export function AuthProvider({ children }) {
         name: data.name || user.name,
         phone: data.phone || null,
         profile_photo: data.profile_photo || null,
-        has_phone: data.hasPhone ? 1 : 0,
-        has_whatsapp: data.hasWhatsapp ? 1 : 0,
-        has_viber: data.hasViber ? 1 : 0,
-        address: data.address || null,
-        city: data.city || null,
-        username: data.username || null,
-        user_type: data.userType || user.user_type,
+        has_phone: data.hasPhone !== undefined ? (data.hasPhone ? 1 : 0) : user.has_phone,
+        has_whatsapp: data.hasWhatsapp !== undefined ? (data.hasWhatsapp ? 1 : 0) : user.has_whatsapp,
+        has_viber: data.hasViber !== undefined ? (data.hasViber ? 1 : 0) : user.has_viber,
+        address: data.address !== undefined ? (data.address || null) : user.address,
+        city: data.city !== undefined ? (data.city || null) : user.city,
+        // Business fields
+        company_name: data.company_name !== undefined ? (data.company_name || null) : user.company_name,
+        company_address: data.company_address !== undefined ? (data.company_address || null) : user.company_address,
+        company_city: data.company_city !== undefined ? (data.company_city || null) : user.company_city,
+        company_postal_code: data.company_postal_code !== undefined ? (data.company_postal_code || null) : user.company_postal_code,
+        tax_id: data.tax_id !== undefined ? (data.tax_id || null) : user.tax_id,
+        website: data.website !== undefined ? (data.website || null) : user.website,
       }
       
       const { data: updatedUser, error } = await supabase
@@ -207,6 +212,13 @@ export function AuthProvider({ children }) {
         username: updatedUser.username,
         user_type: updatedUser.user_type,
         role: user.role,
+        // Business fields
+        company_name: updatedUser.company_name,
+        company_address: updatedUser.company_address,
+        company_city: updatedUser.company_city,
+        company_postal_code: updatedUser.company_postal_code,
+        tax_id: updatedUser.tax_id,
+        website: updatedUser.website,
       }
       
       localStorage.setItem('automarket_user', JSON.stringify(newUserData))

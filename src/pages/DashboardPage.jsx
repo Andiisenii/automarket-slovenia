@@ -153,9 +153,17 @@ function SettingsTab({ user, updateProfile, changePassword }) {
     hasWhatsapp: user?.has_whatsapp === 1,
     hasViber: user?.has_viber === 1,
     photo: user?.profile_photo || '',
+    // Business fields
+    companyName: user?.company_name || '',
+    companyAddress: user?.company_address || '',
+    companyCity: user?.company_city || '',
+    companyPostalCode: user?.company_postal_code || '',
+    taxId: user?.tax_id || '',
+    website: user?.website || '',
   })
-  const [photoPreview, setPhotoPreview] = useState(user?.profile_photo || '' || user?.photo || '')
+  const [photoPreview, setPhotoPreview] = useState(user?.profile_photo || '')
   const [saving, setSaving] = useState(false)
+  const isBusiness = user?.user_type === 'business'
   
   // Password change state
   const [showPasswordForm, setShowPasswordForm] = useState(false)
@@ -188,6 +196,11 @@ function SettingsTab({ user, updateProfile, changePassword }) {
       return
     }
     
+    if (isBusiness && !settingsForm.companyName.trim()) {
+      alert('Ime podjetja je obvezno za poslovne uporabnike')
+      return
+    }
+    
     setSaving(true)
     try {
       const profileData = {
@@ -199,6 +212,13 @@ function SettingsTab({ user, updateProfile, changePassword }) {
         hasWhatsapp: settingsForm.hasWhatsapp,
         hasViber: settingsForm.hasViber,
         profile_photo: settingsForm.photo || null,
+        // Business fields
+        company_name: isBusiness ? settingsForm.companyName : null,
+        company_address: isBusiness ? settingsForm.companyAddress : null,
+        company_city: isBusiness ? settingsForm.companyCity : null,
+        company_postal_code: isBusiness ? settingsForm.companyPostalCode : null,
+        tax_id: isBusiness ? settingsForm.taxId : null,
+        website: isBusiness ? settingsForm.website : null,
       }
       
       const result = await updateProfile(profileData)
@@ -332,6 +352,53 @@ function SettingsTab({ user, updateProfile, changePassword }) {
             </label>
           </div>
         </div>
+        
+        {/* Business Fields - Only for business users */}
+        {isBusiness && (
+          <div className="border-t pt-6">
+            <h4 className="font-medium text-gray-900 mb-4 flex items-center gap-2">
+              <span>🏢</span> Podatki podjetja
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Ime podjetja *</label>
+                <input type="text" value={settingsForm.companyName} onChange={(e) => setSettingsForm({...settingsForm, companyName: e.target.value})}
+                  placeholder="Naziv podjetja d.o.o."
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Naslov podjetja</label>
+                <input type="text" value={settingsForm.companyAddress} onChange={(e) => setSettingsForm({...settingsForm, companyAddress: e.target.value})}
+                  placeholder="Ulica in hisna stevilka"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Kraj</label>
+                <input type="text" value={settingsForm.companyCity} onChange={(e) => setSettingsForm({...settingsForm, companyCity: e.target.value})}
+                  placeholder="Ljubljana"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Postna stevilka</label>
+                <input type="text" value={settingsForm.companyPostalCode} onChange={(e) => setSettingsForm({...settingsForm, companyPostalCode: e.target.value})}
+                  placeholder="1000"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Davcna stevilka (ID za DDV)</label>
+                <input type="text" value={settingsForm.taxId} onChange={(e) => setSettingsForm({...settingsForm, taxId: e.target.value})}
+                  placeholder="SI12345678"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Spletna stran</label>
+                <input type="text" value={settingsForm.website} onChange={(e) => setSettingsForm({...settingsForm, website: e.target.value})}
+                  placeholder="https://www.podjetje.si"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
+              </div>
+            </div>
+          </div>
+        )}
         
         {/* Save Button */}
         <div className="flex justify-end">
