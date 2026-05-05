@@ -146,6 +146,7 @@ const BOOST_PLANS_PRIVATE = [
 function SettingsTab({ user, updateProfile, changePassword }) {
   const [settingsForm, setSettingsForm] = useState({
     name: user?.name || '',
+    username: user?.username || '',
     phone: user?.phone || '',
     address: user?.address || '',
     city: user?.city || '',
@@ -205,6 +206,7 @@ function SettingsTab({ user, updateProfile, changePassword }) {
     try {
       const profileData = {
         name: settingsForm.name,
+        username: settingsForm.username,
         phone: settingsForm.phone,
         address: settingsForm.address,
         city: settingsForm.city,
@@ -303,6 +305,12 @@ function SettingsTab({ user, updateProfile, changePassword }) {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Ime in priimek *</label>
             <input type="text" value={settingsForm.name} onChange={(e) => setSettingsForm({...settingsForm, name: e.target.value})}
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Uporabniško ime</label>
+            <input type="text" value={settingsForm.username} onChange={(e) => setSettingsForm({...settingsForm, username: e.target.value})}
+              placeholder="@username"
               className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
           </div>
           <div>

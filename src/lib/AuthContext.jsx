@@ -168,6 +168,7 @@ export function AuthProvider({ children }) {
       // Build update object with all columns
       const updateData = {
         name: data.name || user.name,
+        username: data.username !== undefined ? (data.username || null) : user.username,
         phone: data.phone || null,
         profile_photo: data.profile_photo || null,
         has_phone: data.hasPhone !== undefined ? (data.hasPhone ? 1 : 0) : user.has_phone,
