@@ -1,0 +1,6 @@
+{
+  "id": "send-reset-email",
+  "name": "Send Reset Email",
+  "description": "Sends password reset emails using Resend API",
+  "verify_jwt": false
+}

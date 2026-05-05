@@ -1195,15 +1195,16 @@ export function ResetPasswordPage() {
       if (userError || !user) {
         // Don't reveal if email exists for security
         setStep('verify')
-        setMessage('Če e-naslov obstaja, smo poslali kodo za ponastavitev.')
+        setMessage('Ce e-naslov obstaja, smo poslali kodo za ponastavitev.')
         setLoading(false)
         return
       }
       
-      // Generate and store reset code
+      // Generate reset code
       const code = generateCode()
       const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString() // 15 minutes
       
+      // Store reset code in database
       const { error: insertError } = await supabase
         .from('password_resets')
         .insert({
@@ -1218,13 +1219,35 @@ export function ResetPasswordPage() {
         console.error('Insert reset code error:', insertError)
       }
       
-      // For demo: show code in console (in production, this would be sent via email)
-      console.log('🔐 Password reset code:', code)
-      console.log('📧 Email would be sent to:', email)
-      console.log('📧 Admin email: info@vozilo.si')
+      // Send real email via Supabase Edge Function
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+      
+      try {
+        const response = await fetch(`${supabaseUrl}/functions/v1/send-reset-email`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: email.toLowerCase(),
+            name: user.name || '',
+            code: code,
+          }),
+        })
+        
+        const result = await response.json()
+        
+        if (result.success) {
+          console.log('Email sent successfully!')
+        } else {
+          console.log('Email sending result:', result)
+        }
+      } catch (emailError) {
+        console.error('Email sending error:', emailError)
+      }
       
       setStep('verify')
-      setMessage('Koda za ponastavitev je bila poslana. Preverite svoj e-naslov ali kontaktirajte info@vozilo.si.')
+      setMessage('Koda za ponastavitev je bila poslana na vas e-naslov. Preverite poste (tudi SPAM).')
       
     } catch (err) {
       console.error('Request reset error:', err)
