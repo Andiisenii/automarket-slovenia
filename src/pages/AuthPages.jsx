@@ -154,18 +154,6 @@ export function LoginPage() {
           </p>
         </motion.div>
       </div>
-
-      {/* Right Side - Welcome Image */}
-      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-black via-gray-900 to-black p-8 items-center justify-center">
-        <div className="max-w-lg w-full text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">
-            Dobrodošli v AvtoMarket
-          </h2>
-          <p className="text-gray-400">
-            Največja platforma za prodajo vozil v Sloveniji
-          </p>
-        </div>
-      </div>
     </div>
   )
 }
