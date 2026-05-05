@@ -959,6 +959,9 @@ export function CarDetailPage() {
                       <Check className="w-4 h-4 text-primary-600" />
                     )}
                   </div>
+                  {car.seller?.username && (
+                    <div className="text-sm text-gray-500">@{car.seller.username}</div>
+                  )}
                   <div className="flex items-center gap-1 text-sm">
                     <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
                     <span className="font-medium">{car.seller?.rating || '5.0'}</span>
