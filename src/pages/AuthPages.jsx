@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Eye, EyeOff, Check, X, User, Building2, ChevronDown } from 'lucide-react'
+import { Eye, EyeOff, Check, X, User, Building2, ChevronDown, Mail, Lock, Shield } from 'lucide-react'
 import { useAuth } from '@/lib/AuthContext'
 import { supabase } from '@/lib/supabase'
 
@@ -1156,4 +1156,428 @@ export function ForgotPasswordPage() {
       </motion.div>
     </div>
   )
+}
+
+// ============ RESET PASSWORD PAGE ============
+export function ResetPasswordPage() {
+  const location = useLocation()
+  const navigate = useNavigate()
+  const [step, setStep] = useState('request') // 'request' | 'verify' | 'reset' | 'success'
+  const [email, setEmail] = useState('')
+  const [resetCode, setResetCode] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState('')
+  
+  // Generate 6 digit code
+  const generateCode = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString()
+  }
+  
+  // Request password reset code
+  const handleRequestReset = async (e) => {
+    e.preventDefault()
+    if (!email) return
+    
+    setLoading(true)
+    setError('')
+    
+    try {
+      // Check if email exists
+      const { data: user, error: userError } = await supabase
+        .from('users')
+        .select('id, email')
+        .eq('email', email.toLowerCase())
+        .single()
+      
+      if (userError || !user) {
+        // Don't reveal if email exists for security
+        setStep('verify')
+        setMessage('Če e-naslov obstaja, smo poslali kodo za ponastavitev.')
+        setLoading(false)
+        return
+      }
+      
+      // Generate and store reset code
+      const code = generateCode()
+      const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString() // 15 minutes
+      
+      const { error: insertError } = await supabase
+        .from('password_resets')
+        .insert({
+          user_id: user.id,
+          email: email.toLowerCase(),
+          code: code,
+          expires_at: expiresAt,
+          used: false
+        })
+      
+      if (insertError) {
+        console.error('Insert reset code error:', insertError)
+      }
+      
+      // For demo: show code in console (in production, this would be sent via email)
+      console.log('🔐 Password reset code:', code)
+      console.log('📧 Email would be sent to:', email)
+      console.log('📧 Admin email: info@vozilo.si')
+      
+      setStep('verify')
+      setMessage('Koda za ponastavitev je bila poslana. Preverite svoj e-naslov ali kontaktirajte info@vozilo.si.')
+      
+    } catch (err) {
+      console.error('Request reset error:', err)
+      setError('Napaka. Poskusite znova.')
+    } finally {
+      setLoading(false)
+    }
+  }
+  
+  // Verify reset code
+  const handleVerifyCode = async (e) => {
+    e.preventDefault()
+    if (!resetCode || resetCode.length !== 6) {
+      setError('Vnesite 6-mestno kodo')
+      return
+    }
+    
+    setLoading(true)
+    setError('')
+    
+    try {
+      const { data: resetData, error: verifyError } = await supabase
+        .from('password_resets')
+        .select('*')
+        .eq('email', email.toLowerCase())
+        .eq('code', resetCode)
+        .eq('used', false)
+        .gte('expires_at', new Date().toISOString())
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single()
+      
+      if (verifyError || !resetData) {
+        setError('Napačna ali potekla koda')
+        setLoading(false)
+        return
+      }
+      
+      setStep('reset')
+      setMessage('Vnesite novo geslo.')
+      
+    } catch (err) {
+      console.error('Verify code error:', err)
+      setError('Napaka pri preverjanju kode')
+    } finally {
+      setLoading(false)
+    }
+  }
+  
+  // Reset password with code
+  const handleResetPassword = async (e) => {
+    e.preventDefault()
+    setError('')
+    
+    if (newPassword.length < 6) {
+      setError('Geslo mora imeti vsaj 6 znakov')
+      return
+    }
+    
+    if (!/[0-9]/.test(newPassword)) {
+      setError('Geslo mora vsebovati vsaj eno številko')
+      return
+    }
+    
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(newPassword)) {
+      setError('Geslo mora vsebovati vsaj en specialen znak')
+      return
+    }
+    
+    if (newPassword !== confirmPassword) {
+      setError('Gesli se ne ujemata')
+      return
+    }
+    
+    setLoading(true)
+    
+    try {
+      // Get user
+      const { data: user, error: userError } = await supabase
+        .from('users')
+        .select('id, email')
+        .eq('email', email.toLowerCase())
+        .single()
+      
+      if (userError || !user) {
+        setError('Uporabnik ne najden')
+        setLoading(false)
+        return
+      }
+      
+      // Hash password (you'll need bcryptjs)
+      const bcrypt = await import('bcryptjs')
+      const hashedPassword = await bcrypt.hash(newPassword, 10)
+      
+      // Update password
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({ password: hashedPassword })
+        .eq('id', user.id)
+      
+      if (updateError) {
+        console.error('Update password error:', updateError)
+        setError('Napaka pri posodabljanju gesla')
+        setLoading(false)
+        return
+      }
+      
+      // Mark reset code as used
+      await supabase
+        .from('password_resets')
+        .update({ used: true })
+        .eq('email', email.toLowerCase())
+        .eq('code', resetCode)
+      
+      setStep('success')
+      
+    } catch (err) {
+      console.error('Reset password error:', err)
+      setError('Napaka. Poskusite znova.')
+    } finally {
+      setLoading(false)
+    }
+  }
+  
+  // Success state
+  if (step === 'success') {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-8">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="w-full max-w-md text-center"
+        >
+          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Check className="w-10 h-10 text-green-600" />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Geslo ponastavljeno!</h1>
+          <p className="text-gray-600 mb-8">
+            Vase geslo je bilo uspesno spremenjeno.
+          </p>
+          <Link to="/login">
+            <button className="w-full py-3 bg-[#ff6a00] text-white font-semibold rounded-xl hover:bg-[#ff7f2a] transition-colors">
+              Nadaljuj na prijavo
+            </button>
+          </Link>
+        </motion.div>
+      </div>
+    )
+  }
+  
+  // Request reset form
+  if (step === 'request') {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full max-w-md"
+        >
+          <div className="text-center mb-8">
+            <Link to="/" className="inline-flex items-center gap-2.5">
+              <img src="/logo.png" alt="AvtoMarket" className="h-[60px] w-auto" />
+            </Link>
+          </div>
+          
+          <Card className="p-8">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Lock className="w-8 h-8 text-orange-600" />
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">Pozabljeno geslo?</h1>
+              <p className="text-gray-600 text-sm">Vnesite svoj e-naslov za ponastavitev gesla.</p>
+            </div>
+            
+            {error && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                {error}
+              </div>
+            )}
+            
+            <form onSubmit={handleRequestReset} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">E-naslov</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ff6a00]"
+                  placeholder="vas@email.com"
+                  required
+                />
+              </div>
+              
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3 bg-[#ff6a00] text-white font-semibold rounded-xl hover:bg-[#ff7f2a] transition-colors disabled:opacity-50"
+              >
+                {loading ? 'Pošiljanje...' : 'Poslji kodo'}
+              </button>
+            </form>
+            
+            <p className="text-center mt-6 text-gray-600 text-sm">
+              Se spomnite gesla?{' '}
+              <Link to="/login" className="text-[#ff6a00] font-semibold hover:underline">
+                Prijavite se
+              </Link>
+            </p>
+            
+            <div className="mt-6 p-4 bg-blue-50 rounded-lg text-sm text-blue-700">
+              <p className="font-medium mb-1">💡 Namig:</p>
+              <p>Koda bo poslana na vas e-naslov. Če je ne prejmete, kontaktirajte <a href="mailto:info@vozilo.si" className="underline">info@vozilo.si</a></p>
+            </div>
+          </Card>
+        </motion.div>
+      </div>
+    )
+  }
+  
+  // Verify code form
+  if (step === 'verify') {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full max-w-md"
+        >
+          <div className="text-center mb-8">
+            <Link to="/" className="inline-flex items-center gap-2.5">
+              <img src="/logo.png" alt="AvtoMarket" className="h-[60px] w-auto" />
+            </Link>
+          </div>
+          
+          <Card className="p-8">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Shield className="w-8 h-8 text-blue-600" />
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">Vnesite kodo</h1>
+              <p className="text-gray-600 text-sm">{message}</p>
+            </div>
+            
+            {error && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                {error}
+              </div>
+            )}
+            
+            <form onSubmit={handleVerifyCode} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">6-mestna koda</label>
+                <input
+                  type="text"
+                  value={resetCode}
+                  onChange={(e) => setResetCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  className="w-full px-4 py-3 text-center text-2xl tracking-widest border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ff6a00]"
+                  placeholder="000000"
+                  maxLength={6}
+                  required
+                />
+              </div>
+              
+              <button
+                type="submit"
+                disabled={loading || resetCode.length !== 6}
+                className="w-full py-3 bg-[#ff6a00] text-white font-semibold rounded-xl hover:bg-[#ff7f2a] transition-colors disabled:opacity-50"
+              >
+                {loading ? 'Preverjanje...' : 'Preveri kodo'}
+              </button>
+            </form>
+            
+            <div className="mt-6 p-4 bg-orange-50 rounded-lg text-sm text-orange-700">
+              <p>Niste prejeli kode? Preverite mapo Nezaželena pošta (SPAM) ali kontaktirajte <a href="mailto:info@vozilo.si" className="underline">info@vozilo.si</a></p>
+            </div>
+            
+            <p className="text-center mt-4 text-gray-600 text-sm">
+              <button onClick={() => setStep('request')} className="text-[#ff6a00] hover:underline">
+                Pošlji kodo znova
+              </button>
+            </p>
+          </Card>
+        </motion.div>
+      </div>
+    )
+  }
+  
+  // Reset password form
+  if (step === 'reset') {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full max-w-md"
+        >
+          <div className="text-center mb-8">
+            <Link to="/" className="inline-flex items-center gap-2.5">
+              <img src="/logo.png" alt="AvtoMarket" className="h-[60px] w-auto" />
+            </Link>
+          </div>
+          
+          <Card className="p-8">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Lock className="w-8 h-8 text-green-600" />
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">Novo geslo</h1>
+              <p className="text-gray-600 text-sm">{message}</p>
+            </div>
+            
+            {error && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                {error}
+              </div>
+            )}
+            
+            <form onSubmit={handleResetPassword} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Novo geslo</label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ff6a00]"
+                  placeholder="Min. 6 znakov, številka, specialen znak"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Potrdi geslo</label>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ff6a00]"
+                  placeholder="Ponovno vnesite geslo"
+                  required
+                />
+              </div>
+              
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3 bg-[#ff6a00] text-white font-semibold rounded-xl hover:bg-[#ff7f2a] transition-colors disabled:opacity-50"
+              >
+                {loading ? 'Shranjujem...' : 'Spremeni geslo'}
+              </button>
+            </form>
+          </Card>
+        </motion.div>
+      </div>
+    )
+  }
 }

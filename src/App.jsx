@@ -10,7 +10,7 @@ import { CarsPage } from '@/pages/CarsPage'
 import { CarDetailPage } from '@/pages/CarDetailPage'
 import { DashboardPage } from '@/pages/DashboardPage'
 import { SellPage } from '@/pages/SellPage'
-import { LoginPage, RegisterPage, ForgotPasswordPage } from '@/pages/AuthPages'
+import { LoginPage, RegisterPage, ForgotPasswordPage, ResetPasswordPage } from '@/pages/AuthPages'
 import { AddCarPage } from '@/pages/AddCarPage'
 import { PaymentPage } from '@/pages/PaymentPage'
 import { FavoritesPage } from '@/pages/FavoritesPage'
@@ -82,6 +82,7 @@ function App() {
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/register" element={<RegisterPage />} />
                   <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                  <Route path="/reset-password" element={<ResetPasswordPage />} />
                   <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
                   <Route path="/add-car" element={<ProtectedRoute><AddCarPage /></ProtectedRoute>} />
                   <Route path="/payment" element={<ProtectedRoute><PaymentPage /></ProtectedRoute>} />
